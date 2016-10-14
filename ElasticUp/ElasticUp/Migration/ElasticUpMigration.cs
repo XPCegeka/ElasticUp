@@ -26,8 +26,13 @@ namespace ElasticUp.Migration
 
             Operations.Add(operation);
         }
-        
-        internal ElasticUpMigration OnIndexAlias(string indexAlias)
+
+        public override string ToString()
+        {
+            return $"{MigrationNumber:D3}_{this.GetType().Name}";
+        }
+
+        public ElasticUpMigration OnIndexAlias(string indexAlias)
         {
             IndexAlias = indexAlias;
             return this;

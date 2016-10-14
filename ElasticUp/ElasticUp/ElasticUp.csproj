@@ -50,7 +50,9 @@
     <Compile Include="Operation\ElasticUpOperation.cs" />
     <Compile Include="Migration\Meta\VersionedIndexName.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Runner\ElasticUp.cs" />
     <Compile Include="Runner\ElasticUpRunner.cs" />
+    <Compile Include="Runner\MigrationHistoryService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

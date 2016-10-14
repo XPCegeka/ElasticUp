@@ -75,5 +75,12 @@ namespace ElasticUp.Tests.Migration
             operation1.Received().Execute();
             operation2.Received().Execute();
         }
+
+        [Test]
+        public void ToString_ReturnsMigrationNumberPlusClassName()
+        {
+            new TestMigration(5).ToString().Should().Be("005_TestMigration");
+            new TestMigration(14).ToString().Should().Be("014_TestMigration");
+        }
     }
 }
