@@ -16,7 +16,6 @@ namespace ElasticUp.Runner
         public ElasticUpRunner(IElasticClient elasticClient)
         {
             _elasticClient = elasticClient;
-           
         }
 
         public void Execute(List<ElasticUpMigration> migrations)
@@ -28,29 +27,9 @@ namespace ElasticUp.Runner
                 var indicesForAlias = _elasticClient.GetIndicesPointingToAlias(migration.IndexAlias);
 
                 //TODO make possible to run in parallel?
-                foreach (var indexForAlias in indicesForAlias)
+                foreach (var indexName in indicesForAlias)
                 {
-                    var fromIndex = VersionedIndexName.CreateFromIndexName(indexForAlias);
-                    var toIndex = fromIndex.GetIncrementedVersion();
-                    var migrationHistoryService = new MigrationHistoryService(_elasticClient, fromIndex, toIndex);
-                    
-                    if (migrationHistoryService.HasMigrationAlreadyBeenApplied(migration))
-                    {
-                        Console.WriteLine($"Already executed operation: {migration.ToString()} on old index {fromIndex}");
-                        return;
-                    }
-
-                    Console.WriteLine($"Copying ElasticUp MigrationHistory to new index: {toIndex.ToString()}");
-                    migrationHistoryService.CopyMigrationHistory();
-
-                    Console.WriteLine($"Starting ElasticUp migration: {migration.ToString()}");
-                    var stopwatch = Stopwatch.StartNew();
-                    migration.Execute(_elasticClient, fromIndex, toIndex);
-                    stopwatch.Stop();
-                    Console.WriteLine($"Finished ElasticUp migration: {migration.ToString()} in {stopwatch.Elapsed.ToHumanTimeString()}");
-
-                    Console.WriteLine($"Adding ElasticUp Migration: {migration.ToString()} to MigrationHistory of new index: {toIndex.ToString()}");
-                    migrationHistoryService.AddMigrationToHistory(migration);
+                    Migrate(indexName, migration);
                 }
                 
                 //TODO alias stuff per migration
@@ -61,6 +40,31 @@ namespace ElasticUp.Runner
 
             }
             Console.WriteLine("Finished ElasticUp migrations");
+        }
+
+        private void Migrate(string indexName, ElasticUpMigration migration)
+        {
+            var fromIndex = VersionedIndexName.CreateFromIndexName(indexName);
+            var toIndex = fromIndex.GetIncrementedVersion();
+            var migrationHistoryService = new MigrationHistoryService(_elasticClient, fromIndex, toIndex);
+
+            if (migrationHistoryService.HasMigrationAlreadyBeenApplied(migration))
+            {
+                Console.WriteLine($"Already executed operation: {migration.ToString()} on old index {fromIndex}. Not migrating to new index {toIndex.ToString()}");
+                return;
+            }
+
+            Console.WriteLine($"Copying ElasticUp MigrationHistory to new index: {toIndex.ToString()}");
+            migrationHistoryService.CopyMigrationHistory();
+
+            Console.WriteLine($"Starting ElasticUp migration: {migration.ToString()} to new index: {toIndex.ToString()}");
+            var stopwatch = Stopwatch.StartNew();
+            migration.Execute(_elasticClient, fromIndex, toIndex);
+            stopwatch.Stop();
+            Console.WriteLine($"Finished ElasticUp migration: {migration.ToString()} to new index: {toIndex.ToString()} in {stopwatch.Elapsed.ToHumanTimeString()}");
+
+            Console.WriteLine($"Adding ElasticUp Migration: {migration.ToString()} to MigrationHistory of new index: {toIndex.ToString()}");
+            migrationHistoryService.AddMigrationToHistory(migration);
         }
     }
 }
