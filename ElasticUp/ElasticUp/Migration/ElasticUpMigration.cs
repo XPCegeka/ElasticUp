@@ -6,12 +6,12 @@ namespace ElasticUp.Migration
 {
     public abstract class ElasticUpMigration
     {
-        private readonly int _migrationNumber;
+        public int MigrationNumber { get; }
         public string IndexAlias { get; protected set; }
 
         protected ElasticUpMigration(int migrationNumber)
         {
-            _migrationNumber = migrationNumber;
+            MigrationNumber = migrationNumber;
         }
 
         public ElasticUpMigration OnIndexAlias(string indexAlias)

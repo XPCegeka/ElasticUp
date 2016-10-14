@@ -13,7 +13,7 @@ namespace ElasticUp.Tests.Runner
         [Test]
         public void WhenAddingAMigration_MakeSureAllMigrationNumbersAreUnique()
         {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<ArgumentException>(() =>
                 ElasticUpRunner.CreateElasticUpRunner(new ElasticClient())
                     .Migration(new TestMigration(1))
                     .Migration(new TestMigration(1)));
@@ -22,7 +22,7 @@ namespace ElasticUp.Tests.Runner
         [Test]
         public void WhenAddingAMigration_MakeSureAllMigrationNumbersAreAscending()
         {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<ArgumentException>(() =>
                 ElasticUpRunner.CreateElasticUpRunner(new ElasticClient())
                     .Migration(new TestMigration(2))
                     .Migration(new TestMigration(1)));
