@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extension\TimeSpanExtensions.cs" />
+    <Compile Include="History\MigrationHistory.cs" />
     <Compile Include="Migration\ElasticUpMigration.cs" />
     <Compile Include="Migration\Meta\AliasHelper.cs" />
     <Compile Include="Operation\ElasticUpOperation.cs" />
@@ -54,7 +55,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runner\ElasticUp.cs" />
     <Compile Include="Runner\ElasticUpRunner.cs" />
-    <Compile Include="Runner\MigrationHistoryService.cs" />
+    <Compile Include="History\MigrationHistoryService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ElasticUp.nuspec" />

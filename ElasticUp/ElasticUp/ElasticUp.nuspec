@@ -1,14 +1,15 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>ElasticUp.ElasticUp.ElasticUp</id>
-    <version>1.1</version>
+    <id>ElasticUp</id>
+    <version>1</version>
     <title>ElasticUp</title>
-    <authors>Yassin</authors>
-    <owners>Ronald,Christophe,Yoram,Tom,Yassin</owners>
+    <authors>Ronald,Christophe,Yoram,Tom,Yassin</authors>
+    <owners>Cegeka</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Tool to run migrations in ElasticSearch</description>
     <releaseNotes>Initial release of the package.</releaseNotes>
+    <iconUrl>https://www.cegeka.com/favicon.ico</iconUrl>
     <copyright>Copyright 2016</copyright>
     <tags>ElasticSearch Migrations</tags>
     <dependencies>
