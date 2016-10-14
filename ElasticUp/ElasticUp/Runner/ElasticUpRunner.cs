@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using ElasticUp.Extension;
+using ElasticUp.History;
 using ElasticUp.Migration;
+using ElasticUp.Migration.Meta;
 using Nest;
 
 namespace ElasticUp.Runner
@@ -10,46 +12,59 @@ namespace ElasticUp.Runner
     public class ElasticUpRunner
     {
         private readonly IElasticClient _elasticClient;
-        private MigrationHistoryService _migrationHistoryService;
 
         public ElasticUpRunner(IElasticClient elasticClient)
         {
             _elasticClient = elasticClient;
-            _migrationHistoryService = new MigrationHistoryService(_elasticClient);
         }
 
         public void Execute(List<ElasticUpMigration> migrations)
         {
             Console.WriteLine("Starting ElasticUp migrations");
-
-            //TODO copy MigrationHistory to new index ?
-
+            
             foreach (var migration in migrations)
             {
-                if (_migrationHistoryService.HasMigrationAlreadyBeenApplied(migration))
+                var indicesForAlias = _elasticClient.GetIndicesPointingToAlias(migration.IndexAlias);
+
+                //TODO make possible to run in parallel?
+                foreach (var indexName in indicesForAlias)
                 {
-                    Console.WriteLine($"Already executed operation: {migration.ToString()}");
-                    return;
+                    Migrate(indexName, migration);
                 }
-
-                Console.WriteLine($"Starting ElasticUp operation: {migration.ToString()}");
-                var stopwatch = Stopwatch.StartNew();
-                migration.Execute(_elasticClient);
-                stopwatch.Stop();
-                Console.WriteLine($"Finished ElasticUp migration: {migration.ToString()} in {stopwatch.Elapsed.ToHumanTimeString()}");
                 
-
-                // TODO alias stuff per migration
+                //TODO alias stuff per migration
                 //TODO add this migration to MigrationHistory in new index ?
                 // alias stuff per migration
                 // remove alias on old indices
                 // add alias to new indices
 
             }
-
-
             Console.WriteLine("Finished ElasticUp migrations");
-            throw new NotImplementedException();
+        }
+
+        private void Migrate(string indexName, ElasticUpMigration migration)
+        {
+            var fromIndex = VersionedIndexName.CreateFromIndexName(indexName);
+            var toIndex = fromIndex.GetIncrementedVersion();
+            var migrationHistoryService = new MigrationHistoryService(_elasticClient, fromIndex, toIndex);
+
+            if (migrationHistoryService.HasMigrationAlreadyBeenApplied(migration))
+            {
+                Console.WriteLine($"Already executed operation: {migration} on old index {fromIndex}. Not migrating to new index {toIndex}");
+                return;
+            }
+
+            Console.WriteLine($"Copying ElasticUp MigrationHistory to new index: {toIndex}");
+            migrationHistoryService.CopyMigrationHistory();
+
+            Console.WriteLine($"Starting ElasticUp migration: {migration} to new index: {toIndex}");
+            var stopwatch = Stopwatch.StartNew();
+            migration.Execute(_elasticClient, fromIndex, toIndex);
+            stopwatch.Stop();
+            Console.WriteLine($"Finished ElasticUp migration: {migration} to new index: {toIndex} in {stopwatch.Elapsed.ToHumanTimeString()}");
+
+            Console.WriteLine($"Adding ElasticUp Migration: {migration} to MigrationHistory of new index: {toIndex}");
+            migrationHistoryService.AddMigrationToHistory(migration);
         }
     }
 }

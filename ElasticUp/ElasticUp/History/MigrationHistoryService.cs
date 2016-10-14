@@ -1,15 +1,30 @@
 ﻿using ElasticUp.Migration;
+using ElasticUp.Migration.Meta;
 using Nest;
 
-namespace ElasticUp.Runner
+namespace ElasticUp.History
 {
     public class MigrationHistoryService
     {
         private readonly IElasticClient _elasticClient;
+        private readonly VersionedIndexName _fromIndexName;
+        private readonly VersionedIndexName _toIndex;
 
-        public MigrationHistoryService(IElasticClient elasticClient)
+        public MigrationHistoryService(IElasticClient elasticClient, VersionedIndexName fromIndexName, VersionedIndexName toIndex)
         {
             _elasticClient = elasticClient;
+            _fromIndexName = fromIndexName;
+            _toIndex = toIndex;
+        }
+
+        public void CopyMigrationHistory()
+        {
+            //TODO
+        }
+
+        public void AddMigrationToHistory(ElasticUpMigration migration)
+        {
+            //TODO
         }
 
         public bool HasMigrationAlreadyBeenApplied(ElasticUpMigration migration)

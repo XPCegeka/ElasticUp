@@ -53,25 +53,29 @@ namespace ElasticUp.Tests.Migration
             Assert.Throws<ArgumentException>(() => _elasticUpMigration.Operation(operation2), "Duplicate operation number.");
         }
 
-        //[Test]
-        //public void Execute_ExecutesEachOperation()
-        //{
-        //    // GIVEN
-        //    var operation1 = Substitute.For<ElasticUpOperation>(0);
-        //    var operation2 = Substitute.For<ElasticUpOperation>(1);
-
-        //    _elasticUpMigration.Operation(operation1);
-        //    _elasticUpMigration.Operation(operation2);
-
-        //    // WHEN
-        //    _elasticUpMigration.Execute(ElasticClient);
-
-        //    // THEN
-        //    operation1.Received().Execute(Arg.Any<string>(), Arg.Any<string>());
-        //    operation2.Received().Execute(Arg.Any<string>(), Arg.Any<string>());
-        //}
-
+        [Ignore("No alias available for type 'test'")]
         [Test]
+        public void Execute_ExecutesEachOperation()
+        {
+            // GIVEN
+            var operation1 = Substitute.For<ElasticUpOperation>(0);
+            var operation2 = Substitute.For<ElasticUpOperation>(1);
+
+            _elasticUpMigration.Operation(operation1);
+            _elasticUpMigration.Operation(operation2);
+
+            var index0 = new VersionedIndexName("test", 0);
+            var index1 = index0.GetIncrementedVersion();
+
+            // WHEN
+            _elasticUpMigration.Execute(ElasticClient, index0, index1);
+
+            // THEN
+            operation1.Received().Execute(Arg.Any<string>(), Arg.Any<string>());
+            operation2.Received().Execute(Arg.Any<string>(), Arg.Any<string>());
+        }
+
+    [Test]
         public void ToString_ReturnsMigrationNumberPlusClassName()
         {
             new TestMigration(5).ToString().Should().Be("005_TestMigration");

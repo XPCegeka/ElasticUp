@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace ElasticUp.Migration.Meta
 {
-    internal class VersionedIndexName
+    public class VersionedIndexName
     {
         public string Name { get; protected set; }
         public int Version { get; protected set; }
