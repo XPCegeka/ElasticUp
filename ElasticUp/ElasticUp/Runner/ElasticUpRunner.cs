@@ -37,11 +37,13 @@ namespace ElasticUp.Runner
                 migration.Execute(_elasticClient);
                 stopwatch.Stop();
                 Console.WriteLine($"Finished ElasticUp migration: {migration.ToString()} in {stopwatch.Elapsed.ToHumanTimeString()}");
-
+                
 
                 // TODO alias stuff per migration
                 //TODO add this migration to MigrationHistory in new index ?
-
+                // alias stuff per migration
+                // remove alias on old indices
+                // add alias to new indices
 
             }
 
