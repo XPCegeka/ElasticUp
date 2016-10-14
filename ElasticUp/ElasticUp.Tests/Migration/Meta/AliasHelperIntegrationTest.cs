@@ -95,11 +95,5 @@ namespace ElasticUp.Tests.Migration.Meta
             var aliasHelper = new AliasHelper(ElasticClient);
             Assert.Throws<Exception>(() => aliasHelper.RemoveAliasOnIndices("unknown alias", indexName));
         }
-
-
-        private class SampleObject
-        {
-            public int Number { get; set; }
-        }
     }
 }
