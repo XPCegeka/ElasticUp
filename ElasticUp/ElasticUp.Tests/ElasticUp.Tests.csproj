@@ -70,7 +70,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Runner\ElasticUpRunnerTest.cs" />
+    <Compile Include="Runner\ElasticUpTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
