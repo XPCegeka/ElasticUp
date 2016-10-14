@@ -32,16 +32,16 @@ namespace ElasticUp.Tests.Migration.Meta
             var sampleObjects = Enumerable
                 .Range(1, 100)
                 .Select(n => new SampleObject {Number = n});
-            _elasticClient.IndexMany(sampleObjects, index: "SampleIndex");
+            _elasticClient.IndexMany(sampleObjects, index: "sampleindex");
 
             // TEST
             var aliasHelper = new AliasHelper(_elasticClient);
-            aliasHelper.AddAliasOnIndices("SampleAlias", "SampleIndex");
+            aliasHelper.AddAliasOnIndices("samplealias", "sampleindex");
 
             // VERIFY
-            var indicesPointingToAlias = _elasticClient.GetIndicesPointingToAlias("SampleAlias");
+            var indicesPointingToAlias = _elasticClient.GetIndicesPointingToAlias("samplealias");
             indicesPointingToAlias.Should().HaveCount(1);
-            indicesPointingToAlias[0].Should().Be("SampleIndex");
+            indicesPointingToAlias[0].Should().Be("sampleindex");
         }
 
         class SampleObject
