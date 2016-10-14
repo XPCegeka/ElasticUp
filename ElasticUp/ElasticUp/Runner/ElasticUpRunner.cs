@@ -50,20 +50,20 @@ namespace ElasticUp.Runner
 
             if (migrationHistoryService.HasMigrationAlreadyBeenApplied(migration))
             {
-                Console.WriteLine($"Already executed operation: {migration.ToString()} on old index {fromIndex}. Not migrating to new index {toIndex.ToString()}");
+                Console.WriteLine($"Already executed operation: {migration} on old index {fromIndex}. Not migrating to new index {toIndex}");
                 return;
             }
 
-            Console.WriteLine($"Copying ElasticUp MigrationHistory to new index: {toIndex.ToString()}");
+            Console.WriteLine($"Copying ElasticUp MigrationHistory to new index: {toIndex}");
             migrationHistoryService.CopyMigrationHistory();
 
-            Console.WriteLine($"Starting ElasticUp migration: {migration.ToString()} to new index: {toIndex.ToString()}");
+            Console.WriteLine($"Starting ElasticUp migration: {migration} to new index: {toIndex}");
             var stopwatch = Stopwatch.StartNew();
             migration.Execute(_elasticClient, fromIndex, toIndex);
             stopwatch.Stop();
-            Console.WriteLine($"Finished ElasticUp migration: {migration.ToString()} to new index: {toIndex.ToString()} in {stopwatch.Elapsed.ToHumanTimeString()}");
+            Console.WriteLine($"Finished ElasticUp migration: {migration} to new index: {toIndex} in {stopwatch.Elapsed.ToHumanTimeString()}");
 
-            Console.WriteLine($"Adding ElasticUp Migration: {migration.ToString()} to MigrationHistory of new index: {toIndex.ToString()}");
+            Console.WriteLine($"Adding ElasticUp Migration: {migration} to MigrationHistory of new index: {toIndex}");
             migrationHistoryService.AddMigrationToHistory(migration);
         }
     }
