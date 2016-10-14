@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using ElasticUp.Migration;
 using Nest;
 
@@ -34,6 +30,15 @@ namespace ElasticUp.Runner
         {
             //TODO 
         }
+
+        /*private void AssertMigrationsValid(List<IElasticSearchOperation> allOperationsGroupedByMigration)
+        {
+            if (allOperationsGroupedByMigration.Any(operation => operation.OperationId == null))
+                throw new ArgumentException($"OperationId is required for an {nameof(ElasticSearchOperation)}");
+
+            if (allOperationsGroupedByMigration.Select(operation => operation.OperationId.ToString()).Distinct().Count() != allOperationsGroupedByMigration.Count)
+                throw new ArgumentException($"OperationId should be a unique identifier for an {nameof(ElasticSearchOperation)}");
+        }*/
 
     }
 }
