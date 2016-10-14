@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using ElasticUp.Operation;
+using ElasticUp.Migration.Meta;
+using Nest;
 
 namespace ElasticUp.Migration
 {
@@ -9,6 +11,7 @@ namespace ElasticUp.Migration
     {
         internal int MigrationNumber { get; }
         internal List<ElasticUpOperation> Operations { get; }
+        public string IndexAlias { get; protected set; }
 
         internal ElasticUpMigration(int migrationNumber)
         {
@@ -23,10 +26,24 @@ namespace ElasticUp.Migration
 
             Operations.Add(operation);
         }
-
-        internal void Execute()
+        
+        internal ElasticUpMigration OnIndexAlias(string indexAlias)
         {
-            Operations.ForEach(o => o.Execute());
+            IndexAlias = indexAlias;
+            return this;
+        }
+
+        public void Execute(IElasticClient elasticClient)
+        {
+            var indicesForAlias = elasticClient.GetIndicesPointingToAlias(IndexAlias);
+
+            foreach (var indexForAlias in indicesForAlias)
+            {
+                var indexName = VersionedIndexName.CreateFromIndexName(indexForAlias);
+                var nextIndexName = indexName.GetIncrementedVersion();
+
+                Operations.ForEach(o => o.Execute());
+            }
         }
 
         private bool HasDuplicateOperationNumber(ElasticUpOperation operation)
