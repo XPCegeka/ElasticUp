@@ -73,7 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Resources\elasticsearch-2.4.1.zip" />
+    <None Include="Resources\elasticsearch-2.4.1-with-head-and-delete_by_query.zip" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ElasticUp.Tests.Infrastructure\ElasticUp.Tests.Infrastructure.csproj">

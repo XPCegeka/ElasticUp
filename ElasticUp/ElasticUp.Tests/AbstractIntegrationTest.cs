@@ -6,7 +6,7 @@ namespace ElasticUp.Tests
     {
         protected ElasticSearchContainer SetupElasticSearchService()
         {
-            var esService = ElasticSearchContainer.StartNewFromArchive(Resources.elasticsearch_2_4_1);
+            var esService = ElasticSearchContainer.StartNewFromArchive(Resources.elasticsearch_2_4_1_with_head_and_delete_by_query);
             esService.WaitUntilElasticOperational();
 
             return esService;
