@@ -10,7 +10,7 @@ namespace ElasticUp.Runner
     {
         private readonly IElasticClient _elasticClient;
 
-        public readonly IList<ElasticUpMigration> Migrations = new List<ElasticUpMigration>();
+        public readonly List<ElasticUpMigration> Migrations = new List<ElasticUpMigration>();
         
         private ElasticUp(IElasticClient elasticClient)
         {
