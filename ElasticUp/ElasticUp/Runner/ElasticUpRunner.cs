@@ -43,7 +43,7 @@ namespace ElasticUp.Runner
                         return;
                     }
 
-                    migration.Execute(_elasticClient); // indexForAlias, nextIndexName
+                    migration.Execute(_elasticClient, fromIndex, toIndex); // indexForAlias, nextIndexName
                 }
 
 
