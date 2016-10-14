@@ -1,7 +1,7 @@
 ﻿using System;
 using ElasticUp.Migration;
+using ElasticUp.Migration.Meta;
 using ElasticUp.Operation;
-using ElasticUp.Tests.Infrastructure;
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
@@ -9,28 +9,21 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.Migration
 {
     [TestFixture]
-    public class ElasticUpMigrationTest : AbstractIntegrationTest
+    public class ElasticUpMigrationIntegrationTest : AbstractIntegrationTest
     {
         private ElasticUpMigration _elasticUpMigration;
-        private ElasticSearchContainer _elasticContainer;
 
-        [OneTimeSetUp]
-        public void OneTimeSetup()
+        public ElasticUpMigrationIntegrationTest()
+            : base(ElasticServiceStartup.OneTimeStartup)
         {
-            _elasticContainer = SetupElasticSearchService();
+            
         }
-
+        
         [SetUp]
         public void Setup()
         {
             _elasticUpMigration = new TestMigration(0);
             _elasticUpMigration.OnIndexAlias("test");
-        }
-
-        [OneTimeTearDown]
-        public void Teardown()
-        {
-            _elasticContainer.Dispose();
         }
 
         [Test]
@@ -68,8 +61,11 @@ namespace ElasticUp.Tests.Migration
             _elasticUpMigration.Operation(operation1);
             _elasticUpMigration.Operation(operation2);
 
+            var index0 = new VersionedIndexName("test", 0);
+            var index1 = index0.GetIncrementedVersion();
+
             // WHEN
-            _elasticUpMigration.Execute(ElasticClient);
+            _elasticUpMigration.Execute(ElasticClient, index0, index1);
 
             // THEN
             operation1.Received().Execute();

@@ -49,7 +49,11 @@ namespace ElasticUp.Runner
 
                 Console.WriteLine($"Starting ElasticUp operation: {migration.ToString()}");
                 var stopwatch = Stopwatch.StartNew();
-                migration.Execute(_elasticClient);
+
+                var index0 = new VersionedIndexName("test", 0);
+                var index1 = index0.GetIncrementedVersion();
+
+                migration.Execute(_elasticClient, index0, index1);
                 stopwatch.Stop();
                 Console.WriteLine($"Finished ElasticUp migration: {migration.ToString()} in {stopwatch.Elapsed.ToHumanTimeString()}");
                 

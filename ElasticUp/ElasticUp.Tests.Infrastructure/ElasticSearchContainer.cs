@@ -41,7 +41,23 @@ namespace ElasticUp.Tests.Infrastructure
         public void Dispose()
         {
             KillProcessAndChildren(_esProcess.Id);
-            Directory.Delete(_tempDirectory, true);
+            CleanupTempDirectory();
+        }
+
+        private void CleanupTempDirectory()
+        {
+            SpinWait.SpinUntil(() =>
+            {
+                try
+                {
+                    Directory.Delete(_tempDirectory, true);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }, TimeSpan.FromSeconds(30));
         }
 
         private Process StartElasticSearch()
