@@ -77,13 +77,15 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AbstractIntegrationTest.cs" />
+    <Compile Include="Documents\TestDocument.cs" />
     <Compile Include="ElasticServiceStartup.cs" />
     <Compile Include="Migration\Meta\AliasHelperIntegrationTest.cs" />
+    <Compile Include="Operation\TestOperation.cs" />
     <Compile Include="SampleObject.cs" />
     <Compile Include="Migration\Meta\VersionedIndexNameTest.cs" />
     <Compile Include="Migration\TestMigration.cs" />
     <Compile Include="Migration\ElasticUpMigrationIntegrationTest.cs" />
-    <Compile Include="Operation\TestOperation.cs" />
+    <Compile Include="Operation\CopyTypeOperationIntegrationTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>

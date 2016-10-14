@@ -4,7 +4,6 @@ using ElasticUp.Migration.Meta;
 using ElasticUp.Operation;
 using ElasticUp.Tests.Operation;
 using FluentAssertions;
-using Nest;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -16,7 +15,7 @@ namespace ElasticUp.Tests.Migration
         private ElasticUpMigration _elasticUpMigration;
 
         public ElasticUpMigrationIntegrationTest()
-            : base(ElasticServiceStartup.OneTimeStartup)
+            : base(ElasticServiceStartup.StartupForEach)
         {
             
         }
@@ -71,8 +70,8 @@ namespace ElasticUp.Tests.Migration
             _elasticUpMigration.Execute(ElasticClient, index0, index1);
 
             // THEN
-            operation1.Received().Execute(Arg.Any<string>(), Arg.Any<string>());
-            operation2.Received().Execute(Arg.Any<string>(), Arg.Any<string>());
+            operation1.Received().Execute(ElasticClient, index0.Name, index1.Name);
+            operation2.Received().Execute(ElasticClient, index0.Name, index1.Name);
         }
 
     [Test]

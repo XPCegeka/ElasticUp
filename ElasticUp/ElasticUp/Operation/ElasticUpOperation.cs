@@ -1,4 +1,5 @@
 ﻿using ElasticUp.Migration.Meta;
+using Nest;
 
 namespace ElasticUp.Operation
 {
@@ -11,6 +12,6 @@ namespace ElasticUp.Operation
             OperationNumber = operationNumber;
         }
 
-        public abstract void Execute(string fromIndex, string toIndex);
+        public abstract void Execute(IElasticClient elasticClient, string fromIndex, string toIndex);
     }
 }

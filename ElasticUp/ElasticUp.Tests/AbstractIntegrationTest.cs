@@ -11,8 +11,7 @@ namespace ElasticUp.Tests
         private ElasticSearchContainer _esService;
         protected readonly IElasticClient ElasticClient = new ElasticClient(new Uri("http://localhost:9200/"));
 
-        protected AbstractIntegrationTest(
-            ElasticServiceStartup elasticServiceStartup = ElasticServiceStartup.NoStartup)
+        protected AbstractIntegrationTest(ElasticServiceStartup elasticServiceStartup = ElasticServiceStartup.NoStartup)
         {
             _elasticServiceStartup = elasticServiceStartup;
         }
