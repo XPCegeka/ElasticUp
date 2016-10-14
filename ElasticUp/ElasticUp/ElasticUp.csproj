@@ -46,6 +46,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extension\TimeSpanExtensions.cs" />
     <Compile Include="Migration\ElasticUpMigration.cs" />
     <Compile Include="Operation\ElasticUpOperation.cs" />
     <Compile Include="Migration\Meta\VersionedIndexName.cs" />
