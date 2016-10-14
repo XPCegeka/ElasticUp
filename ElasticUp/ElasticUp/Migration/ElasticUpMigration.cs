@@ -47,7 +47,7 @@ namespace ElasticUp.Migration
                 var indexName = VersionedIndexName.CreateFromIndexName(indexForAlias);
                 var nextIndexName = indexName.GetIncrementedVersion();
 
-                Operations.ForEach(o => o.From(fromIndex).To(toIndex).Execute());
+                Operations.ForEach(o => o.Execute(indexName.ToString(), nextIndexName.ToString()));
             }
         }
 

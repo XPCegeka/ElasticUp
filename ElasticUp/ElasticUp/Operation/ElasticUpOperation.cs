@@ -2,33 +2,15 @@
 
 namespace ElasticUp.Operation
 {
-    public class ElasticUpOperation
+    public abstract class ElasticUpOperation
     {
         public int OperationNumber { get; private set; }
-        internal VersionedIndexName FromIndex { get; set; }
-        internal VersionedIndexName ToIndex { get; set; }
 
-        public ElasticUpOperation(int operationNumber)
+        protected ElasticUpOperation(int operationNumber)
         {
             OperationNumber = operationNumber;
         }
 
-        public void Execute()
-        {
-        }
-
-        internal ElasticUpOperation From(VersionedIndexName indexName)
-        {
-            FromIndex = indexName;
-
-            return this;
-        }
-
-        internal ElasticUpOperation To(VersionedIndexName indexName)
-        {
-            ToIndex = indexName;
-
-            return this;
-        }
+        public abstract void Execute(string fromIndex, string toIndex);
     }
 }
