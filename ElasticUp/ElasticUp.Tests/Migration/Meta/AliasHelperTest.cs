@@ -32,7 +32,7 @@ namespace ElasticUp.Tests.Migration.Meta
             var sampleObjects = Enumerable
                 .Range(1, 100)
                 .Select(n => new SampleObject {Number = n});
-            _elasticClient.IndexMany(sampleObjects, index: "SampleIndex");
+            _elasticClient.IndexMany(sampleObjects, "SampleIndex");
 
             // TEST
             var aliasHelper = new AliasHelper(_elasticClient);

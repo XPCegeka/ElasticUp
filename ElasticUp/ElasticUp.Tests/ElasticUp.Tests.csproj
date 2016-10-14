@@ -81,7 +81,8 @@
     <Compile Include="Migration\Meta\AliasHelperTest.cs" />
     <Compile Include="Migration\Meta\VersionedIndexNameTest.cs" />
     <Compile Include="Migration\TestMigration.cs" />
-    <Compile Include="Migration\ElasticUpMigrationTest.cs" />
+    <Compile Include="Operation\ElasticUpOperationTest.cs" />
+    <Compile Include="Operation\TestOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
