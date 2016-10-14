@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ElasticUp.Migration;
+﻿using ElasticUp.Migration;
 using Nest;
 
 namespace ElasticUp.Runner
@@ -17,7 +12,7 @@ namespace ElasticUp.Runner
             _elasticClient = elasticClient;
         }
 
-        public bool HasOperationBeenApplied(ElasticUpMigration migration)
+        public bool HasMigrationAlreadyBeenApplied(ElasticUpMigration migration)
         {
             /*var appliedMigrationInPreviousIndex = _elasticClient.Get<ExecutedOperation>(migration.OperationId.ToString()).Source;
             var appliedMigrationInNewIndex = _elasticClient.Get<ExecutedOperation>(migration.OperationId.ToString(), idx => idx.Index(migration.GetTargetIndexName(_elasticClient))).Source;
