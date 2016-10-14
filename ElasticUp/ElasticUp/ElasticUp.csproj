@@ -54,6 +54,7 @@
     <Compile Include="Runner\MigrationHistoryService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ElasticUp.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

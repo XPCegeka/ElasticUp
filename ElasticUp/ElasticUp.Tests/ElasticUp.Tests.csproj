@@ -93,7 +93,7 @@
       <Name>ElasticUp.Tests.Infrastructure</Name>
     </ProjectReference>
     <ProjectReference Include="..\ElasticUp\ElasticUp.csproj">
-      <Project>{f788326d-d913-4b75-b8a8-9be1dbd374fc}</Project>
+      <Project>{6e73de69-a017-4e39-9263-30128edaec80}</Project>
       <Name>ElasticUp</Name>
     </ProjectReference>
   </ItemGroup>
