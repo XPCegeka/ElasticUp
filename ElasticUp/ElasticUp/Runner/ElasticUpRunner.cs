@@ -33,7 +33,7 @@ namespace ElasticUp.Runner
                     
                     var fromIndex = VersionedIndexName.CreateFromIndexName(indexForAlias);
                     var toIndex = fromIndex.GetIncrementedVersion();
-                    var migrationHistoryService = new MigrationHistoryService(_elasticClient, toIndex);
+                    var migrationHistoryService = new MigrationHistoryService(_elasticClient, fromIndex, toIndex);
 
                     //TODO copy MigrationHistory to new index ?
 
