@@ -19,17 +19,30 @@ namespace ElasticUp.Runner
             _migrationHistoryService = new MigrationHistoryService(_elasticClient);
         }
 
-        public void Execute(IList<ElasticUpMigration> migrations)
+        public void Execute(List<ElasticUpMigration> migrations)
         {
             Console.WriteLine("Starting ElasticUp migrations");
 
-            //For each migration
-            //For each operation
-            // check if operation already ran
-            //  if yes skip
-            //  if no execute
+            foreach (var migration in migrations)
+            {
+                if (_migrationHistoryService.HasOperationBeenApplied(migration))
+                {
+                    Console.WriteLine($"Already executed migration {migration.ToString()}");
+                    return;
+                }
 
-            // alias stuff per migration
+                //For each migration
+                //For each operation
+                // check if operation already ran
+                //  if yes skip
+                //  if no execute
+
+                // alias stuff per migration
+
+
+            }
+
+
 
             throw new NotImplementedException();
         }

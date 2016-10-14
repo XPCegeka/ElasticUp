@@ -14,6 +14,11 @@ namespace ElasticUp.Migration
             MigrationNumber = migrationNumber;
         }
 
+        public override string ToString()
+        {
+            return $"{MigrationNumber}_{this.GetType().Name}";
+        }
+
         public ElasticUpMigration OnIndexAlias(string indexAlias)
         {
             IndexAlias = indexAlias;
