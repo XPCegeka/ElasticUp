@@ -1,4 +1,5 @@
 ﻿using ElasticUp.Migration;
+using ElasticUp.Migration.Meta;
 using Nest;
 
 namespace ElasticUp.History
@@ -6,10 +7,12 @@ namespace ElasticUp.History
     public class MigrationHistoryService
     {
         private readonly IElasticClient _elasticClient;
+        private readonly VersionedIndexName _toIndex;
 
-        public MigrationHistoryService(IElasticClient elasticClient)
+        public MigrationHistoryService(IElasticClient elasticClient, VersionedIndexName toIndex)
         {
             _elasticClient = elasticClient;
+            _toIndex = toIndex;
         }
 
         public bool HasMigrationAlreadyBeenApplied(ElasticUpMigration migration)

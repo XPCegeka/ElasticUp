@@ -4,6 +4,7 @@ using System.Diagnostics;
 using ElasticUp.Extension;
 using ElasticUp.History;
 using ElasticUp.Migration;
+using ElasticUp.Migration.Meta;
 using Nest;
 
 namespace ElasticUp.Runner
@@ -11,27 +12,40 @@ namespace ElasticUp.Runner
     public class ElasticUpRunner
     {
         private readonly IElasticClient _elasticClient;
-        private MigrationHistoryService _migrationHistoryService;
 
         public ElasticUpRunner(IElasticClient elasticClient)
         {
             _elasticClient = elasticClient;
-            _migrationHistoryService = new MigrationHistoryService(_elasticClient);
+           
         }
 
         public void Execute(List<ElasticUpMigration> migrations)
         {
             Console.WriteLine("Starting ElasticUp migrations");
-
-            //TODO copy MigrationHistory to new index ?
-
+            
             foreach (var migration in migrations)
             {
-                if (_migrationHistoryService.HasMigrationAlreadyBeenApplied(migration))
+                var indicesForAlias = _elasticClient.GetIndicesPointingToAlias(migration.IndexAlias);
+
+                //TODO make possible to run in parallel?
+                foreach (var indexForAlias in indicesForAlias)
                 {
-                    Console.WriteLine($"Already executed operation: {migration.ToString()}");
-                    return;
+                    
+                    var fromIndex = VersionedIndexName.CreateFromIndexName(indexForAlias);
+                    var toIndex = fromIndex.GetIncrementedVersion();
+                    var migrationHistoryService = new MigrationHistoryService(_elasticClient, toIndex);
+
+                    //TODO copy MigrationHistory to new index ?
+
+                    if (migrationHistoryService.HasMigrationAlreadyBeenApplied(migration))
+                    {
+                        Console.WriteLine($"Already executed operation: {migration.ToString()} on index {fromIndex}");
+                        return;
+                    }
+
+                    migration.Execute(_elasticClient); // indexForAlias, nextIndexName
                 }
+
 
                 Console.WriteLine($"Starting ElasticUp operation: {migration.ToString()}");
                 var stopwatch = Stopwatch.StartNew();
