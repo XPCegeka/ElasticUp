@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using ElasticUp.Migration.Meta;
-using ElasticUp.Tests.Infrastructure;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
@@ -11,8 +10,6 @@ namespace ElasticUp.Tests.Migration.Meta
     [TestFixture]
     public class AliasHelperIntegrationTest : AbstractIntegrationTest
     {
-        private readonly IElasticClient _elasticClient = new ElasticClient(new Uri("http://localhost:9200"));
-
         public AliasHelperIntegrationTest()
             : base(ElasticServiceStartup.StartupForEach)
         {
@@ -28,15 +25,15 @@ namespace ElasticUp.Tests.Migration.Meta
             var sampleObjects = Enumerable
                 .Range(1, 100)
                 .Select(n => new SampleObject { Number = n });
-            _elasticClient.IndexMany(sampleObjects, index: indexName);
-            _elasticClient.Refresh(Indices.All);
+            ElasticClient.IndexMany(sampleObjects, index: indexName);
+            ElasticClient.Refresh(Indices.All);
 
             // TEST
-            var aliasHelper = new AliasHelper(_elasticClient);
+            var aliasHelper = new AliasHelper(ElasticClient);
             aliasHelper.AddAliasOnIndices(aliasName, indexName);
 
             // VERIFY
-            var indicesPointingToAlias = _elasticClient.GetIndicesPointingToAlias(aliasName);
+            var indicesPointingToAlias = ElasticClient.GetIndicesPointingToAlias(aliasName);
             indicesPointingToAlias.Should().HaveCount(1);
             indicesPointingToAlias[0].Should().Be(indexName);
         }
@@ -51,11 +48,11 @@ namespace ElasticUp.Tests.Migration.Meta
             var sampleObjects = Enumerable
                 .Range(1, 100)
                 .Select(n => new SampleObject { Number = n });
-            _elasticClient.IndexMany(sampleObjects, index: indexName);
-            _elasticClient.Refresh(Indices.All);
+            ElasticClient.IndexMany(sampleObjects, index: indexName);
+            ElasticClient.Refresh(Indices.All);
 
             // TEST
-            var aliasHelper = new AliasHelper(_elasticClient);
+            var aliasHelper = new AliasHelper(ElasticClient);
             Assert.Throws<Exception>(() => aliasHelper.AddAliasOnIndices(aliasName, "unknown index"));
         }
 
@@ -69,16 +66,16 @@ namespace ElasticUp.Tests.Migration.Meta
             var sampleObjects = Enumerable
                 .Range(1, 100)
                 .Select(n => new SampleObject { Number = n });
-            _elasticClient.IndexMany(sampleObjects, index: indexName);
-            _elasticClient.PutAlias(indexName, aliasName);
-            _elasticClient.Refresh(Indices.All);
+            ElasticClient.IndexMany(sampleObjects, index: indexName);
+            ElasticClient.PutAlias(indexName, aliasName);
+            ElasticClient.Refresh(Indices.All);
 
             // TEST
-            var aliasHelper = new AliasHelper(_elasticClient);
+            var aliasHelper = new AliasHelper(ElasticClient);
             aliasHelper.RemoveAliasOnIndices(aliasName, indexName);
 
             // VERIFY
-            var aliasesPointingToIndex = _elasticClient.GetAliasesPointingToIndex(indexName);
+            var aliasesPointingToIndex = ElasticClient.GetAliasesPointingToIndex(indexName);
             aliasesPointingToIndex.Should().HaveCount(0);
         }
 
@@ -91,11 +88,11 @@ namespace ElasticUp.Tests.Migration.Meta
             var sampleObjects = Enumerable
                 .Range(1, 100)
                 .Select(n => new SampleObject { Number = n });
-            _elasticClient.IndexMany(sampleObjects, index: indexName);
-            _elasticClient.Refresh(Indices.All);
+            ElasticClient.IndexMany(sampleObjects, index: indexName);
+            ElasticClient.Refresh(Indices.All);
 
             // TEST
-            var aliasHelper = new AliasHelper(_elasticClient);
+            var aliasHelper = new AliasHelper(ElasticClient);
             Assert.Throws<Exception>(() => aliasHelper.RemoveAliasOnIndices("unknown alias", indexName));
         }
 

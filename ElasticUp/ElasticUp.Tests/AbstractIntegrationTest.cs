@@ -1,4 +1,6 @@
-﻿using ElasticUp.Tests.Infrastructure;
+﻿using System;
+using ElasticUp.Tests.Infrastructure;
+using Nest;
 using NUnit.Framework;
 
 namespace ElasticUp.Tests
@@ -7,6 +9,7 @@ namespace ElasticUp.Tests
     {
         private readonly ElasticServiceStartup _elasticServiceStartup;
         private ElasticSearchContainer _esService;
+        protected readonly IElasticClient ElasticClient = new ElasticClient(new Uri("http://localhost:9200/"));
 
         protected AbstractIntegrationTest(
             ElasticServiceStartup elasticServiceStartup = ElasticServiceStartup.NoStartup)
@@ -49,7 +52,5 @@ namespace ElasticUp.Tests
 
             return esService;
         }
-
-
     }
 }
