@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="AbstractIntegrationTest.cs" />
     <Compile Include="Migration\ElasticUpMigrationTest.cs" />
+    <Compile Include="Migration\Meta\AliasHelperTest.cs" />
     <Compile Include="Migration\Meta\VersionedIndexNameTest.cs" />
     <Compile Include="Migration\TestMigration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
