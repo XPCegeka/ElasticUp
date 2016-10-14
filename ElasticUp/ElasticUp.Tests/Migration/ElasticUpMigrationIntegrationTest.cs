@@ -1,5 +1,6 @@
 ﻿using System;
 using ElasticUp.Migration;
+using ElasticUp.Migration.Meta;
 using ElasticUp.Operation;
 using FluentAssertions;
 using NSubstitute;
@@ -60,8 +61,11 @@ namespace ElasticUp.Tests.Migration
             _elasticUpMigration.Operation(operation1);
             _elasticUpMigration.Operation(operation2);
 
+            var index0 = new VersionedIndexName("test", 0);
+            var index1 = index0.GetIncrementedVersion();
+
             // WHEN
-            _elasticUpMigration.Execute(ElasticClient);
+            _elasticUpMigration.Execute(ElasticClient, index0, index1);
 
             // THEN
             operation1.Received().Execute();

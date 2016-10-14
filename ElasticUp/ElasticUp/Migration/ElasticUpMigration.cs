@@ -38,7 +38,7 @@ namespace ElasticUp.Migration
             return this;
         }
 
-        public void Execute(IElasticClient elasticClient)
+        internal void Execute(IElasticClient elasticClient, VersionedIndexName fromIndex, VersionedIndexName toIndex)
         {
             var indicesForAlias = elasticClient.GetIndicesPointingToAlias(IndexAlias);
 
@@ -47,7 +47,7 @@ namespace ElasticUp.Migration
                 var indexName = VersionedIndexName.CreateFromIndexName(indexForAlias);
                 var nextIndexName = indexName.GetIncrementedVersion();
 
-                Operations.ForEach(o => o.From(indexName).To(nextIndexName).Execute());
+                Operations.ForEach(o => o.From(fromIndex).To(toIndex).Execute());
             }
         }
 
