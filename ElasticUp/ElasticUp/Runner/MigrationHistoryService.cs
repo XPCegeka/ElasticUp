@@ -12,7 +12,7 @@ namespace ElasticUp.Runner
             _elasticClient = elasticClient;
         }
 
-        public bool HasOperationAlreadyBeenApplied(ElasticUpMigration migration)
+        public bool HasMigrationAlreadyBeenApplied(ElasticUpMigration migration)
         {
             /*var appliedMigrationInPreviousIndex = _elasticClient.Get<ExecutedOperation>(migration.OperationId.ToString()).Source;
             var appliedMigrationInNewIndex = _elasticClient.Get<ExecutedOperation>(migration.OperationId.ToString(), idx => idx.Index(migration.GetTargetIndexName(_elasticClient))).Source;

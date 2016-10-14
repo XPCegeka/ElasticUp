@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using ElasticUp.Extension;
 using ElasticUp.Migration;
 using Nest;
 
@@ -31,15 +33,16 @@ namespace ElasticUp.Runner
                 }
 
                 Console.WriteLine($"Starting ElasticUp operation: {migration.ToString()}");
-                //TODO execute operation
+                var stopwatch = Stopwatch.StartNew();
                 migration.Execute(_elasticClient);
+                stopwatch.Stop();
+                Console.WriteLine($"Finished ElasticUp migration: {migration.ToString()} in {stopwatch.Elapsed.ToHumanTimeString()}");
 
-                
-                
+
                 // TODO alias stuff per migration
                 //TODO add this migration to MigrationHistory in new index ?
 
-                Console.WriteLine($"Finished ElasticUp migration: {migration.ToString()}");
+
             }
 
 
