@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using ElasticUp.Extension;
+using ElasticUp.History;
 using ElasticUp.Migration;
 using Nest;
 

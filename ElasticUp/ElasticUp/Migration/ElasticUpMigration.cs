@@ -27,7 +27,7 @@ namespace ElasticUp.Migration
             Operations.Add(operation);
         }
 
-        public override string ToString()
+        public sealed override string ToString()
         {
             return $"{MigrationNumber:D3}_{this.GetType().Name}";
         }

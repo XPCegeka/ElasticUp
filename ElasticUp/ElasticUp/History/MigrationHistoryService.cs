@@ -1,7 +1,7 @@
 ﻿using ElasticUp.Migration;
 using Nest;
 
-namespace ElasticUp.Runner
+namespace ElasticUp.History
 {
     public class MigrationHistoryService
     {
