@@ -24,18 +24,15 @@ namespace ElasticUp.Runner
 
             foreach (var migration in migrations)
             {
-
-                //TODO for each operation in migration?
-
-                if (_migrationHistoryService.HasOperationAlreadyBeenApplied(migration))
+                if (_migrationHistoryService.HasMigrationAlreadyBeenApplied(migration))
                 {
                     Console.WriteLine($"Already executed operation: {migration.ToString()}");
                     return;
                 }
 
-                Console.WriteLine($"Starting ElasticUp migration: {migration.ToString()}");
+                Console.WriteLine($"Starting ElasticUp operation: {migration.ToString()}");
                 //TODO execute operation
-
+                migration.Execute(_elasticClient);
 
                 
                 
