@@ -11,7 +11,7 @@ namespace ElasticUp.Tests.Migration.Meta
     public class AliasHelperIntegrationTest : AbstractIntegrationTest
     {
         public AliasHelperIntegrationTest()
-            : base(ElasticServiceStartup.StartupForEach)
+            : base(ElasticServiceStartup.OneTimeStartup)
         {
         }
 
@@ -42,8 +42,8 @@ namespace ElasticUp.Tests.Migration.Meta
         public void AddAliasOnIndices_ThrowsWhenAliasCreationFailes()
         {
             // GIVEN
-            const string indexName = "sample-index";
-            const string aliasName = "sample-alias";
+            const string indexName = "sample-index2";
+            const string aliasName = "sample-alias2";
 
             var sampleObjects = Enumerable
                 .Range(1, 100)
@@ -60,8 +60,8 @@ namespace ElasticUp.Tests.Migration.Meta
         public void RemoveAliasOnIndices_DeletesAliasFromGivenIndex()
         {
             // GIVEN
-            const string indexName = "sample-index";
-            const string aliasName = "sample-alias";
+            const string indexName = "sample-index3";
+            const string aliasName = "sample-alias3";
 
             var sampleObjects = Enumerable
                 .Range(1, 100)
@@ -83,7 +83,7 @@ namespace ElasticUp.Tests.Migration.Meta
         public void RemoveAliasOnIndices_ThrowsWhenAliasDeletionFailes()
         {
             // GIVEN
-            const string indexName = "sample-index";
+            const string indexName = "sample-index4";
 
             var sampleObjects = Enumerable
                 .Range(1, 100)
