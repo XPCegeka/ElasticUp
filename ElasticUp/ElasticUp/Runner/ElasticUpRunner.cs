@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using ElasticUp.Migration;
 using Nest;
 
@@ -21,7 +23,7 @@ namespace ElasticUp.Runner
 
         public ElasticUpRunner Migration(ElasticUpMigration migration)
         {
-
+            AssertMigrationNumber(migration.MigrationNumber);
             Migrations.Add(migration);
             return this;
         }
@@ -31,14 +33,13 @@ namespace ElasticUp.Runner
             //TODO 
         }
 
-        /*private void AssertMigrationsValid(List<IElasticSearchOperation> allOperationsGroupedByMigration)
+        private void AssertMigrationNumber(int newMigrationNumber)
         {
-            if (allOperationsGroupedByMigration.Any(operation => operation.OperationId == null))
-                throw new ArgumentException($"OperationId is required for an {nameof(ElasticSearchOperation)}");
+            var migrationNumbers = Migrations.Select(migration => migration.MigrationNumber).ToList();
 
-            if (allOperationsGroupedByMigration.Select(operation => operation.OperationId.ToString()).Distinct().Count() != allOperationsGroupedByMigration.Count)
-                throw new ArgumentException($"OperationId should be a unique identifier for an {nameof(ElasticSearchOperation)}");
-        }*/
+            if (migrationNumbers.Any(number => number >= newMigrationNumber))
+                throw new ArgumentException("Your migrations should have unique ascending numbers!");
+        }
 
     }
 }

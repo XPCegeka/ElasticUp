@@ -2,11 +2,11 @@
 {
     public abstract class ElasticUpMigration
     {
-        private readonly int _migrationNumber;
+        public int MigrationNumber { get; }
 
         protected ElasticUpMigration(int migrationNumber)
         {
-            _migrationNumber = migrationNumber;
+            MigrationNumber = migrationNumber;
         }
 
        
