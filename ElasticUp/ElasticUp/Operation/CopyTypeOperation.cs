@@ -11,11 +11,11 @@ namespace ElasticUp.Operation
 
         public override void Execute(IElasticClient elasticClient, string fromIndex, string toIndex)
         {
-            var docs = elasticClient.Search<T>(s => s
+            var searchResponse = elasticClient.Search<T>(s => s
                 .Index(fromIndex)
-                .Type<T>()).Documents;
+                .Type<T>());
 
-            elasticClient.IndexMany(docs, toIndex);
+            elasticClient.IndexMany(searchResponse.Documents, toIndex);
         }
     }
 }

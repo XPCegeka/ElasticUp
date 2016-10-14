@@ -11,7 +11,7 @@ namespace ElasticUp.Tests.Operation
     [TestFixture]
     public class CopyTypeOperationIntegrationTest : AbstractIntegrationTest
     {
-        public CopyTypeOperationIntegrationTest() : base(ElasticServiceStartup.OneTimeStartup)
+        public CopyTypeOperationIntegrationTest() : base(ElasticServiceStartup.StartupForEach)
         {
         }
 
@@ -21,17 +21,19 @@ namespace ElasticUp.Tests.Operation
             // GIVEN
             var operation = new CopyTypeOperation<TestDocument>(0);
             
-            var index0 = new VersionedIndexName("test", 0);
-            var index1 = index0.GetIncrementedVersion();
+            var oldIndex = new VersionedIndexName("test", 0);
+            var newIndex = oldIndex.GetIncrementedVersion();
 
-            ElasticClient.IndexMany(new [] {new TestDocument()}, index0.Name);
+            ElasticClient.IndexMany(new [] {new TestDocument()}, oldIndex.ToString());
+            ElasticClient.Refresh(Indices.All);
 
             // WHEN
-            operation.Execute(ElasticClient, index0.Name, index1.Name);
+            operation.Execute(ElasticClient, oldIndex.ToString(), newIndex.ToString());
 
             // THEN
-            var docs = ElasticClient.Search<TestDocument>(s => s.Index(index1.Name).Type<TestDocument>()).Documents;
-            docs.Should().HaveCount(1);
+            ElasticClient.Refresh(Indices.All);
+            var countResponse = ElasticClient.Count<TestDocument>(descriptor => descriptor.Index(newIndex.ToString()));
+            countResponse.Count.Should().Be(1);
         }
     }
 }

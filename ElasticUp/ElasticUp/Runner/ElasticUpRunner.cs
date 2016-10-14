@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using ElasticUp.Extension;
 using ElasticUp.History;
 using ElasticUp.Migration;
@@ -21,7 +22,8 @@ namespace ElasticUp.Runner
         public void Execute(List<ElasticUpMigration> migrations)
         {
             Console.WriteLine("Starting ElasticUp migrations");
-            
+            var aliasHelper = new AliasHelper(_elasticClient);
+
             foreach (var migration in migrations)
             {
                 var indicesForAlias = _elasticClient.GetIndicesPointingToAlias(migration.IndexAlias);
@@ -30,11 +32,13 @@ namespace ElasticUp.Runner
                 foreach (var indexName in indicesForAlias)
                 {
                     Migrate(indexName, migration);
+
                 }
-                
+
                 //TODO alias stuff per migration
                 //TODO add this migration to MigrationHistory in new index ?
                 // alias stuff per migration
+
                 // remove alias on old indices
                 // add alias to new indices
 

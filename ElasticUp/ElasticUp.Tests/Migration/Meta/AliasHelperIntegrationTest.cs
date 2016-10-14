@@ -11,7 +11,7 @@ namespace ElasticUp.Tests.Migration.Meta
     public class AliasHelperIntegrationTest : AbstractIntegrationTest
     {
         public AliasHelperIntegrationTest()
-            : base(ElasticServiceStartup.OneTimeStartup)
+            : base(ElasticServiceStartup.StartupForEach)
         {
         }
 

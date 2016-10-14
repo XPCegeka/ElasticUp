@@ -40,6 +40,7 @@ namespace ElasticUp.Runner
         public void Run()
         {
             new ElasticUpRunner(_elasticClient).Execute(Migrations);
+            
         }
 
     }

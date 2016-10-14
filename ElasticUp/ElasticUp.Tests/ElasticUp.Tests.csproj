@@ -81,6 +81,7 @@
     <Compile Include="ElasticServiceStartup.cs" />
     <Compile Include="Migration\Meta\AliasHelperIntegrationTest.cs" />
     <Compile Include="Operation\TestOperation.cs" />
+    <Compile Include="Runner\ElasticUpIntegrationTest.cs" />
     <Compile Include="SampleObject.cs" />
     <Compile Include="Migration\Meta\VersionedIndexNameTest.cs" />
     <Compile Include="Migration\TestMigration.cs" />
