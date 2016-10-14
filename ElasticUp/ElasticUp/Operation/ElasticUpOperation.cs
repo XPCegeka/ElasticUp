@@ -3,17 +3,15 @@ using Nest;
 
 namespace ElasticUp.Operation
 {
-    public class ElasticUpOperation
+    public abstract class ElasticUpOperation
     {
         public int OperationNumber { get; private set; }
 
-        public ElasticUpOperation(int operationNumber)
+        protected ElasticUpOperation(int operationNumber)
         {
             OperationNumber = operationNumber;
         }
 
-        public void Execute(IElasticClient elasticClient, string fromIndex, string toIndex)
-        {
-        }
+        public abstract void Execute(IElasticClient elasticClient, string fromIndex, string toIndex);
     }
 }

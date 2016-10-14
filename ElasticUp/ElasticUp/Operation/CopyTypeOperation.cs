@@ -9,7 +9,7 @@ namespace ElasticUp.Operation
         {
         }
 
-        public new void Execute(IElasticClient elasticClient, string fromIndex, string toIndex)
+        public override void Execute(IElasticClient elasticClient, string fromIndex, string toIndex)
         {
             var docs = elasticClient.Search<T>(s => s
                 .Index(fromIndex)

@@ -26,5 +26,13 @@ namespace ElasticUp.Tests.Runner
                     .Migration(new TestMigration(2))
                     .Migration(new TestMigration(1)));
         }
+
+        [Test]
+        public void ElasticUp_DoesItAll()
+        {
+            // GIVEN
+
+
+        }
     }
 }
