@@ -1,6 +1,5 @@
 
 using System;
-using ElasticUp.Runner;
 using ElasticUp.Tests.Migration;
 using Nest;
 using NUnit.Framework;

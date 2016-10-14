@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ElasticUp.Migration;
 using Nest;
 
@@ -23,27 +20,33 @@ namespace ElasticUp.Runner
         {
             Console.WriteLine("Starting ElasticUp migrations");
 
+            //TODO copy MigrationHistory to new index ?
+
             foreach (var migration in migrations)
             {
-                if (_migrationHistoryService.HasOperationBeenApplied(migration))
+
+                //TODO for each operation in migration?
+
+                if (_migrationHistoryService.HasOperationAlreadyBeenApplied(migration))
                 {
-                    Console.WriteLine($"Already executed migration {migration.ToString()}");
+                    Console.WriteLine($"Already executed operation: {migration.ToString()}");
                     return;
                 }
 
-                //For each migration
-                //For each operation
-                // check if operation already ran
-                //  if yes skip
-                //  if no execute
-
-                // alias stuff per migration
+                Console.WriteLine($"Starting ElasticUp migration: {migration.ToString()}");
+                //TODO execute operation
 
 
+                
+                
+                // TODO alias stuff per migration
+                //TODO add this migration to MigrationHistory in new index ?
+
+                Console.WriteLine($"Finished ElasticUp migration: {migration.ToString()}");
             }
 
 
-
+            Console.WriteLine("Finished ElasticUp migrations");
             throw new NotImplementedException();
         }
     }

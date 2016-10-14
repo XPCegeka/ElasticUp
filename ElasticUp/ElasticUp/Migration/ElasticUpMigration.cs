@@ -1,5 +1,4 @@
-﻿using System;
-using ElasticUp.Migration.Meta;
+﻿using ElasticUp.Migration.Meta;
 using Nest;
 
 namespace ElasticUp.Migration
@@ -16,7 +15,7 @@ namespace ElasticUp.Migration
 
         public override string ToString()
         {
-            return $"{MigrationNumber}_{this.GetType().Name}";
+            return $"{MigrationNumber:D3}_{this.GetType().Name}";
         }
 
         public ElasticUpMigration OnIndexAlias(string indexAlias)
