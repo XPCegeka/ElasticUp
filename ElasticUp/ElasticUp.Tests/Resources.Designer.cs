@@ -63,9 +63,9 @@ namespace ElasticUp.Tests {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] elasticsearch_2_4_1 {
+        internal static byte[] elasticsearch_2_4_1_with_head_and_delete_by_query {
             get {
-                object obj = ResourceManager.GetObject("elasticsearch_2_4_1", resourceCulture);
+                object obj = ResourceManager.GetObject("elasticsearch_2_4_1_with_head_and_delete_by_query", resourceCulture);
                 return ((byte[])(obj));
             }
         }
