@@ -1,7 +1,6 @@
 using System.Linq;
-using ElasticUp.Migration;
 using ElasticUp.Migration.Meta;
-using ElasticUp.Operation;
+using ElasticUp.Tests.Sample;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
@@ -11,11 +10,7 @@ namespace ElasticUp.Tests.Runner
     [TestFixture]
     public class ElasticUpIntegrationTest : AbstractIntegrationTest
     {
-        public ElasticUpIntegrationTest()
-            : base(ElasticServiceStartup.StartupForEach)
-        {
-            
-        }
+        public ElasticUpIntegrationTest() : base(ElasticServiceStartupType.StartupForEach) {}
 
         [Test]
         public void ElasticUp_FullStackTest()
@@ -35,7 +30,7 @@ namespace ElasticUp.Tests.Runner
             // TEST
             ElasticUp.Runner.ElasticUp
                 .ConfigureElasticUp(ElasticClient)
-                .Migration(new SampleMigration())
+                .Migration(new SampleMigrationWithCopyTypeOperation(0))
                 .Run();
 
             // VERIFY
@@ -47,15 +42,6 @@ namespace ElasticUp.Tests.Runner
             //var indicesPointingToAlias = ElasticClient.GetIndicesPointingToAlias(aliasName);
             //indicesPointingToAlias.Should().HaveCount(1);
             //indicesPointingToAlias[0].Should().Be(newIndexName);
-        }
-    }
-
-    public class SampleMigration : ElasticUpMigration
-    {
-        public SampleMigration() : base(0)
-        {
-            OnIndexAlias("sample-index")
-                .Operation(new CopyTypeOperation<SampleObject>(0));
         }
     }
 }

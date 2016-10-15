@@ -3,6 +3,7 @@ using ElasticUp.Migration;
 using ElasticUp.Migration.Meta;
 using ElasticUp.Operation;
 using ElasticUp.Tests.Operation;
+using ElasticUp.Tests.Sample;
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
@@ -14,16 +15,12 @@ namespace ElasticUp.Tests.Migration
     {
         private ElasticUpMigration _elasticUpMigration;
 
-        public ElasticUpMigrationIntegrationTest()
-            : base(ElasticServiceStartup.StartupForEach)
-        {
-            
-        }
+        public ElasticUpMigrationIntegrationTest() : base(ElasticServiceStartupType.StartupForEach) {}
         
         [SetUp]
         public void Setup()
         {
-            _elasticUpMigration = new TestMigration(0);
+            _elasticUpMigration = new SampleEmptyMigration(0);
             _elasticUpMigration.OnIndexAlias("test");
         }
 
@@ -31,7 +28,7 @@ namespace ElasticUp.Tests.Migration
         public void Operation_AddsOperationToOperations()
         {
             // GIVEN
-            var operation = new TestOperation(0);
+            var operation = new SampleEmptyOperation(0);
 
             // WHEN
             _elasticUpMigration.Operation(operation);
@@ -44,8 +41,8 @@ namespace ElasticUp.Tests.Migration
         public void Operation_ThrowsWhenAddingOperationWithSameIndex()
         {
             // GIVEN
-            var operation1 = new TestOperation(0);
-            var operation2 = new TestOperation(0);
+            var operation1 = new SampleEmptyOperation(0);
+            var operation2 = new SampleEmptyOperation(0);
 
             // WHEN / THEN
             _elasticUpMigration.Operation(operation1);
@@ -77,8 +74,8 @@ namespace ElasticUp.Tests.Migration
     [Test]
         public void ToString_ReturnsMigrationNumberPlusClassName()
         {
-            new TestMigration(5).ToString().Should().Be("005_TestMigration");
-            new TestMigration(14).ToString().Should().Be("014_TestMigration");
+            new SampleEmptyMigration(5).ToString().Should().Be("005_TestMigration");
+            new SampleEmptyMigration(14).ToString().Should().Be("014_TestMigration");
         }
     }
 }

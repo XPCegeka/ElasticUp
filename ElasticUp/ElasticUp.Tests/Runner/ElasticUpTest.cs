@@ -14,8 +14,8 @@ namespace ElasticUp.Tests.Runner
         {
             Assert.Throws<ArgumentException>(() =>
                 ElasticUp.Runner.ElasticUp.ConfigureElasticUp(new ElasticClient())
-                    .Migration(new TestMigration(1))
-                    .Migration(new TestMigration(1)));
+                    .Migration(new Sample.SampleEmptyMigration(1))
+                    .Migration(new Sample.SampleEmptyMigration(1)));
         }
 
         [Test]
@@ -23,8 +23,8 @@ namespace ElasticUp.Tests.Runner
         {
             Assert.Throws<ArgumentException>(() =>
                 ElasticUp.Runner.ElasticUp.ConfigureElasticUp(new ElasticClient())
-                    .Migration(new TestMigration(2))
-                    .Migration(new TestMigration(1)));
+                    .Migration(new Sample.SampleEmptyMigration(2))
+                    .Migration(new Sample.SampleEmptyMigration(1)));
         }
     }
 }

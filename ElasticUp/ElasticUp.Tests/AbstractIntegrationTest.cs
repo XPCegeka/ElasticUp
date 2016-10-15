@@ -7,40 +7,40 @@ namespace ElasticUp.Tests
 {
     public abstract class AbstractIntegrationTest
     {
-        private readonly ElasticServiceStartup _elasticServiceStartup;
+        private readonly ElasticServiceStartupType _elasticServiceStartupType;
         private ElasticSearchContainer _esService;
         protected readonly IElasticClient ElasticClient = new ElasticClient(new Uri("http://localhost:9200/"));
 
-        protected AbstractIntegrationTest(ElasticServiceStartup elasticServiceStartup = ElasticServiceStartup.NoStartup)
+        protected AbstractIntegrationTest(ElasticServiceStartupType elasticServiceStartupType = ElasticServiceStartupType.NoStartup)
         {
-            _elasticServiceStartup = elasticServiceStartup;
+            _elasticServiceStartupType = elasticServiceStartupType;
         }
 
         [SetUp]
         protected void SetUp()
         {
-            if (_elasticServiceStartup == ElasticServiceStartup.StartupForEach)
+            if (_elasticServiceStartupType == ElasticServiceStartupType.StartupForEach)
                 _esService = StartAndWaitForElasticSearchService();
         }
 
         [TearDown]
         protected void TearDown()
         {
-            if (_elasticServiceStartup == ElasticServiceStartup.StartupForEach)
+            if (_elasticServiceStartupType == ElasticServiceStartupType.StartupForEach)
                 _esService.Dispose();
         }
 
         [OneTimeSetUp]
         protected void OneTimeSetUp()
         {
-            if (_elasticServiceStartup == ElasticServiceStartup.OneTimeStartup)
+            if (_elasticServiceStartupType == ElasticServiceStartupType.OneTimeStartup)
                 _esService = StartAndWaitForElasticSearchService();
         }
 
         [OneTimeTearDown]
         protected void OneTimeTearDown()
         {
-            if (_elasticServiceStartup == ElasticServiceStartup.OneTimeStartup)
+            if (_elasticServiceStartupType == ElasticServiceStartupType.OneTimeStartup)
                 _esService.Dispose();
         }
 

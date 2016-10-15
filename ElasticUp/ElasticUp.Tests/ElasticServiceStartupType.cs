@@ -1,6 +1,6 @@
 ﻿namespace ElasticUp.Tests
 {
-    public enum ElasticServiceStartup
+    public enum ElasticServiceStartupType
     {
         /// <summary>
         /// Do not start the ElasticSearch service
