@@ -71,11 +71,11 @@ namespace ElasticUp.Tests.Migration
             operation2.Received().Execute(ElasticClient, index0.Name, index1.Name);
         }
 
-    [Test]
+        [Test]
         public void ToString_ReturnsMigrationNumberPlusClassName()
         {
-            new SampleEmptyMigration(5).ToString().Should().Be("005_TestMigration");
-            new SampleEmptyMigration(14).ToString().Should().Be("014_TestMigration");
+            new SampleEmptyMigration(5).ToString().Should().Be("005_SampleEmptyMigration");
+            new SampleEmptyMigration(14).ToString().Should().Be("014_SampleEmptyMigration");
         }
     }
 }
