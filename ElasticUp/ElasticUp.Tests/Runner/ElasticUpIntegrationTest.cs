@@ -37,11 +37,10 @@ namespace ElasticUp.Tests.Runner
             ElasticClient.Refresh(Indices.All);
             var objCountInNewIndex = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(newIndexName)).Count;
             objCountInNewIndex.Should().Be(sampleObjects.Count);
-
-            //TODO introduce alias migrationss
-            //var indicesPointingToAlias = ElasticClient.GetIndicesPointingToAlias(aliasName);
-            //indicesPointingToAlias.Should().HaveCount(1);
-            //indicesPointingToAlias[0].Should().Be(newIndexName);
+            
+            var indicesPointingToAlias = ElasticClient.GetIndicesPointingToAlias(aliasName);
+            indicesPointingToAlias.Should().HaveCount(1);
+            indicesPointingToAlias[0].Should().Be(newIndexName);
         }
     }
 }

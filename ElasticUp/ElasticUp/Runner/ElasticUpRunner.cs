@@ -22,7 +22,6 @@ namespace ElasticUp.Runner
         public void Execute(List<ElasticUpMigration> migrations)
         {
             Console.WriteLine("Starting ElasticUp migrations");
-            var aliasHelper = new AliasHelper(_elasticClient);
 
             foreach (var migration in migrations)
             {
@@ -32,18 +31,22 @@ namespace ElasticUp.Runner
                 foreach (var indexName in indicesForAlias)
                 {
                     Migrate(indexName, migration);
-
                 }
 
-                //TODO alias stuff per migration
+                SetAliasesForMigration(migration, indicesForAlias);
+
                 //TODO add this migration to MigrationHistory in new index ?
-                // alias stuff per migration
-
-                // remove alias on old indices
-                // add alias to new indices
-
             }
             Console.WriteLine("Finished ElasticUp migrations");
+        }
+
+        private void SetAliasesForMigration(ElasticUpMigration migration, IList<string> indicesForAlias)
+        {
+            var aliasHelper = new AliasHelper(_elasticClient);
+            aliasHelper.RemoveAliasOnIndices(migration.IndexAlias, indicesForAlias.ToArray());
+            var newIndices =
+                indicesForAlias.Select(x => VersionedIndexName.CreateFromIndexName(x).GetIncrementedVersion().ToString());
+            aliasHelper.AddAliasOnIndices(migration.IndexAlias, newIndices.ToArray());
         }
 
         private void Migrate(string indexName, ElasticUpMigration migration)
