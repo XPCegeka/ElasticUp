@@ -1,4 +1,6 @@
-﻿using ElasticUp.History;
+﻿using System;
+using Elasticsearch.Net;
+using ElasticUp.History;
 using Nest;
 
 namespace ElasticUp.Operation
@@ -11,11 +13,21 @@ namespace ElasticUp.Operation
 
         public override void Execute(IElasticClient elasticClient, string fromIndex, string toIndex)
         {
-            var searchResponse = elasticClient.Search<T>(s => s
-                .Index(fromIndex)
-                .Type<T>());
+            var typename = typeof (T).Name.ToLowerInvariant();
 
-            elasticClient.IndexMany(searchResponse.Documents, toIndex);
+            var response = elasticClient.ReindexOnServer(descriptor =>
+                descriptor.Source(sourceDescriptor =>
+                    sourceDescriptor
+                        .Type(typename)
+                        .Index(fromIndex))
+                    .Destination(destinationDescriptor =>
+                        destinationDescriptor.Index(toIndex))
+                    .WaitForCompletion());
+
+            if (response.ServerError != null)
+            {
+                throw new Exception($"Could not execute {typeof(CopyTypeOperation<>).Name}. Error information: '{response.DebugInformation}'");
+            }
         }
     }
 }
