@@ -1,24 +1,28 @@
 ﻿using System;
-using Elasticsearch.Net;
-using ElasticUp.History;
 using Nest;
 
 namespace ElasticUp.Operation
 {
-    public class CopyTypeOperation<T> : ElasticUpOperation where T : class
+    public class CopyTypeOperation : ElasticUpOperation
     {
+        public string TypeName { get; set; }
+
         public CopyTypeOperation(int operationNumber) : base(operationNumber)
         {
         }
 
+        public CopyTypeOperation WithTypeName(string typeName)
+        {
+            TypeName = typeName;
+            return this;
+        }
+
         public override void Execute(IElasticClient elasticClient, string fromIndex, string toIndex)
         {
-            var typename = typeof (T).Name.ToLowerInvariant();
-
             var response = elasticClient.ReindexOnServer(descriptor =>
                 descriptor.Source(sourceDescriptor =>
                     sourceDescriptor
-                        .Type(typename)
+                        .Type(TypeName)
                         .Index(fromIndex))
                     .Destination(destinationDescriptor =>
                         destinationDescriptor.Index(toIndex))
@@ -28,6 +32,14 @@ namespace ElasticUp.Operation
             {
                 throw new Exception($"Could not execute {typeof(CopyTypeOperation<>).Name}. Error information: '{response.DebugInformation}'");
             }
+        }
+    }
+
+    public class CopyTypeOperation<T> : CopyTypeOperation where T : class
+    {
+        public CopyTypeOperation(int operationNumber) : base(operationNumber)
+        {
+            TypeName = typeof (T).Name.ToLowerInvariant();
         }
     }
 }

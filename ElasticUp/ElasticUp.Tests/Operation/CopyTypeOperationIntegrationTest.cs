@@ -1,5 +1,4 @@
-﻿using System;
-using ElasticUp.History;
+using System;
 using ElasticUp.Migration.Meta;
 using ElasticUp.Operation;
 using ElasticUp.Tests.Sample;
@@ -27,7 +26,7 @@ namespace ElasticUp.Tests.Operation
             ElasticClient.Refresh(Indices.All);
 
             // WHEN
-            var operation = new CopyTypeOperation<SampleDocument>(0);
+            var operation = new CopyTypeOperation(0).WithTypeName("sampledocument");
             operation.Execute(ElasticClient, oldIndex, newIndex);
 
             // THEN
@@ -44,7 +43,7 @@ namespace ElasticUp.Tests.Operation
             var newIndex = oldIndex.GetIncrementedVersion();
 
             // WHEN
-            var operation = new CopyTypeOperation<SampleDocument>(0);
+            var operation = new CopyTypeOperation(0).WithTypeName("sampledocument");
             Assert.Throws<Exception>(() => operation.Execute(ElasticClient, oldIndex, newIndex));
         }
 
@@ -59,7 +58,7 @@ namespace ElasticUp.Tests.Operation
             ElasticClient.Refresh(Indices.All);
 
             // WHEN
-            var operation = new CopyTypeOperation<SampleDocument>(0);
+            var operation = new CopyTypeOperation(0).WithTypeName("sampledocument");
             operation.Execute(ElasticClient, oldIndex, newIndex);
 
             // THEN
