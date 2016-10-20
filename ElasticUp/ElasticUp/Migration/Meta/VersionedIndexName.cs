@@ -34,5 +34,10 @@ namespace ElasticUp.Migration.Meta
             var version = int.Parse(match.Groups["version"].Value);
             return new VersionedIndexName(name, version);
         }
+
+        public static implicit operator string(VersionedIndexName indexName)
+        {
+            return indexName.ToString();
+        }
     }
 }
