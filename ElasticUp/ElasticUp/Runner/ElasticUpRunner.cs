@@ -71,7 +71,7 @@ namespace ElasticUp.Runner
             Console.WriteLine($"Finished ElasticUp migration: {migration} to new index: {toIndex} in {stopwatch.Elapsed.ToHumanTimeString()}");
 
             Console.WriteLine($"Adding ElasticUp Migration: {migration} to MigrationHistory of new index: {toIndex}");
-            migrationHistoryService.AddMigrationToHistory(migration);
+            migrationHistoryService.AddMigrationToHistory(migration, toIndex);
         }
     }
 }

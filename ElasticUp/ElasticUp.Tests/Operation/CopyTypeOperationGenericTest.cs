@@ -1,10 +1,6 @@
-﻿using System;
-using ElasticUp.History;
-using ElasticUp.Migration.Meta;
-using ElasticUp.Operation;
+﻿using ElasticUp.Operation;
 using ElasticUp.Tests.Sample;
 using FluentAssertions;
-using Nest;
 using NUnit.Framework;
 
 namespace ElasticUp.Tests.Operation

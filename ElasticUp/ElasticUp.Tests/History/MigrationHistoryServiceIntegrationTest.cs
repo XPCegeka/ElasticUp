@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ElasticUp.History;
+using ElasticUp.Migration;
+using ElasticUp.Operation;
+using ElasticUp.Tests.Sample;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
@@ -37,7 +41,6 @@ namespace ElasticUp.Tests.History
             actualMigrationHistory.Documents.ShouldBeEquivalentTo(migrationHistory);
         }
 
-
         [Test]
         public void CopyMigrationHistory_DoesNotThrowWhenNoMigrationHistoryInFromIndex()
         {
@@ -56,6 +59,44 @@ namespace ElasticUp.Tests.History
             ElasticClient.Refresh(Indices.All);
             var actualMigrationHistory = ElasticClient.Count<MigrationHistory>(descriptor => descriptor.Index(toIndex));
             actualMigrationHistory.Count.Should().Be(0);
+        }
+
+        [Test]
+        public void AddMigrationHistory_AddsMigrationHistoryForExecutedOperation()
+        {
+            // GIVEN
+            const string toIndex = "to";
+
+            var migration = new SampleEmptyMigration(0);
+
+            // TEST
+            var migrationHistoryService = new MigrationHistoryService(ElasticClient);
+            migrationHistoryService.AddMigrationToHistory(migration, toIndex);
+
+            // VERIFY
+            ElasticClient.Refresh(Indices.All);
+            var actualMigrationResponse = ElasticClient.Get<MigrationHistory>(migration.ToString(), descriptor => descriptor.Index(toIndex));
+            actualMigrationResponse.Found.Should().BeTrue();
+        }
+
+        [Test]
+        public void AddMigrationHistory_WithException_AddsMigrationHistoryWithExceptionForExecutedOperation()
+        {
+            // GIVEN
+            const string toIndex = "to";
+
+            var migration = new SampleEmptyMigration(0);
+            var exception = new Exception("Sample");
+
+            // TEST
+            var migrationHistoryService = new MigrationHistoryService(ElasticClient);
+            migrationHistoryService.AddMigrationToHistory(migration, toIndex, exception);
+
+            // VERIFY
+            ElasticClient.Refresh(Indices.All);
+            var actualMigration = ElasticClient.Get<MigrationHistory>(migration.ToString(), descriptor => descriptor.Index(toIndex));
+            actualMigration.Found.Should().BeTrue();
+            actualMigration.Source.Exception.Message.Should().Be(exception.Message);
         }
     }
 }
