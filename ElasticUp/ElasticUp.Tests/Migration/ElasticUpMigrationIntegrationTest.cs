@@ -5,6 +5,7 @@ using ElasticUp.Operation;
 using ElasticUp.Tests.Operation;
 using ElasticUp.Tests.Sample;
 using FluentAssertions;
+using Nest;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -48,15 +49,15 @@ namespace ElasticUp.Tests.Migration
             _elasticUpMigration.Operation(operation1);
             Assert.Throws<ArgumentException>(() => _elasticUpMigration.Operation(operation2), "Duplicate operation number.");
         }
-
-        [Ignore("No alias available for type 'test'")]
+        
         [Test]
         public void Execute_ExecutesEachOperation()
         {
             // GIVEN
             var operation1 = Substitute.For<ElasticUpOperation>(0);
             var operation2 = Substitute.For<ElasticUpOperation>(1);
-
+            var elasticClient = Substitute.For<IElasticClient>();
+            
             _elasticUpMigration.Operation(operation1);
             _elasticUpMigration.Operation(operation2);
 
@@ -64,11 +65,11 @@ namespace ElasticUp.Tests.Migration
             var index1 = index0.GetIncrementedVersion();
 
             // WHEN
-            _elasticUpMigration.Execute(ElasticClient, index0, index1);
+            _elasticUpMigration.Execute(elasticClient, index0, index1);
 
             // THEN
-            operation1.Received().Execute(ElasticClient, index0.Name, index1.Name);
-            operation2.Received().Execute(ElasticClient, index0.Name, index1.Name);
+            operation1.Received().Execute(elasticClient, index0, index1);
+            operation2.Received().Execute(elasticClient, index0, index1);
         }
 
         [Test]

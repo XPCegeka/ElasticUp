@@ -40,15 +40,7 @@ namespace ElasticUp.Migration
 
         internal void Execute(IElasticClient elasticClient, VersionedIndexName fromIndex, VersionedIndexName toIndex)
         {
-            var indicesForAlias = elasticClient.GetIndicesPointingToAlias(IndexAlias);
-
-            foreach (var indexForAlias in indicesForAlias)
-            {
-                var indexName = VersionedIndexName.CreateFromIndexName(indexForAlias);
-                var nextIndexName = indexName.GetIncrementedVersion();
-
-                Operations.ForEach(o => o.Execute(elasticClient, fromIndex.ToString(), toIndex.ToString()));
-            }
+            Operations.ForEach(o => o.Execute(elasticClient, fromIndex.ToString(), toIndex.ToString()));
         }
 
         private bool HasDuplicateOperationNumber(ElasticUpOperation operation)
