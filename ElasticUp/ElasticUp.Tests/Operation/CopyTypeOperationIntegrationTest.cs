@@ -11,10 +11,6 @@ namespace ElasticUp.Tests.Operation
     [TestFixture]
     public class CopyTypeOperationIntegrationTest : AbstractIntegrationTest
     {
-        public CopyTypeOperationIntegrationTest() : base(ElasticServiceStartupType.StartupForEach)
-        {
-        }
-
         [Test]
         public void Execute_CopiesTypeToNewIndex()
         {

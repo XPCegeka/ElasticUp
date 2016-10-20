@@ -10,8 +10,6 @@ namespace ElasticUp.Tests.Runner
     [TestFixture]
     public class ElasticUpIntegrationTest : AbstractIntegrationTest
     {
-        public ElasticUpIntegrationTest() : base(ElasticServiceStartupType.StartupForEach) {}
-
         [Test]
         public void ElasticUp_FullStackTest()
         {

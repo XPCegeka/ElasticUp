@@ -2,7 +2,6 @@
 using ElasticUp.Migration;
 using ElasticUp.Migration.Meta;
 using ElasticUp.Operation;
-using ElasticUp.Tests.Operation;
 using ElasticUp.Tests.Sample;
 using FluentAssertions;
 using Nest;
@@ -15,8 +14,6 @@ namespace ElasticUp.Tests.Migration
     public class ElasticUpMigrationIntegrationTest : AbstractIntegrationTest
     {
         private ElasticUpMigration _elasticUpMigration;
-
-        public ElasticUpMigrationIntegrationTest() : base(ElasticServiceStartupType.StartupForEach) {}
         
         [SetUp]
         public void Setup()

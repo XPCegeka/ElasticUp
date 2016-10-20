@@ -1,5 +1,5 @@
 ﻿using ElasticUp.Migration;
-using ElasticUp.Migration.Meta;
+using ElasticUp.Operation;
 using Nest;
 
 namespace ElasticUp.History
@@ -7,19 +7,16 @@ namespace ElasticUp.History
     public class MigrationHistoryService
     {
         private readonly IElasticClient _elasticClient;
-        private readonly VersionedIndexName _fromIndexName;
-        private readonly VersionedIndexName _toIndex;
 
-        public MigrationHistoryService(IElasticClient elasticClient, VersionedIndexName fromIndexName, VersionedIndexName toIndex)
+        public MigrationHistoryService(IElasticClient elasticClient)
         {
             _elasticClient = elasticClient;
-            _fromIndexName = fromIndexName;
-            _toIndex = toIndex;
         }
 
-        public void CopyMigrationHistory()
+        public void CopyMigrationHistory(string fromIndex, string toIndex)
         {
-            //TODO
+            var copyTypeOperation = new CopyTypeOperation<MigrationHistory>(0);
+            copyTypeOperation.Execute(_elasticClient, fromIndex, toIndex);
         }
 
         public void AddMigrationToHistory(ElasticUpMigration migration)

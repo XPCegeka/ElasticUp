@@ -53,7 +53,7 @@ namespace ElasticUp.Runner
         {
             var fromIndex = VersionedIndexName.CreateFromIndexName(indexName);
             var toIndex = fromIndex.GetIncrementedVersion();
-            var migrationHistoryService = new MigrationHistoryService(_elasticClient, fromIndex, toIndex);
+            var migrationHistoryService = new MigrationHistoryService(_elasticClient);
 
             if (migrationHistoryService.HasMigrationAlreadyBeenApplied(migration))
             {
@@ -62,7 +62,7 @@ namespace ElasticUp.Runner
             }
 
             Console.WriteLine($"Copying ElasticUp MigrationHistory to new index: {toIndex}");
-            migrationHistoryService.CopyMigrationHistory();
+            migrationHistoryService.CopyMigrationHistory(fromIndex, toIndex);
 
             Console.WriteLine($"Starting ElasticUp migration: {migration} to new index: {toIndex}");
             var stopwatch = Stopwatch.StartNew();

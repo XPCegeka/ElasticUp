@@ -10,8 +10,6 @@ namespace ElasticUp.Tests.Migration.Meta
     [TestFixture]
     public class AliasHelperIntegrationTest : AbstractIntegrationTest
     {
-        public AliasHelperIntegrationTest() : base(ElasticServiceStartupType.StartupForEach) {}
-
         [Test]
         public void AddAliasOnIndices_CreatesNewAliasOnGivenIndex()
         {
