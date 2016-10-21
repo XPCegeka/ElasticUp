@@ -98,5 +98,75 @@ namespace ElasticUp.Tests.History
             actualMigration.Found.Should().BeTrue();
             actualMigration.Source.Exception.Message.Should().Be(exception.Message);
         }
+
+        [Test]
+        public void HasMigrationAlreadyBeenApplied_ReturnsTrueIfMigrationAlreadyApplied()
+        {
+            // GIVEN
+            const string toIndex = "to";
+
+            var migration = new SampleEmptyMigration(0);
+            var migrationHistory = new MigrationHistory(migration);
+
+            ElasticClient.Index(migrationHistory, descriptor => descriptor.Index(toIndex));
+            ElasticClient.Refresh(Indices.All);
+
+            // TEST
+            var migrationHistoryService = new MigrationHistoryService(ElasticClient);
+            var hasMigrationAlreadyBeenApplied = migrationHistoryService.HasMigrationAlreadyBeenApplied(migration, toIndex);
+
+            // VERIFY
+            hasMigrationAlreadyBeenApplied.Should().BeTrue();
+        }
+
+        [Test]
+        public void HasMigrationAlreadyBeenApplied_ReturnsFalseIfMigrationNotApplied()
+        {
+            // GIVEN
+            const string toIndex = "to";
+
+            var migration = new SampleEmptyMigration(0);
+
+            ElasticClient.CreateIndex(toIndex);
+            ElasticClient.Refresh(Indices.All);
+
+            // TEST
+            var migrationHistoryService = new MigrationHistoryService(ElasticClient);
+            var hasMigrationAlreadyBeenApplied = migrationHistoryService.HasMigrationAlreadyBeenApplied(migration, toIndex);
+
+            // VERIFY
+            hasMigrationAlreadyBeenApplied.Should().BeFalse();
+        }
+
+        [Test]
+        public void HasMigrationAlreadyBeenApplied_ReturnsFalseIfMigrationNotSucessfullyApplied()
+        {
+            // GIVEN
+            const string toIndex = "to";
+
+            var migration = new SampleEmptyMigration(0);
+            var migrationHistory = new MigrationHistory(migration, new Exception());
+
+            ElasticClient.Index(migrationHistory, descriptor => descriptor.Index(toIndex));
+            ElasticClient.Refresh(Indices.All);
+
+            // TEST
+            var migrationHistoryService = new MigrationHistoryService(ElasticClient);
+            var hasMigrationAlreadyBeenApplied = migrationHistoryService.HasMigrationAlreadyBeenApplied(migration, toIndex);
+
+            // VERIFY
+            hasMigrationAlreadyBeenApplied.Should().BeFalse();
+        }
+
+        [Test]
+        public void HasMigrationAlreadyBeenApplied_ThrowsIfIndexDoesNotExist()
+        {
+            // GIVEN
+            var migration = new SampleEmptyMigration(0);
+
+            // TEST
+            var migrationHistoryService = new MigrationHistoryService(ElasticClient);
+            Assert.Throws<Exception>(() => migrationHistoryService.HasMigrationAlreadyBeenApplied(migration, "unknown-index"));
+        }
     }
 }

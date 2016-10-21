@@ -37,24 +37,24 @@ namespace ElasticUp.History
             if (string.IsNullOrEmpty(indexName))
                 throw new ArgumentNullException(nameof(indexName));
 
-            var history = new MigrationHistory
-            {
-                Applied = DateTime.UtcNow,
-                Id = migration.ToString(),
-                Exception = exception
-            };
+            var history = new MigrationHistory(migration, exception);
 
             _elasticClient.Index(history, descriptor => descriptor.Index(indexName));
         }
 
-        public bool HasMigrationAlreadyBeenApplied(ElasticUpMigration migration)
+        public bool HasMigrationAlreadyBeenApplied(ElasticUpMigration migration, string indexName)
         {
-            /*var appliedMigrationInPreviousIndex = _elasticClient.Get<ExecutedOperation>(migration.OperationId.ToString()).Source;
-            var appliedMigrationInNewIndex = _elasticClient.Get<ExecutedOperation>(migration.OperationId.ToString(), idx => idx.Index(migration.GetTargetIndexName(_elasticClient))).Source;
+            if (migration == null)
+                throw new ArgumentNullException(nameof(migration));
+            if (string.IsNullOrEmpty(indexName))
+                throw new ArgumentNullException(nameof(indexName));
 
-            return appliedMigrationInPreviousIndex != null && appliedMigrationInPreviousIndex.HasBeenAppliedSuccessfully
-                || appliedMigrationInNewIndex != null && appliedMigrationInNewIndex.HasBeenAppliedSuccessfully;*/
-            return false;
+            var existsResponse = _elasticClient.Get<MigrationHistory>(migration.ToString(), descriptor => descriptor.Index(indexName));
+
+            if (existsResponse.ServerError != null)
+                throw new Exception($"Could not verify if migration '{migration}' was already applied. Debug information: '{existsResponse.DebugInformation}'");
+
+            return existsResponse.Found && existsResponse.Source.HasBeenAppliedSuccessfully;
         }
         /*
         public void OperationSucceeded(IElasticSearchOperation migrationThatSucceeded)

@@ -55,7 +55,7 @@ namespace ElasticUp.Runner
             var toIndex = fromIndex.GetIncrementedVersion();
             var migrationHistoryService = new MigrationHistoryService(_elasticClient);
 
-            if (migrationHistoryService.HasMigrationAlreadyBeenApplied(migration))
+            if (migrationHistoryService.HasMigrationAlreadyBeenApplied(migration, fromIndex))
             {
                 Console.WriteLine($"Already executed operation: {migration} on old index {fromIndex}. Not migrating to new index {toIndex}");
                 return;

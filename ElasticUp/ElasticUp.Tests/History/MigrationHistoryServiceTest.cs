@@ -48,5 +48,14 @@ namespace ElasticUp.Tests.History
             Assert.Throws<ArgumentNullException>(() => migrationHistoryService.AddMigrationToHistory(new SampleEmptyMigration(0), null, null));
             Assert.Throws<ArgumentNullException>(() => migrationHistoryService.AddMigrationToHistory(new SampleEmptyMigration(0), string.Empty, null));
         }
+
+        [Test]
+        public void HasMigrationAlreadyBeenApplied_ThrowsWithInvalidParameters()
+        {
+            var migrationHistoryService = new MigrationHistoryService(_elasticClient);
+            Assert.Throws<ArgumentNullException>(() => migrationHistoryService.HasMigrationAlreadyBeenApplied(null, "x"));
+            Assert.Throws<ArgumentNullException>(() => migrationHistoryService.HasMigrationAlreadyBeenApplied(new SampleEmptyMigration(0), null));
+            Assert.Throws<ArgumentNullException>(() => migrationHistoryService.HasMigrationAlreadyBeenApplied(new SampleEmptyMigration(0), string.Empty));
+        }
     }
 }

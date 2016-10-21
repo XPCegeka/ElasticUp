@@ -18,7 +18,7 @@ namespace ElasticUp.History
         public MigrationHistory(ElasticUpMigration migration)
         {
             Id = migration.ToString();
-            Applied = DateTime.Now;
+            Applied = DateTime.UtcNow;
         }
 
         public MigrationHistory(ElasticUpMigration migration, Exception e) : this(migration)
