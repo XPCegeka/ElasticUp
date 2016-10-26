@@ -56,6 +56,7 @@ namespace ElasticUp.History
 
             return existsResponse.Found && existsResponse.Source.HasBeenAppliedSuccessfully;
         }
+
         /*
         public void OperationSucceeded(IElasticSearchOperation migrationThatSucceeded)
         {

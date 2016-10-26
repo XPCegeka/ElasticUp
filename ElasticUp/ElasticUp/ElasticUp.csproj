@@ -50,6 +50,7 @@
     <Compile Include="History\MigrationHistory.cs" />
     <Compile Include="Migration\ElasticUpMigration.cs" />
     <Compile Include="Migration\Meta\AliasHelper.cs" />
+    <Compile Include="Operation\BatchedElasticUpOperation.cs" />
     <Compile Include="Operation\CopyTypeOperation.cs" />
     <Compile Include="Operation\ElasticUpOperation.cs" />
     <Compile Include="Migration\Meta\VersionedIndexName.cs" />

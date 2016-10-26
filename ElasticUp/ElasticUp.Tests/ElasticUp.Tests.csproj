@@ -78,6 +78,8 @@
   <ItemGroup>
     <Compile Include="AbstractIntegrationTest.cs" />
     <Compile Include="History\MigrationHistoryServiceTest.cs" />
+    <Compile Include="Operation\BatchElasticUpOperationIntegrationTest.cs" />
+    <Compile Include="Operation\BatchElasticUpOperationTest.cs" />
     <Compile Include="Operation\CopyTypeOperationIntegrationTest.cs" />
     <Compile Include="Sample\SampleMigrationWithCopyTypeOperation.cs" />
     <Compile Include="Sample\SampleDocument.cs" />

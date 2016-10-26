@@ -1,5 +1,4 @@
-﻿using ElasticUp.Migration.Meta;
-using Nest;
+﻿using Nest;
 
 namespace ElasticUp.Operation
 {
