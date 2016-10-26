@@ -43,6 +43,15 @@ namespace ElasticUp.Operation
             return this;
         }
 
+        public BatchedElasticUpOperation<TDocument> WithOnBatchProcessed(BatchProcessedHandler eventHandler)
+        {
+            if (eventHandler == null)
+                throw new ArgumentNullException(nameof(eventHandler));
+
+            BatchProcessed += eventHandler;
+            return this;
+        }    
+
         public BatchedElasticUpOperation<TDocument> WithBatchSize(int batchSize)
         {
             if (batchSize <= 0)
@@ -51,6 +60,7 @@ namespace ElasticUp.Operation
             BatchSize = batchSize;
             return this;
         }
+        
 
         public override void Execute(IElasticClient elasticClient, string fromIndex, string toIndex)
         {
@@ -63,8 +73,7 @@ namespace ElasticUp.Operation
             if (!searchResponse.Documents.Any())
                 return;
 
-            elasticClient.IndexMany(BatchTransformation.Invoke(searchResponse.Documents), toIndex);
-
+            ProcessBatch(elasticClient, searchResponse.Documents.ToList(), toIndex);
 
             var scrollId = searchResponse.ScrollId;
             var scrollResponse = elasticClient.Scroll<TDocument>(scrollTimeout, scrollId);
@@ -74,10 +83,22 @@ namespace ElasticUp.Operation
                 if (scrollResponse.ServerError != null)
                     throw new Exception($"Could not complete Search call. Debug information: '{scrollResponse.DebugInformation}'");
 
-                elasticClient.IndexMany(BatchTransformation.Invoke(scrollResponse.Documents), toIndex);
+                ProcessBatch(elasticClient, scrollResponse.Documents.ToList(), toIndex);
 
                 scrollResponse = elasticClient.Scroll<TDocument>(scrollTimeout, scrollId);
             }
         }
+
+        private void ProcessBatch(IElasticClient elasticClient, IList<TDocument> documentBatch, string toIndex)
+        {
+            var transformedDocuments = BatchTransformation.Invoke(documentBatch)?.ToList() ?? new List<TDocument>();
+            elasticClient.IndexMany(transformedDocuments, index: toIndex);
+            BatchProcessed?.Invoke(documentBatch, transformedDocuments);
+        }
+
+        public event BatchProcessedHandler BatchProcessed;
+
+        public delegate void BatchProcessedHandler(IEnumerable<TDocument> originalDocuments, IEnumerable<TDocument> transformedDocuments);
     }
+
 }

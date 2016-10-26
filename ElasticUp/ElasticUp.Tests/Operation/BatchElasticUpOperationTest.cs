@@ -41,5 +41,13 @@ namespace ElasticUp.Tests.Operation
 
             Assert.Throws<ArgumentNullException>(() => operation.WithSearchDescriptor(null));
         }
+
+        [Test]
+        public void WithOnBatchProcessed_ThrowsWithInvalidParameters()
+        {
+            var operation = new BatchedElasticUpOperation<SampleObject>(0);
+
+            Assert.Throws<ArgumentNullException>(() => operation.WithOnBatchProcessed(null));
+        }
     }
 }
