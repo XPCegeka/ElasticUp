@@ -10,7 +10,8 @@ namespace ElasticUp.Operation
         public virtual double ScrollTimeoutInSeconds { get; set; } = 360;
         public virtual int BatchSize { get; set; } = 5000;
         public virtual Func<SearchDescriptor<TDocument>, ISearchRequest> SearchDescriptor { get; set; } = descriptor => descriptor.Type(typeof(TDocument).Name.ToLowerInvariant());
-        public Func<IEnumerable<TDocument>, IEnumerable<TDocument>> BatchTransformation { get; set; } = batchDocuments => new List<TDocument>(batchDocuments);
+        public Func<TDocument, TDocument> Transformation { get; set; } = doc => doc;
+        public Action<TDocument> OnDocumentProcessed { get; set; }
 
         public BatchedElasticUpOperation(int operationNumber) : base(operationNumber)
         {
@@ -25,12 +26,12 @@ namespace ElasticUp.Operation
             return this;
         }
 
-        public BatchedElasticUpOperation<TDocument> WithBatchTransformation(Func<IEnumerable<TDocument>, IEnumerable<TDocument>> batchOperation)
+        public BatchedElasticUpOperation<TDocument> WithDocumentTransformation(Func<TDocument, TDocument> transformation)
         {
-            if (batchOperation == null)
-                throw new ArgumentNullException(nameof(batchOperation));
+            if (transformation == null)
+                throw new ArgumentNullException(nameof(transformation));
 
-            BatchTransformation = batchOperation;
+            Transformation = transformation;
             return this;
         }
 
@@ -43,14 +44,15 @@ namespace ElasticUp.Operation
             return this;
         }
 
-        public BatchedElasticUpOperation<TDocument> WithOnBatchProcessed(BatchProcessedHandler eventHandler)
+        public BatchedElasticUpOperation<TDocument> WithOnDocumentProcessed(Action<TDocument> onDocumentProcessed)
         {
-            if (eventHandler == null)
-                throw new ArgumentNullException(nameof(eventHandler));
+            if (onDocumentProcessed == null)
+                throw new ArgumentNullException(nameof(onDocumentProcessed));
 
-            BatchProcessed += eventHandler;
+            OnDocumentProcessed = onDocumentProcessed;
             return this;
-        }    
+        }
+
 
         public BatchedElasticUpOperation<TDocument> WithBatchSize(int batchSize)
         {
@@ -91,14 +93,14 @@ namespace ElasticUp.Operation
 
         private void ProcessBatch(IElasticClient elasticClient, IList<TDocument> documentBatch, string toIndex)
         {
-            var transformedDocuments = BatchTransformation.Invoke(documentBatch)?.ToList() ?? new List<TDocument>();
+
+            var transformedDocuments = documentBatch.Select(Transformation).Where(doc => doc != null).ToList();
             elasticClient.IndexMany(transformedDocuments, index: toIndex);
-            BatchProcessed?.Invoke(documentBatch, transformedDocuments);
+
+            foreach (var transformedDocument in transformedDocuments)
+            {
+                OnDocumentProcessed?.Invoke(transformedDocument);
+            }
         }
-
-        public event BatchProcessedHandler BatchProcessed;
-
-        public delegate void BatchProcessedHandler(IEnumerable<TDocument> originalDocuments, IEnumerable<TDocument> transformedDocuments);
     }
-
 }

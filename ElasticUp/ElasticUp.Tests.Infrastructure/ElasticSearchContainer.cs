@@ -74,7 +74,7 @@ namespace ElasticUp.Tests.Infrastructure
 
         private static async Task<bool> IsElasticSearchUpAndRunning()
         {
-            const string endpointUrl = "http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=30s";
+            const string endpointUrl = "http://localhost:9201/_cluster/health?wait_for_status=yellow&timeout=30s";
 
             using (var httpClient = new HttpClient())
             using (var request = new HttpRequestMessage(HttpMethod.Get, endpointUrl))

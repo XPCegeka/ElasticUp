@@ -8,7 +8,7 @@ namespace ElasticUp.Tests
     public abstract class AbstractIntegrationTest
     {
         private ElasticSearchContainer _esService;
-        protected readonly IElasticClient ElasticClient = new ElasticClient(new Uri("http://localhost:9200/"));
+        protected readonly IElasticClient ElasticClient = new ElasticClient(new Uri("http://localhost:9201/"));
         
         [SetUp]
         protected void SetUp()

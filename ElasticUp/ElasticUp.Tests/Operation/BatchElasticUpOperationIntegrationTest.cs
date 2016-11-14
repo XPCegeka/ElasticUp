@@ -12,7 +12,7 @@ namespace ElasticUp.Tests.Operation
     public class BatchElasticUpOperationIntegrationTest : AbstractIntegrationTest
     {
         [Test]
-        public void Execute_ProcessesDocumentsInBatchesAndInsertsInNewIndex()
+        public void Execute_ProcessesDocumentsAndInsertsInNewIndex()
         {
             // GIVEN
             const string fromIndex = "from";
@@ -24,27 +24,18 @@ namespace ElasticUp.Tests.Operation
 
 
             // TEST
-            var processedDocumentCount = 0;
-            var processedBatchCount = 0;
+            var processedRecordCount = 0;
             var operation = new BatchedElasticUpOperation<SampleObject>(0)
-                .WithBatchTransformation(docs =>
+                .WithDocumentTransformation(doc =>
                 {
-                    processedBatchCount++;
-                    var transformedDocs = new List<SampleObject>();
-                    foreach (var doc in docs)
-                    {
-                        processedDocumentCount++;
-                        transformedDocs.Add(doc);
-                    }
-
-                    return transformedDocs;
+                    processedRecordCount++;
+                    return doc;
                 });
 
             operation.Execute(ElasticClient, fromIndex, toIndex);
 
             // VERIFY
-            processedDocumentCount.Should().Be(expectedDocumentCount);
-            processedBatchCount.Should().Be(10);
+            processedRecordCount.Should().Be(expectedDocumentCount);
 
             ElasticClient.Refresh(Indices.All);
             var countResponse = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(toIndex));
@@ -52,34 +43,32 @@ namespace ElasticUp.Tests.Operation
         }
 
         [Test]
-        public void Execute_WithOnBatchProcessed_ProcessesDocumentsInBatchesAndInvokesEventHandler()
+        public void Execute_WithOnDocumentProcessed_InvokesEventHandler()
         {
             // GIVEN
             const string fromIndex = "from";
             const string toIndex = "to";
             const int expectedDocumentCount = 50000;
-            var sampleDocuments = Enumerable.Range(0, expectedDocumentCount).Select(n => new SampleObject { Number = n });
+            var sampleDocuments = Enumerable.Range(0, expectedDocumentCount).Select(n => new SampleObject { Number = n }).ToList();
             ElasticClient.IndexMany(sampleDocuments, fromIndex);
             ElasticClient.Refresh(Indices.All);
 
             // TEST
-            var numberOfTimesInvoked = 0;
+            var processedDocuments = new List<SampleObject>();
             var operation = new BatchedElasticUpOperation<SampleObject>(0)
-                .WithBatchTransformation(docs => new List<SampleObject>(docs))
-                .WithOnBatchProcessed((originalDocuments, transformedDocuments) =>
+                .WithOnDocumentProcessed(doc =>
                 {
-                    numberOfTimesInvoked++;
-                    originalDocuments.ShouldBeEquivalentTo(transformedDocuments);
+                    processedDocuments.Add(doc);
                 });
 
             operation.Execute(ElasticClient, fromIndex, toIndex);
 
             // VERIFY
-            numberOfTimesInvoked.Should().Be(10);
+            processedDocuments.OrderBy(doc => doc.Number).ShouldAllBeEquivalentTo(sampleDocuments.OrderBy(doc => doc.Number));
         }
 
         [Test]
-        public void Execute_WithSearchDescriptor_ProcessesFilteredDocumentsInBatchesAndInsertsInNewIndex()
+        public void Execute_WithSearchDescriptor_ProcessesFilteredDocumentsAndInsertsInNewIndex()
         {
             // GIVEN
             const string fromIndex = "from";
@@ -91,35 +80,21 @@ namespace ElasticUp.Tests.Operation
 
 
             // TEST
-            var processedDocumentCount = 0;
             var operation = new BatchedElasticUpOperation<SampleObject>(0)
                 .WithSearchDescriptor(descriptor =>
                     descriptor.Query(query =>
-                        query.Range(rangeQuery => rangeQuery.Field(x => x.Number).LessThan(10000))))
-                .WithBatchTransformation(docs =>
-                {
-                    var transformedDocs = new List<SampleObject>();
-                    foreach (var doc in docs)
-                    {
-                        processedDocumentCount++;
-                        transformedDocs.Add(doc);
-                    }
-
-                    return transformedDocs;
-                });
+                        query.Range(rangeQuery => rangeQuery.Field(x => x.Number).LessThan(10000))));
 
             operation.Execute(ElasticClient, fromIndex, toIndex);
 
             // VERIFY
-            processedDocumentCount.Should().Be(10000);
-
             ElasticClient.Refresh(Indices.All);
             var countResponse = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(toIndex));
             countResponse.Count.Should().Be(10000);
         }
 
         [Test]
-        public void Execute_WithBatchTransformationWithFilters_ProcessesAllDocumentsInBatchesAndInsertsFilteredInNewIndex()
+        public void Execute_WithDocumentTransformationWithFilters_ProcessesAllDocumentsInBatchesAndInsertsFilteredInNewIndex()
         {
             // GIVEN
             const string fromIndex = "from";
@@ -134,21 +109,16 @@ namespace ElasticUp.Tests.Operation
             var processedDocumentCount = 0;
             var documentCountWithEvenNumber = 0;
             var operation = new BatchedElasticUpOperation<SampleObject>(0)
-                .WithBatchTransformation(docs =>
+                .WithDocumentTransformation(doc =>
                 {
-                    var transformedDocs = new List<SampleObject>();
-                    foreach (var doc in docs)
+                    processedDocumentCount++;
+
+                    if (doc.Number%2 == 0)
                     {
-                        processedDocumentCount++;
-
-                        if (doc.Number%2 == 0)
-                        {
-                            documentCountWithEvenNumber++;
-                            transformedDocs.Add(doc);
-                        }
+                        documentCountWithEvenNumber++;
+                        return doc;
                     }
-
-                    return transformedDocs;
+                    return null;
                 });
 
             operation.Execute(ElasticClient, fromIndex, toIndex);
@@ -170,8 +140,7 @@ namespace ElasticUp.Tests.Operation
             const string toIndex = "to";
 
             // TEST
-            var operation = new BatchedElasticUpOperation<SampleObject>(0)
-                .WithBatchTransformation(docs => docs.ToList());
+            var operation = new BatchedElasticUpOperation<SampleObject>(0);
             
             Assert.Throws<Exception>(() => operation.Execute(ElasticClient, fromIndex, toIndex));
         }

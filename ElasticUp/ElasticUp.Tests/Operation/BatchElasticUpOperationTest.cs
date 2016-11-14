@@ -31,7 +31,7 @@ namespace ElasticUp.Tests.Operation
         {
             var operation = new BatchedElasticUpOperation<SampleObject>(0);
 
-            Assert.Throws<ArgumentNullException>(() => operation.WithBatchTransformation(null));
+            Assert.Throws<ArgumentNullException>(() => operation.WithDocumentTransformation(null));
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace ElasticUp.Tests.Operation
         {
             var operation = new BatchedElasticUpOperation<SampleObject>(0);
 
-            Assert.Throws<ArgumentNullException>(() => operation.WithOnBatchProcessed(null));
+            Assert.Throws<ArgumentNullException>(() => operation.WithOnDocumentProcessed(null));
         }
     }
 }
