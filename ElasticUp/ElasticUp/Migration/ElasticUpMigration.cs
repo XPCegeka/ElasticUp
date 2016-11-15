@@ -13,13 +13,13 @@ namespace ElasticUp.Migration
         internal List<ElasticUpOperation> Operations { get; }
         public string IndexAlias { get; protected set; }
 
-        internal ElasticUpMigration(int migrationNumber)
+        protected ElasticUpMigration(int migrationNumber)
         {
             MigrationNumber = migrationNumber;
             Operations = new List<ElasticUpOperation>();
         }
 
-        internal void Operation(ElasticUpOperation operation)
+        public void Operation(ElasticUpOperation operation)
         {
             if(HasDuplicateOperationNumber(operation)) 
                 throw new ArgumentException("Duplicate operation number.");
