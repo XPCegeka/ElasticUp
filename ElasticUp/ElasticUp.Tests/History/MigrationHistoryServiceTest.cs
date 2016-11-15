@@ -21,7 +21,6 @@ namespace ElasticUp.Tests.History
         [Test]
         public void CopyMigrationHistory_ThrowsWithInvalidParameters()
         {
-            var elasticClient = Substitute.For<IElasticClient>();
             var migrationHistoryService = new MigrationHistoryService(_elasticClient);
 
             Assert.Throws<ArgumentNullException>(() => migrationHistoryService.CopyMigrationHistory(null, "x"));
