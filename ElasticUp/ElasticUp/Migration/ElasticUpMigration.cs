@@ -21,9 +21,7 @@ namespace ElasticUp.Migration
 
         public void Operation(ElasticUpOperation operation)
         {
-            if(HasDuplicateOperationNumber(operation)) 
-                throw new ArgumentException("Duplicate operation number.");
-
+            if(HasDuplicateOperationNumber(operation)) throw new ArgumentException("Duplicate operation number.");
             Operations.Add(operation);
         }
 

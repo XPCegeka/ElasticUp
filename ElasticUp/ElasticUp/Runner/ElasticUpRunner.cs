@@ -34,8 +34,6 @@ namespace ElasticUp.Runner
                 }
 
                 SetAliasesForMigration(migration, indicesForAlias);
-
-                //TODO add this migration to MigrationHistory in new index ?
             }
             Console.WriteLine("Finished ElasticUp migrations");
         }
@@ -44,8 +42,7 @@ namespace ElasticUp.Runner
         {
             var aliasHelper = new AliasHelper(_elasticClient);
             aliasHelper.RemoveAliasOnIndices(migration.IndexAlias, indicesForAlias.ToArray());
-            var newIndices =
-                indicesForAlias.Select(x => VersionedIndexName.CreateFromIndexName(x).GetIncrementedVersion().ToString());
+            var newIndices = indicesForAlias.Select(x => VersionedIndexName.CreateFromIndexName(x).GetIncrementedVersion().ToString());
             aliasHelper.AddAliasOnIndices(migration.IndexAlias, newIndices.ToArray());
         }
 
