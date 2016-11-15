@@ -48,6 +48,9 @@
   <ItemGroup>
     <Compile Include="Extension\TimeSpanExtensions.cs" />
     <Compile Include="History\MigrationHistory.cs" />
+    <Compile Include="Migration\AbstractElasticUpMigration.cs" />
+    <Compile Include="Migration\CustomElasticUpMigration.cs" />
+    <Compile Include="Migration\DefaultElasticUpMigration.cs" />
     <Compile Include="Migration\ElasticUpMigration.cs" />
     <Compile Include="Migration\Meta\AliasHelper.cs" />
     <Compile Include="Operation\BatchedElasticUpOperation.cs" />
