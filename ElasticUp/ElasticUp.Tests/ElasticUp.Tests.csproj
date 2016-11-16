@@ -77,6 +77,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AbstractIntegrationTest.cs" />
+    <Compile Include="Elastic\ElasticClientHelperIntegrationTest.cs" />
     <Compile Include="Extension\ElasticClientExtensionsTest.cs" />
     <Compile Include="History\MigrationHistoryHelperTest.cs" />
     <Compile Include="Operation\BatchElasticUpOperationIntegrationTest.cs" />

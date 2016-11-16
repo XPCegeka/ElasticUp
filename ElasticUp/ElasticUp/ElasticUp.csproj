@@ -46,6 +46,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Elastic\ElasticClientHelper.cs" />
+    <Compile Include="Elastic\ElasticUpException.cs" />
     <Compile Include="Extension\TimeSpanExtensions.cs" />
     <Compile Include="History\MigrationHistory.cs" />
     <Compile Include="Migration\AbstractElasticUpMigration.cs" />

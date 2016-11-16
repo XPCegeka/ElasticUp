@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using ElasticUp.Migration;
 using ElasticUp.Operation;
 using Nest;
+using static ElasticUp.Elastic.ElasticClientHelper;
 
 namespace ElasticUp.History
 {
@@ -44,7 +46,7 @@ namespace ElasticUp.History
 
             var history = new MigrationHistory(migrationName, exception);
 
-            _elasticClient.Index(history, descriptor => descriptor.Index(indexName));
+            ValidateElasticResponse(_elasticClient.Index(history, descriptor => descriptor.Index(indexName)));
         }
 
         public bool HasMigrationAlreadyBeenApplied(AbstractElasticUpMigration migration, string indexName)
@@ -59,12 +61,15 @@ namespace ElasticUp.History
             if (string.IsNullOrEmpty(indexName))
                 throw new ArgumentNullException(nameof(indexName));
 
-            var existsResponse = _elasticClient.Get<MigrationHistory>(migrationName, descriptor => descriptor.Index(indexName));
+            var searchResponse = _elasticClient.Search<MigrationHistory>(sd =>
+                sd.Index(Indices.Parse(indexName))
+                  .From(0).Size(5000)
+                  .Query(q => q.Term(f => f.Id, migrationName.ToLower())));
 
-            if (existsResponse.ServerError != null)
-                throw new Exception($"Could not verify if migration '{migrationName}' was already applied. Debug information: '{existsResponse.DebugInformation}'");
+            ValidateElasticResponse(searchResponse);
 
-            return existsResponse.Found && existsResponse.Source.HasBeenAppliedSuccessfully;
+            var foundMigration = searchResponse.Documents.SingleOrDefault(); //count should be 0 or 1 - but search to prevent 404
+            return foundMigration != null && foundMigration.HasBeenAppliedSuccessfully;
         }
     }
 }

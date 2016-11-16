@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ElasticUp.Elastic;
 using ElasticUp.History;
 using ElasticUp.Migration;
 using ElasticUp.Operation;
@@ -166,7 +167,7 @@ namespace ElasticUp.Tests.History
 
             // TEST
             var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient);
-            Assert.Throws<Exception>(() => migrationHistoryHelper.HasMigrationAlreadyBeenApplied(migration, "unknown-index"));
+            Assert.Throws<ElasticUpException>(() => migrationHistoryHelper.HasMigrationAlreadyBeenApplied(migration, "unknown-index"));
         }
     }
 }
