@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ElasticUp.Operation;
 using FluentAssertions;
 using Nest;
-using NSubstitute;
 using NUnit.Framework;
 
 namespace ElasticUp.Tests.Operation
 {
+    [TestFixture]
     public class BatchElasticUpOperationIntegrationTest : AbstractIntegrationTest
     {
         [Test]
@@ -144,5 +145,50 @@ namespace ElasticUp.Tests.Operation
             
             Assert.Throws<Exception>(() => operation.Execute(ElasticClient, fromIndex, toIndex));
         }
+
+        [Test]
+        public void ParallelTest()
+        {
+            // GIVEN
+            const string index = "from";
+            const int documentCount = 25000;
+            var documents = Enumerable.Range(0, documentCount).Select(n => new SampleObject {Number = n}).ToList();
+            ElasticClient.IndexMany(documents, index);
+            ElasticClient.Refresh(Indices.All);
+
+            // TEST
+            var actualDocuments = new List<SampleObject>(documentCount);
+            var scrollTimeout = new Time(60*1000);
+            var searchResponse = ElasticClient.Search<SampleObject>(descriptor => descriptor.Scroll(scrollTimeout).Size(5000).Index(index));
+            actualDocuments.AddRange(searchResponse.Documents);
+
+            var scrollId = searchResponse.ScrollId;
+            DoScroll<SampleObject>(scrollId, docs => { actualDocuments.AddRange(docs); }).Wait();
+        }
+
+        private Task<ISearchResponse<TDocument>> DoScroll<TDocument>(string scrollId, Action<IEnumerable<TDocument>> action) where TDocument : class
+        {
+            Console.WriteLine(@"Retrieving data");
+            var scrollTimeout = new Time(60 * 1000);
+            var bar = ElasticClient.ScrollAsync<TDocument>(scrollTimeout, scrollId)
+                .ContinueWith(responseTask =>
+                {
+                    Console.WriteLine(@"Data retrieved");
+
+                    var response = responseTask.Result;
+                    if (!response.Documents.Any())
+                        return responseTask;
+
+                    var doScrollTask = DoScroll(response.ScrollId, action);
+                    Console.WriteLine(@"Processing data");
+                    action(response.Documents);
+                    Console.WriteLine(@"Data processed");
+
+                    return doScrollTask;
+                });
+
+            return bar.Unwrap();
+        }
     }
 }
+
