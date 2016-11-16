@@ -6,7 +6,7 @@ using FluentAssertions;
 using Nest;
 using NUnit.Framework;
 
-namespace ElasticUp.Tests.Runner
+namespace ElasticUp.Tests
 {
     [TestFixture]
     public class ElasticUpIntegrationTest : AbstractIntegrationTest
@@ -43,7 +43,6 @@ namespace ElasticUp.Tests.Runner
             indicesPointingToAlias.Should().HaveCount(1);
             indicesPointingToAlias[0].Should().Be(newIndexName);
         }
-
 
         [Test]
         public void ElasticUp_FullStackTest_FromIndexWithPriorMigrations()

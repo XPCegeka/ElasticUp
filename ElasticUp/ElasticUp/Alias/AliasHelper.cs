@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Nest;
 
-namespace ElasticUp.Migration.Meta
+namespace ElasticUp.Alias
 {
     public class AliasHelper
     {

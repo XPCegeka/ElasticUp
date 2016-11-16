@@ -5,11 +5,11 @@ using Nest;
 
 namespace ElasticUp.History
 {
-    public class MigrationHistoryService
+    public class MigrationHistoryHelper
     {
         private readonly IElasticClient _elasticClient;
 
-        public MigrationHistoryService(IElasticClient elasticClient)
+        public MigrationHistoryHelper(IElasticClient elasticClient)
         {
             _elasticClient = elasticClient;
         }
@@ -30,17 +30,12 @@ namespace ElasticUp.History
             AddMigrationToHistory(migration?.ToString(), indexName, null);
         }
 
-        public void AddMigrationToHistory(ElasticUpMigration migration, string indexName)
-        {
-            AddMigrationToHistory(migration?.ToString(), indexName, null);
-        }
-
         public void AddMigrationToHistory(AbstractElasticUpMigration migration, string indexName, Exception exception)
         {
             AddMigrationToHistory(migration?.ToString(), indexName, exception);
         }
 
-        public void AddMigrationToHistory(string migrationName, string indexName, Exception exception)
+        private void AddMigrationToHistory(string migrationName, string indexName, Exception exception)
         {
             if (string.IsNullOrWhiteSpace(migrationName))
                 throw new ArgumentNullException(nameof(migrationName));
@@ -54,12 +49,7 @@ namespace ElasticUp.History
 
         public bool HasMigrationAlreadyBeenApplied(AbstractElasticUpMigration migration, string indexName)
         {
-            return HasMigrationAlreadyBeenApplied(migration.ToString(), indexName);
-        }
-
-        public bool HasMigrationAlreadyBeenApplied(ElasticUpMigration migration, string indexName)
-        {
-            return HasMigrationAlreadyBeenApplied(migration.ToString(), indexName);
+            return HasMigrationAlreadyBeenApplied(migration?.ToString(), indexName);
         }
 
         private bool HasMigrationAlreadyBeenApplied(string migrationName, string indexName)

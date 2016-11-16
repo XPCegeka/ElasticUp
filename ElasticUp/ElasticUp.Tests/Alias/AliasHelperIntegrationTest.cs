@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
-using ElasticUp.Migration.Meta;
+using ElasticUp.Alias;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
 
-namespace ElasticUp.Tests.Migration.Meta
+namespace ElasticUp.Tests.Alias
 {
     [TestFixture]
     public class AliasHelperIntegrationTest : AbstractIntegrationTest

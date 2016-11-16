@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using ElasticUp.Alias;
 using ElasticUp.Extension;
 using ElasticUp.History;
+using ElasticUp.Migration.Meta;
 using ElasticUp.Operation;
 using Nest;
 
@@ -12,9 +14,10 @@ namespace ElasticUp.Migration
     public abstract class AbstractElasticUpMigration
     {
         protected IElasticClient ElasticClient;
-        protected MigrationHistoryService MigrationHistoryService;
+        protected MigrationHistoryHelper MigrationHistoryHelper;
+        protected AliasHelper AliasHelper;
 
-        public List<ElasticUpOperation> Operations { get; }
+        public List<ElasticUpOperation> Operations { get; } = new List<ElasticUpOperation>();
 
         protected string SourceIndex;
         protected string TargetIndex;
@@ -28,7 +31,8 @@ namespace ElasticUp.Migration
         public void SetElasticClient(IElasticClient elasticClient)
         {
             ElasticClient = elasticClient;
-            MigrationHistoryService = new MigrationHistoryService(ElasticClient);
+            MigrationHistoryHelper = new MigrationHistoryHelper(ElasticClient);
+            AliasHelper = new AliasHelper(ElasticClient);
         }
 
         public virtual void Run()
@@ -54,7 +58,7 @@ namespace ElasticUp.Migration
 
         protected virtual bool SkipMigration()
         {
-            if (MigrationHistoryService.HasMigrationAlreadyBeenApplied(this, SourceIndex))
+            if (MigrationHistoryHelper.HasMigrationAlreadyBeenApplied(this, SourceIndex))
             {
                 Console.WriteLine($"Already ran migration {this} on old index {SourceIndex}. Not migrating to new index {TargetIndex}");
                 return true;
@@ -65,7 +69,7 @@ namespace ElasticUp.Migration
         protected virtual void CopyHistory(string sourceIndex, string targetIndex)
         {
             Console.WriteLine($"Copying ElasticUp MigrationHistory from index {sourceIndex} to index {targetIndex}");
-            MigrationHistoryService.CopyMigrationHistory(sourceIndex, targetIndex);
+            MigrationHistoryHelper.CopyMigrationHistory(sourceIndex, targetIndex);
         }
 
         protected virtual void DoMigrationTasks()
@@ -76,7 +80,23 @@ namespace ElasticUp.Migration
         protected virtual void AddMigrationToHistory(AbstractElasticUpMigration migration, string index)
         {
             Console.WriteLine($"Adding ElasticUp Migration {migration} to MigrationHistory of index {index}");
-            MigrationHistoryService.AddMigrationToHistory(migration, index);
+            MigrationHistoryHelper.AddMigrationToHistory(migration, index);
+        }
+
+        protected virtual void MoveAlias(string alias, string sourceIndex, string targetIndex)
+        {
+            RemoveAlias(alias, sourceIndex);
+            PutAlias(alias, targetIndex);
+        }
+
+        protected virtual void PutAlias(string alias, string index)
+        {
+            AliasHelper.AddAliasOnIndices(alias, index);
+        }
+
+        protected virtual void RemoveAlias(string alias, string index)
+        {
+            AliasHelper.RemoveAliasOnIndices(alias, index);
         }
 
         public void Operation(ElasticUpOperation operation)

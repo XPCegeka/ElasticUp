@@ -77,18 +77,18 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AbstractIntegrationTest.cs" />
-    <Compile Include="Helpers\ElasticClientExtensionsTest.cs" />
-    <Compile Include="History\MigrationHistoryServiceTest.cs" />
+    <Compile Include="Extension\ElasticClientExtensionsTest.cs" />
+    <Compile Include="History\MigrationHistoryHelperTest.cs" />
     <Compile Include="Operation\BatchElasticUpOperationIntegrationTest.cs" />
     <Compile Include="Operation\BatchElasticUpOperationTest.cs" />
     <Compile Include="Operation\CopyTypeOperationIntegrationTest.cs" />
     <Compile Include="Sample\SampleMigrationWithCopyTypeOperation.cs" />
     <Compile Include="Sample\SampleDocument.cs" />
     <Compile Include="ElasticServiceStartupType.cs" />
-    <Compile Include="History\MigrationHistoryServiceIntegrationTest.cs" />
-    <Compile Include="Migration\Meta\AliasHelperIntegrationTest.cs" />
+    <Compile Include="History\MigrationHistoryHelperIntegrationTest.cs" />
+    <Compile Include="Alias\AliasHelperIntegrationTest.cs" />
     <Compile Include="Sample\SampleEmptyOperation.cs" />
-    <Compile Include="Runner\ElasticUpIntegrationTest.cs" />
+    <Compile Include="ElasticUpIntegrationTest.cs" />
     <Compile Include="SampleObject.cs" />
     <Compile Include="Migration\Meta\VersionedIndexNameTest.cs" />
     <Compile Include="Sample\SampleEmptyMigration.cs" />

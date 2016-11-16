@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nest;
 
-namespace ElasticUp.Helpers
+namespace ElasticUp.Extension
 {
     internal static class ElasticClientExtensions
     {

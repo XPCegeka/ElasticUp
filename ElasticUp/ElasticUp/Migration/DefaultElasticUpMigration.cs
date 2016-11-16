@@ -33,9 +33,7 @@ namespace ElasticUp.Migration
         protected override void PostMigrationTasks()
         {
             AddMigrationToHistory(this, TargetIndex);
-            // TODO move alias
+            MoveAlias(IndexAlias, SourceIndex, TargetIndex);
         }
-
-       
     }
 }
