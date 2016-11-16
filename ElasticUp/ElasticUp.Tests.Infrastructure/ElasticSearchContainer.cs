@@ -65,7 +65,7 @@ namespace ElasticUp.Tests.Infrastructure
             var esBinPath = Path.Combine(_tempDirectory, @"bin\elasticsearch.bat");
             var processInfo = new ProcessStartInfo("cmd.exe", $"/c {esBinPath}")
             {
-                CreateNoWindow = true,
+                CreateNoWindow = false,
                 UseShellExecute = false
             };
 

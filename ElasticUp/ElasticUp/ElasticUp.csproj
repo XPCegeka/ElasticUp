@@ -55,6 +55,7 @@
     <Compile Include="Migration\Meta\AliasHelper.cs" />
     <Compile Include="Operation\BatchedElasticUpOperation.cs" />
     <Compile Include="Operation\CopyTypeOperation.cs" />
+    <Compile Include="Helpers\ElasticClientExtensions.cs" />
     <Compile Include="Operation\ElasticUpOperation.cs" />
     <Compile Include="Migration\Meta\VersionedIndexName.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
