@@ -1,5 +1,6 @@
 using System;
 using ElasticUp.History;
+using ElasticUp.Migration;
 using ElasticUp.Tests.Sample;
 using Nest;
 using NSubstitute;
@@ -34,7 +35,7 @@ namespace ElasticUp.Tests.History
         public void AddMigrationHistory_ThrowsWithInvalidParameters()
         {
             var migrationHistoryService = new MigrationHistoryService(_elasticClient);
-            Assert.Throws<ArgumentNullException>(() => migrationHistoryService.AddMigrationToHistory(null, "x"));
+            Assert.Throws<ArgumentNullException>(() => migrationHistoryService.AddMigrationToHistory((AbstractElasticUpMigration)null, "x"));
             Assert.Throws<ArgumentNullException>(() => migrationHistoryService.AddMigrationToHistory(new SampleEmptyMigration(0), null));
             Assert.Throws<ArgumentNullException>(() => migrationHistoryService.AddMigrationToHistory(new SampleEmptyMigration(0), string.Empty));
         }
@@ -43,16 +44,16 @@ namespace ElasticUp.Tests.History
         public void AddMigrationHistory_WithException_ThrowsWithInvalidParameters()
         {
             var migrationHistoryService = new MigrationHistoryService(_elasticClient);
-            Assert.Throws<ArgumentNullException>(() => migrationHistoryService.AddMigrationToHistory(null, "x", null));
-            Assert.Throws<ArgumentNullException>(() => migrationHistoryService.AddMigrationToHistory(new SampleEmptyMigration(0), null, null));
-            Assert.Throws<ArgumentNullException>(() => migrationHistoryService.AddMigrationToHistory(new SampleEmptyMigration(0), string.Empty, null));
+            Assert.Throws<ArgumentNullException>(() => migrationHistoryService.AddMigrationToHistory((AbstractElasticUpMigration)null, "x", null));
+            Assert.Throws<ArgumentNullException>(() => migrationHistoryService.AddMigrationToHistory(new SampleEmptyMigration(0).ToString(), null, null));
+            Assert.Throws<ArgumentNullException>(() => migrationHistoryService.AddMigrationToHistory(new SampleEmptyMigration(0).ToString(), string.Empty, null));
         }
 
         [Test]
         public void HasMigrationAlreadyBeenApplied_ThrowsWithInvalidParameters()
         {
             var migrationHistoryService = new MigrationHistoryService(_elasticClient);
-            Assert.Throws<ArgumentNullException>(() => migrationHistoryService.HasMigrationAlreadyBeenApplied(null, "x"));
+            Assert.Throws<ArgumentNullException>(() => migrationHistoryService.HasMigrationAlreadyBeenApplied((AbstractElasticUpMigration)null, "x"));
             Assert.Throws<ArgumentNullException>(() => migrationHistoryService.HasMigrationAlreadyBeenApplied(new SampleEmptyMigration(0), null));
             Assert.Throws<ArgumentNullException>(() => migrationHistoryService.HasMigrationAlreadyBeenApplied(new SampleEmptyMigration(0), string.Empty));
         }

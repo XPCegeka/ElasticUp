@@ -106,7 +106,7 @@ namespace ElasticUp.Tests.History
             const string toIndex = "to";
 
             var migration = new SampleEmptyMigration(0);
-            var migrationHistory = new MigrationHistory(migration);
+            var migrationHistory = new MigrationHistory(migration.ToString());
 
             ElasticClient.Index(migrationHistory, descriptor => descriptor.Index(toIndex));
             ElasticClient.Refresh(Indices.All);
@@ -145,7 +145,7 @@ namespace ElasticUp.Tests.History
             const string toIndex = "to";
 
             var migration = new SampleEmptyMigration(0);
-            var migrationHistory = new MigrationHistory(migration, new Exception());
+            var migrationHistory = new MigrationHistory(migration.ToString(), new Exception());
 
             ElasticClient.Index(migrationHistory, descriptor => descriptor.Index(toIndex));
             ElasticClient.Refresh(Indices.All);

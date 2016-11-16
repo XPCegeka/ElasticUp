@@ -1,9 +1,11 @@
-﻿using ElasticUp.Migration;
+﻿using System;
+using ElasticUp.Migration;
 
 namespace ElasticUp.Tests.Sample
 {
-    public class SampleEmptyMigration : ElasticUpMigration
+    public class SampleEmptyMigration : DefaultElasticUpMigration
     {
-        public SampleEmptyMigration(int migrationNumber) : base(migrationNumber) {}
+        public SampleEmptyMigration(int migrationNumber) : base(migrationNumber, "sampleIndex") {}
+        public SampleEmptyMigration(int migrationNumber, string indexAlias) : base(migrationNumber, indexAlias) {}
     }
 }

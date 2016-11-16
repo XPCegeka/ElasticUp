@@ -25,48 +25,57 @@ namespace ElasticUp.History
             copyTypeOperation.Execute(_elasticClient, fromIndex, toIndex);
         }
 
-        public void AddMigrationToHistory(ElasticUpMigration migration, string indexName)
+        public void AddMigrationToHistory(AbstractElasticUpMigration migration, string indexName)
         {
-            AddMigrationToHistory(migration, indexName, null);
+            AddMigrationToHistory(migration?.ToString(), indexName, null);
         }
 
-        public void AddMigrationToHistory(ElasticUpMigration migration, string indexName, Exception exception)
+        public void AddMigrationToHistory(ElasticUpMigration migration, string indexName)
         {
-            if (migration == null)
-                throw new ArgumentNullException(nameof(migration));
+            AddMigrationToHistory(migration?.ToString(), indexName, null);
+        }
+
+        public void AddMigrationToHistory(AbstractElasticUpMigration migration, string indexName, Exception exception)
+        {
+            AddMigrationToHistory(migration?.ToString(), indexName, exception);
+        }
+
+        public void AddMigrationToHistory(string migrationName, string indexName, Exception exception)
+        {
+            if (string.IsNullOrWhiteSpace(migrationName))
+                throw new ArgumentNullException(nameof(migrationName));
             if (string.IsNullOrEmpty(indexName))
                 throw new ArgumentNullException(nameof(indexName));
 
-            var history = new MigrationHistory(migration, exception);
+            var history = new MigrationHistory(migrationName, exception);
 
             _elasticClient.Index(history, descriptor => descriptor.Index(indexName));
         }
 
+        public bool HasMigrationAlreadyBeenApplied(AbstractElasticUpMigration migration, string indexName)
+        {
+            return HasMigrationAlreadyBeenApplied(migration.ToString(), indexName);
+        }
+
         public bool HasMigrationAlreadyBeenApplied(ElasticUpMigration migration, string indexName)
         {
-            if (migration == null)
-                throw new ArgumentNullException(nameof(migration));
+            return HasMigrationAlreadyBeenApplied(migration.ToString(), indexName);
+        }
+
+        private bool HasMigrationAlreadyBeenApplied(string migrationName, string indexName)
+        {
+            if (string.IsNullOrWhiteSpace(migrationName))
+                throw new ArgumentNullException(nameof(migrationName));
             if (string.IsNullOrEmpty(indexName))
                 throw new ArgumentNullException(nameof(indexName));
 
-            var existsResponse = _elasticClient.Get<MigrationHistory>(migration.ToString(), descriptor => descriptor.Index(indexName));
+            var existsResponse = _elasticClient.Get<MigrationHistory>(migrationName, descriptor => descriptor.Index(indexName));
 
             if (existsResponse.ServerError != null)
-                throw new Exception($"Could not verify if migration '{migration}' was already applied. Debug information: '{existsResponse.DebugInformation}'");
+                throw new Exception($"Could not verify if migration '{migrationName}' was already applied. Debug information: '{existsResponse.DebugInformation}'");
 
             return existsResponse.Found && existsResponse.Source.HasBeenAppliedSuccessfully;
         }
-
-        /*
-        public void OperationSucceeded(IElasticSearchOperation migrationThatSucceeded)
-        {
-            _elasticClient.Index(new ExecutedOperation(migrationThatSucceeded), idx => idx.Index(migrationThatSucceeded.GetTargetIndexName(_elasticClient)));
-        }
-
-        public void OperationFailed(IElasticSearchOperation migrationThatFailed, Exception e)
-        {
-            _elasticClient.Index(new ExecutedOperation(migrationThatFailed, e), idx => idx.Index(migrationThatFailed.GetTargetIndexName(_elasticClient)));
-        }*/
     }
 }
 

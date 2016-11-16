@@ -11,15 +11,14 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.Migration
 {
     [TestFixture]
-    public class ElasticUpMigrationIntegrationTest : AbstractIntegrationTest
+    public class AbstractElasticUpMigrationTest
     {
-        private ElasticUpMigration _elasticUpMigration;
+        private AbstractElasticUpMigration _elasticUpMigration;
         
         [SetUp]
         public void Setup()
         {
-            _elasticUpMigration = new SampleEmptyMigration(0);
-            _elasticUpMigration.OnIndexAlias("test");
+            _elasticUpMigration = new SampleEmptyMigration(0, "test");
         }
 
         [Test]
@@ -45,28 +44,6 @@ namespace ElasticUp.Tests.Migration
             // WHEN / THEN
             _elasticUpMigration.Operation(operation1);
             Assert.Throws<ArgumentException>(() => _elasticUpMigration.Operation(operation2), "Duplicate operation number.");
-        }
-        
-        [Test]
-        public void Execute_ExecutesEachOperation()
-        {
-            // GIVEN
-            var operation1 = Substitute.For<ElasticUpOperation>(0);
-            var operation2 = Substitute.For<ElasticUpOperation>(1);
-            var elasticClient = Substitute.For<IElasticClient>();
-            
-            _elasticUpMigration.Operation(operation1);
-            _elasticUpMigration.Operation(operation2);
-
-            var index0 = new VersionedIndexName("test", 0);
-            var index1 = index0.GetIncrementedVersion();
-
-            // WHEN
-            _elasticUpMigration.Execute(elasticClient, index0, index1);
-
-            // THEN
-            operation1.Received().Execute(elasticClient, index0, index1);
-            operation2.Received().Execute(elasticClient, index0, index1);
         }
 
         [Test]

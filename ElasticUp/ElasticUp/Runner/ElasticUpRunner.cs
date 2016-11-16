@@ -10,6 +10,7 @@ using Nest;
 
 namespace ElasticUp.Runner
 {
+    [Obsolete("not used anymore - all done from ElasticUp class")]
     public class ElasticUpRunner
     {
         private readonly IElasticClient _elasticClient;
@@ -48,6 +49,11 @@ namespace ElasticUp.Runner
 
         private void Migrate(string indexName, ElasticUpMigration migration)
         {
+            //******* REFACTOR HOED *************/
+            //TODO move all this into the Migration.Execute and extract methods that can be overriden 
+            //ALSO move the alias changes into the migration and do the same
+
+
             var fromIndex = VersionedIndexName.CreateFromIndexName(indexName);
             var toIndex = fromIndex.GetIncrementedVersion();
             var migrationHistoryService = new MigrationHistoryService(_elasticClient);

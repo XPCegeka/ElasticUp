@@ -27,8 +27,7 @@ namespace ElasticUp.Tests.Runner
             ElasticClient.Refresh(Indices.All);
 
             // TEST
-            ElasticUp.Runner.ElasticUp
-                .ConfigureElasticUp(ElasticClient)
+            new ElasticUp(ElasticClient)
                 .Migration(new SampleMigrationWithCopyTypeOperation(0))
                 .Run();
 
@@ -65,8 +64,7 @@ namespace ElasticUp.Tests.Runner
             ElasticClient.Refresh(Indices.All);
 
             // TEST
-            ElasticUp.Runner.ElasticUp
-                .ConfigureElasticUp(ElasticClient)
+            new ElasticUp(ElasticClient)
                 .Migration(new SampleMigrationWithCopyTypeOperation(0))
                 .Run();
 

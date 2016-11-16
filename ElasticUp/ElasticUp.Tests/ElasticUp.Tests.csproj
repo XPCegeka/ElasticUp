@@ -91,7 +91,7 @@
     <Compile Include="SampleObject.cs" />
     <Compile Include="Migration\Meta\VersionedIndexNameTest.cs" />
     <Compile Include="Sample\SampleEmptyMigration.cs" />
-    <Compile Include="Migration\ElasticUpMigrationIntegrationTest.cs" />
+    <Compile Include="Migration\AbstractElasticUpMigrationTest.cs" />
     <Compile Include="Operation\CopyTypeOperationGenericTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -99,7 +99,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Runner\ElasticUpTest.cs" />
+    <Compile Include="ElasticUpTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

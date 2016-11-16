@@ -3,12 +3,11 @@ using ElasticUp.Operation;
 
 namespace ElasticUp.Tests.Sample
 {
-    public class SampleMigrationWithCopyTypeOperation : ElasticUpMigration
+    public class SampleMigrationWithCopyTypeOperation : DefaultElasticUpMigration
     {
-        public SampleMigrationWithCopyTypeOperation(int migrationNumber) : base(migrationNumber)
+        public SampleMigrationWithCopyTypeOperation(int migrationNumber) : base(migrationNumber, "sample-index")
         {
-            OnIndexAlias("sample-index")
-                .Operation(new CopyTypeOperation<SampleObject>(0));
+            Operation(new CopyTypeOperation<SampleObject>(0));
         }
     }
 }

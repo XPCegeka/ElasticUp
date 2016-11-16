@@ -15,13 +15,13 @@ namespace ElasticUp.History
 
         public MigrationHistory() {}
 
-        public MigrationHistory(ElasticUpMigration migration)
+        public MigrationHistory(string migrationName)
         {
-            Id = migration.ToString();
+            Id = migrationName;
             Applied = DateTime.UtcNow;
         }
 
-        public MigrationHistory(ElasticUpMigration migration, Exception e) : this(migration)
+        public MigrationHistory(string migrationName, Exception e) : this(migrationName)
         {
             Exception = e;
         }
