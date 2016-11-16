@@ -58,7 +58,7 @@ namespace ElasticUp.Tests
             ElasticClient.IndexMany(sampleObjects, oldIndexName);
             ElasticClient.PutAlias(oldIndexName, aliasName);
 
-            ElasticClient.Index(new MigrationHistory {Id = "Sample"}, descriptor => descriptor.Index(oldIndexName));
+            ElasticClient.Index(new MigrationHistory {Name = "Sample"}, descriptor => descriptor.Index(oldIndexName));
 
             ElasticClient.Refresh(Indices.All);
 

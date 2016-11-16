@@ -6,7 +6,7 @@ namespace ElasticUp.History
 {
     public class MigrationHistory
     {
-        public string Id { get; set; }
+        public string Name { get; set; }
         public DateTime Applied { get; set; }
         public Exception Exception { get; set; }
 
@@ -17,7 +17,7 @@ namespace ElasticUp.History
 
         public MigrationHistory(string migrationName)
         {
-            Id = migrationName;
+            Name = migrationName;
             Applied = DateTime.UtcNow;
         }
 

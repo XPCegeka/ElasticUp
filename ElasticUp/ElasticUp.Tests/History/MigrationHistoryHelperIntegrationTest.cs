@@ -25,7 +25,7 @@ namespace ElasticUp.Tests.History
             var migrationHistory = Enumerable.Range(1, 10)
                 .Select(n => new MigrationHistory
                 {
-                    Id = $"SampleMigration-{n}",
+                    Name = $"SampleMigration-{n}",
                     Applied = DateTime.UtcNow
                 }).ToList();
 

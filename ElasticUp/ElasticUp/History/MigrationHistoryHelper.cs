@@ -64,7 +64,7 @@ namespace ElasticUp.History
             var searchResponse = _elasticClient.Search<MigrationHistory>(sd =>
                 sd.Index(Indices.Parse(indexName))
                   .From(0).Size(5000)
-                  .Query(q => q.Term(f => f.Id, migrationName.ToLower())));
+                  .Query(q => q.Term(f => f.Name, migrationName.ToLower())));
 
             ValidateElasticResponse(searchResponse);
 
