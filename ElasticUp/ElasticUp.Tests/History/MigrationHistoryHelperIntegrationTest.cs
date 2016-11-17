@@ -23,10 +23,10 @@ namespace ElasticUp.Tests.History
             const string toIndex = "to";
 
             var migrationHistory = Enumerable.Range(1, 10)
-                .Select(n => new MigrationHistory
+                .Select(n => new ElasticUpMigrationHistory
                 {
-                    Name = $"SampleMigration-{n}",
-                    Applied = DateTime.UtcNow
+                    ElasticUpMigrationName = $"SampleMigration-{n}",
+                    ElasticUpMigrationApplied = DateTime.UtcNow
                 }).ToList();
 
             ElasticClient.IndexMany(migrationHistory, fromIndex);
@@ -38,7 +38,7 @@ namespace ElasticUp.Tests.History
 
             // VERIFY
             ElasticClient.Refresh(Indices.All);
-            var actualMigrationHistory = ElasticClient.Search<MigrationHistory>(descriptor => descriptor.Index(toIndex));
+            var actualMigrationHistory = ElasticClient.Search<ElasticUpMigrationHistory>(descriptor => descriptor.Index(toIndex));
             actualMigrationHistory.Documents.ShouldBeEquivalentTo(migrationHistory);
         }
 
@@ -58,7 +58,7 @@ namespace ElasticUp.Tests.History
 
             // VERIFY
             ElasticClient.Refresh(Indices.All);
-            var actualMigrationHistory = ElasticClient.Count<MigrationHistory>(descriptor => descriptor.Index(toIndex));
+            var actualMigrationHistory = ElasticClient.Count<ElasticUpMigrationHistory>(descriptor => descriptor.Index(toIndex));
             actualMigrationHistory.Count.Should().Be(0);
         }
 
@@ -76,8 +76,10 @@ namespace ElasticUp.Tests.History
 
             // VERIFY
             ElasticClient.Refresh(Indices.All);
-            var actualMigrationResponse = ElasticClient.Get<MigrationHistory>(migration.ToString(), descriptor => descriptor.Index(toIndex));
-            actualMigrationResponse.Found.Should().BeTrue();
+
+            var historyFromElastic = ElasticClient.Search<ElasticUpMigrationHistory>(sd => sd.Index(toIndex).Query(q => q.Term(t => t.ElasticUpMigrationName, migration.ToString()))).Documents.ToList();
+            historyFromElastic.Should().HaveCount(1);
+            historyFromElastic[0].ElasticUpMigrationName.Should().Be(migration.ToString());
         }
 
         [Test]
@@ -95,9 +97,11 @@ namespace ElasticUp.Tests.History
 
             // VERIFY
             ElasticClient.Refresh(Indices.All);
-            var actualMigration = ElasticClient.Get<MigrationHistory>(migration.ToString(), descriptor => descriptor.Index(toIndex));
-            actualMigration.Found.Should().BeTrue();
-            actualMigration.Source.Exception.Message.Should().Be(exception.Message);
+            
+            var historyFromElastic = ElasticClient.Search<ElasticUpMigrationHistory>(sd => sd.Index(toIndex).Query(q => q.Term(t => t.ElasticUpMigrationName, migration.ToString()))).Documents.ToList();
+            historyFromElastic.Should().HaveCount(1);
+            historyFromElastic[0].ElasticUpMigrationName.Should().Be(migration.ToString());
+            historyFromElastic[0].ElasticUpMigrationException.Message.Should().Be(exception.Message);
         }
 
         [Test]
@@ -107,7 +111,7 @@ namespace ElasticUp.Tests.History
             const string toIndex = "to";
 
             var migration = new SampleEmptyMigration(0);
-            var migrationHistory = new MigrationHistory(migration.ToString());
+            var migrationHistory = new ElasticUpMigrationHistory(migration.ToString());
 
             ElasticClient.Index(migrationHistory, descriptor => descriptor.Index(toIndex));
             ElasticClient.Refresh(Indices.All);
@@ -146,7 +150,7 @@ namespace ElasticUp.Tests.History
             const string toIndex = "to";
 
             var migration = new SampleEmptyMigration(0);
-            var migrationHistory = new MigrationHistory(migration.ToString(), new Exception());
+            var migrationHistory = new ElasticUpMigrationHistory(migration.ToString(), new Exception());
 
             ElasticClient.Index(migrationHistory, descriptor => descriptor.Index(toIndex));
             ElasticClient.Refresh(Indices.All);

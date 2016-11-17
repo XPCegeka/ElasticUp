@@ -36,7 +36,7 @@ namespace ElasticUp.Tests
             var objCountInNewIndex = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(newIndexName)).Count;
             objCountInNewIndex.Should().Be(sampleObjects.Count);
 
-            var migrationHistoryCountInNewIndex = ElasticClient.Count<MigrationHistory>(descriptor => descriptor.Index(newIndexName)).Count;
+            var migrationHistoryCountInNewIndex = ElasticClient.Count<ElasticUpMigrationHistory>(descriptor => descriptor.Index(newIndexName)).Count;
             migrationHistoryCountInNewIndex.Should().Be(1);
             
             var indicesPointingToAlias = ElasticClient.GetIndicesPointingToAlias(aliasName);
@@ -58,7 +58,7 @@ namespace ElasticUp.Tests
             ElasticClient.IndexMany(sampleObjects, oldIndexName);
             ElasticClient.PutAlias(oldIndexName, aliasName);
 
-            ElasticClient.Index(new MigrationHistory {Name = "Sample"}, descriptor => descriptor.Index(oldIndexName));
+            ElasticClient.Index(new ElasticUpMigrationHistory {ElasticUpMigrationName = "Sample"}, descriptor => descriptor.Index(oldIndexName));
 
             ElasticClient.Refresh(Indices.All);
 
@@ -72,7 +72,7 @@ namespace ElasticUp.Tests
             var objCountInNewIndex = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(newIndexName)).Count;
             objCountInNewIndex.Should().Be(sampleObjects.Count);
 
-            var migrationHistoryCountInNewIndex = ElasticClient.Count<MigrationHistory>(descriptor => descriptor.Index(newIndexName)).Count;
+            var migrationHistoryCountInNewIndex = ElasticClient.Count<ElasticUpMigrationHistory>(descriptor => descriptor.Index(newIndexName)).Count;
             migrationHistoryCountInNewIndex.Should().Be(2);
 
             var indicesPointingToAlias = ElasticClient.GetIndicesPointingToAlias(aliasName);

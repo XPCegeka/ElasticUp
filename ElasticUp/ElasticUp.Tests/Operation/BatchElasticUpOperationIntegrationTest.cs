@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ElasticUp.Elastic;
 using ElasticUp.Operation;
 using FluentAssertions;
 using Nest;
@@ -143,7 +144,7 @@ namespace ElasticUp.Tests.Operation
             // TEST
             var operation = new BatchedElasticUpOperation<SampleObject>(0);
             
-            Assert.Throws<Exception>(() => operation.Execute(ElasticClient, fromIndex, toIndex));
+            Assert.Throws<ElasticUpException>(() => operation.Execute(ElasticClient, fromIndex, toIndex));
         }
 
         [Test]

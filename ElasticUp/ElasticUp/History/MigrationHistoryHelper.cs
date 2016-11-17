@@ -23,7 +23,7 @@ namespace ElasticUp.History
             if (string.IsNullOrEmpty(toIndex))
                 throw new ArgumentNullException(nameof(toIndex));
 
-            var copyTypeOperation = new CopyTypeOperation<MigrationHistory>(0);
+            var copyTypeOperation = new CopyTypeOperation<ElasticUpMigrationHistory>(0);
             copyTypeOperation.Execute(_elasticClient, fromIndex, toIndex);
         }
 
@@ -44,7 +44,7 @@ namespace ElasticUp.History
             if (string.IsNullOrEmpty(indexName))
                 throw new ArgumentNullException(nameof(indexName));
 
-            var history = new MigrationHistory(migrationName, exception);
+            var history = new ElasticUpMigrationHistory(migrationName, exception);
 
             ValidateElasticResponse(_elasticClient.Index(history, descriptor => descriptor.Index(indexName)));
         }
@@ -61,10 +61,10 @@ namespace ElasticUp.History
             if (string.IsNullOrEmpty(indexName))
                 throw new ArgumentNullException(nameof(indexName));
 
-            var searchResponse = _elasticClient.Search<MigrationHistory>(sd =>
-                sd.Index(Indices.Parse(indexName))
+            var searchResponse = _elasticClient.Search<ElasticUpMigrationHistory>(sd =>
+                sd.Index(indexName)
                   .From(0).Size(5000)
-                  .Query(q => q.Term(f => f.Name, migrationName.ToLower())));
+                  .Query(q => q.Term(f => f.ElasticUpMigrationName, migrationName)));
 
             ValidateElasticResponse(searchResponse);
 

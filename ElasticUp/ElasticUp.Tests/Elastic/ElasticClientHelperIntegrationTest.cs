@@ -18,7 +18,7 @@ namespace ElasticUp.Tests.Elastic
         [Test]
         public void GivenAnIResponseFromElasticClient_WhenValidating_ThrowExceptionContainingInformationAboutError()
         {
-            var response = ElasticClient.Get<MigrationHistory>("migration01", descriptor => descriptor.Index("not-existing-index"));
+            var response = ElasticClient.Get<ElasticUpMigrationHistory>("migration01", descriptor => descriptor.Index("not-existing-index"));
 
             try
             {
@@ -29,7 +29,7 @@ namespace ElasticUp.Tests.Elastic
             {
                 expectedException.ServerError.Status.Should().Be(404);
                 expectedException.ServerError.Error.Reason.Should().Be("no such index");
-                expectedException.DebugInformation.StartsWith("Invalid NEST response built from a unsuccessful low level call on GET: /not-existing-index/migrationhistory/migration01").Should().BeTrue();
+                expectedException.DebugInformation.StartsWith("Invalid NEST response built from a unsuccessful low level call on GET: /not-existing-index/elasticupmigrationhistory/migration01").Should().BeTrue();
                 expectedException.Message.Should().Be("Exception when calling elasticsearch");
             }
         }

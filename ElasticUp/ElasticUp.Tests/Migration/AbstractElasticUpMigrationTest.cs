@@ -49,8 +49,8 @@ namespace ElasticUp.Tests.Migration
         [Test]
         public void ToString_ReturnsMigrationNumberPlusClassName()
         {
-            new SampleEmptyMigration(5).ToString().Should().Be("005_SampleEmptyMigration");
-            new SampleEmptyMigration(14).ToString().Should().Be("014_SampleEmptyMigration");
+            new SampleEmptyMigration(5).ToString().Should().Be("005_sampleemptymigration");
+            new SampleEmptyMigration(14).ToString().Should().Be("014_sampleemptymigration");
         }
     }
 }

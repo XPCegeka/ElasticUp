@@ -112,7 +112,7 @@ namespace ElasticUp.Migration
 
         public sealed override string ToString()
         {
-            return $"{MigrationNumber:D3}_{this.GetType().Name}";
+            return ($"{MigrationNumber:D3}_{this.GetType().Name}").ToLowerInvariant();
         }
     }
 }
