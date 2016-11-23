@@ -1,10 +1,8 @@
-
 using System;
-using ElasticUp.Tests.Migration;
 using Nest;
 using NUnit.Framework;
 
-namespace ElasticUp.Tests.Runner
+namespace ElasticUp.Tests
 {
     [TestFixture]
     public class ElasticUpTest
@@ -13,7 +11,7 @@ namespace ElasticUp.Tests.Runner
         public void WhenAddingAMigration_MakeSureAllMigrationNumbersAreUnique()
         {
             Assert.Throws<ArgumentException>(() =>
-                ElasticUp.Runner.ElasticUp.ConfigureElasticUp(new ElasticClient())
+                new ElasticUp(new ElasticClient())
                     .Migration(new Sample.SampleEmptyMigration(1))
                     .Migration(new Sample.SampleEmptyMigration(1)));
         }
@@ -22,7 +20,7 @@ namespace ElasticUp.Tests.Runner
         public void WhenAddingAMigration_MakeSureAllMigrationNumbersAreAscending()
         {
             Assert.Throws<ArgumentException>(() =>
-                ElasticUp.Runner.ElasticUp.ConfigureElasticUp(new ElasticClient())
+                new ElasticUp(new ElasticClient())
                     .Migration(new Sample.SampleEmptyMigration(2))
                     .Migration(new Sample.SampleEmptyMigration(1)));
         }

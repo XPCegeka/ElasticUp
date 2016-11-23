@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
-using ElasticUp.Migration.Meta;
+using ElasticUp.Alias;
+using ElasticUp.Elastic;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
 
-namespace ElasticUp.Tests.Migration.Meta
+namespace ElasticUp.Tests.Alias
 {
     [TestFixture]
     public class AliasHelperIntegrationTest : AbstractIntegrationTest
@@ -70,12 +71,12 @@ namespace ElasticUp.Tests.Migration.Meta
             aliasHelper.RemoveAliasOnIndices(aliasName, indexName);
 
             // VERIFY
-            var aliasesPointingToIndex = ElasticClient.GetAliasesPointingToIndex(indexName);
-            aliasesPointingToIndex.Should().HaveCount(0);
+            var getIndexResponse = ElasticClient.GetIndex(indexName);
+            getIndexResponse.Indices[indexName].Aliases.ContainsKey(aliasName).Should().BeFalse();
         }
 
         [Test]
-        public void RemoveAliasOnIndices_ThrowsWhenAliasDeletionFailes()
+        public void RemoveAliasOnIndices_ThrowsWhenAliasDeletionFails()
         {
             // GIVEN
             const string indexName = "sample-index4";
@@ -88,7 +89,7 @@ namespace ElasticUp.Tests.Migration.Meta
 
             // TEST
             var aliasHelper = new AliasHelper(ElasticClient);
-            Assert.Throws<Exception>(() => aliasHelper.RemoveAliasOnIndices("unknown alias", indexName));
+            Assert.Throws<ElasticUpException>(() => aliasHelper.RemoveAliasOnIndices("unknown alias", indexName));
         }
     }
 }

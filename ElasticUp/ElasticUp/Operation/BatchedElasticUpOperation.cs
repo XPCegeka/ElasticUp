@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Nest;
+using static ElasticUp.Elastic.ElasticClientHelper;
 
 namespace ElasticUp.Operation
 {
@@ -70,7 +71,7 @@ namespace ElasticUp.Operation
         {
             var scrollTimeout = new Time(TimeSpan.FromSeconds(ScrollTimeoutInSeconds));
 
-            var searchResponse = elasticClient.Search<TDocument>(descriptor => SearchDescriptor(descriptor.Index(fromIndex).Scroll(scrollTimeout).Size(BatchSize)));
+            var searchResponse = ValidateElasticResponse(elasticClient.Search<TDocument>(descriptor => SearchDescriptor(descriptor.Index(fromIndex).Scroll(scrollTimeout).Size(BatchSize))));
             if (searchResponse.ServerError != null)
                 throw new Exception($"Could not complete Search call. Debug information: '{searchResponse.DebugInformation}'");
 
@@ -80,7 +81,7 @@ namespace ElasticUp.Operation
             ProcessBatch(elasticClient, searchResponse.Documents.ToList(), toIndex);
 
             var scrollId = searchResponse.ScrollId;
-            var scrollResponse = elasticClient.Scroll<TDocument>(scrollTimeout, scrollId);
+            var scrollResponse = ValidateElasticResponse(elasticClient.Scroll<TDocument>(scrollTimeout, scrollId));
 
             while (scrollResponse.Documents.Any())
             {
@@ -89,7 +90,7 @@ namespace ElasticUp.Operation
 
                 ProcessBatch(elasticClient, scrollResponse.Documents.ToList(), toIndex);
 
-                scrollResponse = elasticClient.Scroll<TDocument>(scrollTimeout, scrollId);
+                scrollResponse = ValidateElasticResponse(elasticClient.Scroll<TDocument>(scrollTimeout, scrollId));
             }
         }
 
@@ -97,7 +98,7 @@ namespace ElasticUp.Operation
         {
 
             var transformedDocuments = documentBatch.Select(Transformation).Where(doc => doc != null).ToList();
-            elasticClient.IndexMany(transformedDocuments, index: toIndex);
+            ValidateElasticResponse(elasticClient.IndexMany(transformedDocuments, index: toIndex));
 
             foreach (var transformedDocument in transformedDocuments)
             {

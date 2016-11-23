@@ -4,26 +4,26 @@ using ElasticUp.Migration;
 
 namespace ElasticUp.History
 {
-    public class MigrationHistory
+    public class ElasticUpMigrationHistory
     {
-        public string Id { get; set; }
-        public DateTime Applied { get; set; }
-        public Exception Exception { get; set; }
+        public string ElasticUpMigrationName { get; set; }
+        public DateTime ElasticUpMigrationApplied { get; set; }
+        public Exception ElasticUpMigrationException { get; set; }
 
         [Boolean(Ignore = true)]
-        public bool HasBeenAppliedSuccessfully => Exception == null;
+        public bool HasBeenAppliedSuccessfully => ElasticUpMigrationException == null;
 
-        public MigrationHistory() {}
+        public ElasticUpMigrationHistory() {}
 
-        public MigrationHistory(ElasticUpMigration migration)
+        public ElasticUpMigrationHistory(string migrationElasticUpMigrationName)
         {
-            Id = migration.ToString();
-            Applied = DateTime.UtcNow;
+            ElasticUpMigrationName = migrationElasticUpMigrationName;
+            ElasticUpMigrationApplied = DateTime.UtcNow;
         }
 
-        public MigrationHistory(ElasticUpMigration migration, Exception e) : this(migration)
+        public ElasticUpMigrationHistory(string migrationElasticUpMigrationName, Exception e) : this(migrationElasticUpMigrationName)
         {
-            Exception = e;
+            ElasticUpMigrationException = e;
         }
     }
 }

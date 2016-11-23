@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using ElasticUp.Helpers;
+using ElasticUp.Extension;
 using ElasticUp.Tests.Sample;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
 
-namespace ElasticUp.Tests.Helpers
+namespace ElasticUp.Tests.Extension
 {
     public class ElasticClientExtensionsTest : AbstractIntegrationTest
     {

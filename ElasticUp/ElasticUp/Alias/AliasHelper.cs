@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using ElasticUp.Elastic;
 using Nest;
 
-namespace ElasticUp.Migration.Meta
+namespace ElasticUp.Alias
 {
     public class AliasHelper
     {
@@ -21,17 +22,15 @@ namespace ElasticUp.Migration.Meta
         public virtual void RemoveAliasOnIndices(string alias, params string[] indexNames)
         {
             var indices = string.Join(",", indexNames);
-            var removeAliasResponse = _elasticClient.Alias(
-                descriptor => descriptor.Remove(removeDescriptor =>
-                    removeDescriptor.Alias(alias).Index(indices)));
-
-            if (!removeAliasResponse.IsValid)
-                throw new Exception($"RemoveAlias failed. Could not remove alias '{alias}' from indices '{indices}'. Reason: '{removeAliasResponse.DebugInformation}'");
+            ElasticClientHelper.ValidateElasticResponse(
+                _elasticClient.Alias(
+                    descriptor => descriptor.Remove(removeDescriptor =>
+                        removeDescriptor.Alias(alias).Index(indices))));
         }
 
         public virtual void AddAliasOnIndices(string alias, params string[] indexNames)
         {
-            var putAliasResponse = _elasticClient.PutAlias(Indices.Parse(string.Join(",", indexNames)), alias);
+            var putAliasResponse = _elasticClient.PutAlias(string.Join(",", indexNames), alias);
             if (!putAliasResponse.IsValid)
                 throw new Exception($"PutAlias failed. Reason: ''{putAliasResponse.DebugInformation}");
         }

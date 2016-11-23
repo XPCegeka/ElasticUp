@@ -6,28 +6,14 @@ namespace ElasticUp.Migration
 {
     public abstract class DefaultElasticUpMigration : AbstractElasticUpMigration
     {
-        protected string IndexAlias;
+        protected readonly string IndexAlias;
 
-        protected DefaultElasticUpMigration(IElasticClient elasticClient, string indexAlias) : base(elasticClient)
+        protected DefaultElasticUpMigration(int migrationNumber, string indexAlias) : base(migrationNumber)
         {
             IndexAlias = indexAlias;
         }
 
-        public override void PreMigrationTasks()
-        {
-            SetIndices();
-            // check if migration has already run
-            // copy history from index to index
-            
-        }
-
-        public override void PostMigrationTasks()
-        {
-            // add this migration to history 
-            // move alias
-        }
-
-        private void SetIndices()
+        protected override void InitIndices()
         {
             var indicesForAlias = ElasticClient.GetIndicesPointingToAlias(IndexAlias);
             if (indicesForAlias == null || indicesForAlias.Count > 1)
@@ -37,6 +23,17 @@ namespace ElasticUp.Migration
 
             SourceIndex = versionedIndexName.ToString();
             TargetIndex = versionedIndexName.GetIncrementedVersion().ToString();
+        }
+
+        protected override void PreMigrationTasks()
+        {
+            CopyHistory(SourceIndex, TargetIndex);
+        }
+
+        protected override void PostMigrationTasks()
+        {
+            AddMigrationToHistory(this, TargetIndex);
+            MoveAlias(IndexAlias, SourceIndex, TargetIndex);
         }
     }
 }

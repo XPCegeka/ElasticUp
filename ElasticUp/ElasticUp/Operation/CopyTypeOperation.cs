@@ -1,5 +1,6 @@
 ﻿using System;
 using Nest;
+using static ElasticUp.Elastic.ElasticClientHelper;
 
 namespace ElasticUp.Operation
 {
@@ -19,14 +20,14 @@ namespace ElasticUp.Operation
 
         public override void Execute(IElasticClient elasticClient, string fromIndex, string toIndex)
         {
-            var response = elasticClient.ReindexOnServer(descriptor =>
-                descriptor.Source(sourceDescriptor =>
-                    sourceDescriptor
+            var response = ValidateElasticResponse(
+                elasticClient.ReindexOnServer(descriptor => descriptor
+                    .Source(sourceDescriptor => sourceDescriptor
                         .Type(TypeName)
                         .Index(fromIndex))
-                    .Destination(destinationDescriptor =>
-                        destinationDescriptor.Index(toIndex))
-                    .WaitForCompletion());
+                    .Destination(destinationDescriptor => destinationDescriptor
+                        .Index(toIndex))
+                    .WaitForCompletion()));
 
             if (response.ServerError != null)
             {
