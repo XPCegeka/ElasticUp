@@ -11,6 +11,8 @@ using NUnit.Framework;
 
 namespace ElasticUp.Tests.Extension
 {
+    [Parallelizable]
+    [TestFixture]
     public class ElasticClientExtensionsTest : AbstractIntegrationTest
     {
         [Test]
@@ -28,31 +30,6 @@ namespace ElasticUp.Tests.Extension
 
             // VERIFY
             actualDocuments.ShouldBeEquivalentTo(actualDocuments);
-        }
-
-        [Test]
-        public void DoScrollAsync_IsFasterThanDoScroll()
-        {
-            // GIVEN
-            const string index = "from";
-            var filler = string.Concat(Enumerable.Repeat("X", 512));
-            var documents = Enumerable.Range(0, 150000).Select(n => new SampleDocument { Name = $"{n}-{filler}"}).ToList();
-            ElasticClient.IndexMany(documents, index);
-            ElasticClient.Refresh(Indices.All);
-
-            // TEST
-            Action<IEnumerable<SampleDocument>> simulatedActivity = _ => Thread.Sleep(500);
-
-            var elapsedTimeAsync = Stopwatch.StartNew();
-            ElasticClient.DoScrollAsync(descriptor => descriptor.Index(index).MatchAll(), simulatedActivity).Wait();
-            elapsedTimeAsync.Stop();
-
-            var elapsedTimeSync = Stopwatch.StartNew();
-            ElasticClient.DoScroll(descriptor => descriptor.Index(index).MatchAll(), simulatedActivity);
-            elapsedTimeSync.Stop();
-
-            // VERIFY
-            elapsedTimeAsync.Elapsed.Should().BeLessThan(elapsedTimeSync.Elapsed);
         }
     }
 }

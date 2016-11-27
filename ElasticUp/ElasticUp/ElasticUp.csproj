@@ -54,7 +54,7 @@
     <Compile Include="Migration\DefaultElasticUpMigration.cs" />
     <Compile Include="Alias\AliasHelper.cs" />
     <Compile Include="Operation\BatchedElasticUpOperation.cs" />
-    <Compile Include="Operation\CopyTypeOperation.cs" />
+    <Compile Include="Operation\ReindexTypeOperation.cs" />
     <Compile Include="Extension\ElasticClientExtensions.cs" />
     <Compile Include="Operation\ElasticUpOperation.cs" />
     <Compile Include="Migration\Meta\VersionedIndexName.cs" />

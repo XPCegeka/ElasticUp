@@ -1,4 +1,3 @@
-using System;
 using Elasticsearch.Net;
 using ElasticUp.Migration.Meta;
 using ElasticUp.Operation;
@@ -10,6 +9,7 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.Operation
 {
     [TestFixture]
+    [Parallelizable]
     public class CopyTypeOperationIntegrationTest : AbstractIntegrationTest
     {
         [Test]
@@ -20,7 +20,7 @@ namespace ElasticUp.Tests.Operation
             ElasticClient.Refresh(Indices.All);
 
             // WHEN
-            var operation = new CopyTypeOperation(0).WithTypeName("sampledocument");
+            var operation = new ReindexTypeOperation(0).WithTypeName("sampledocument");
             operation.Execute(ElasticClient, TestIndex.IndexNameWithVersion(), TestIndex.NextIndexNameWithVersion());
 
             // THEN
@@ -37,7 +37,7 @@ namespace ElasticUp.Tests.Operation
             var newIndex = oldIndex.NextVersion();
 
             // WHEN
-            var operation = new CopyTypeOperation(0).WithTypeName("sampledocument");
+            var operation = new ReindexTypeOperation(0).WithTypeName("sampledocument");
             Assert.Throws<ElasticsearchClientException>(() => operation.Execute(ElasticClient, oldIndex, newIndex));
         }
 
@@ -45,7 +45,7 @@ namespace ElasticUp.Tests.Operation
         public void Execute_DoesNotThrowWhenNoDocumentsOfTypeAvailableInFromIndex()
         {
             // WHEN
-            var operation = new CopyTypeOperation(0).WithTypeName("sampledocument");
+            var operation = new ReindexTypeOperation(0).WithTypeName("sampledocument");
             operation.Execute(ElasticClient, TestIndex.IndexNameWithVersion(), TestIndex.NextIndexNameWithVersion());
 
             // THEN

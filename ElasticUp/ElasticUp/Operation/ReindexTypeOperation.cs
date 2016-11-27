@@ -3,13 +3,13 @@ using Nest;
 
 namespace ElasticUp.Operation
 {
-    public class CopyTypeOperation : ElasticUpOperation
+    public class ReindexTypeOperation : ElasticUpOperation
     {
         public string TypeName { get; set; }
 
-        public CopyTypeOperation(int operationNumber) : base(operationNumber) {}
+        public ReindexTypeOperation(int operationNumber) : base(operationNumber) {}
 
-        public CopyTypeOperation WithTypeName(string typeName)
+        public ReindexTypeOperation WithTypeName(string typeName)
         {
             TypeName = typeName;
             return this;
@@ -27,14 +27,14 @@ namespace ElasticUp.Operation
 
             if (response.ServerError != null)
             {
-                throw new Exception($"Could not execute {typeof(CopyTypeOperation<>).Name}. Error information: '{response.DebugInformation}'");
+                throw new Exception($"Could not execute {typeof(ReindexTypeOperation<>).Name}. Error information: '{response.DebugInformation}'");
             }
         }
     }
 
-    public class CopyTypeOperation<T> : CopyTypeOperation where T : class
+    public class ReindexTypeOperation<T> : ReindexTypeOperation where T : class
     {
-        public CopyTypeOperation(int operationNumber) : base(operationNumber)
+        public ReindexTypeOperation(int operationNumber) : base(operationNumber)
         {
             TypeName = typeof (T).Name.ToLowerInvariant();
         }

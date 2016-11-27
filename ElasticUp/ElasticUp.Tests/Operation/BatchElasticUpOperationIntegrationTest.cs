@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
-using ElasticUp.Elastic;
 using ElasticUp.Operation;
 using FluentAssertions;
 using Nest;
@@ -12,6 +11,7 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.Operation
 {
     [TestFixture]
+    [Parallelizable]
     public class BatchElasticUpOperationIntegrationTest : AbstractIntegrationTest
     {
         [Test]

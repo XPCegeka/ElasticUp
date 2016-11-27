@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Elasticsearch.Net;
-using ElasticUp.Elastic;
 using ElasticUp.History;
 using ElasticUp.Tests.Sample;
 using FluentAssertions;
@@ -11,6 +10,7 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.History
 {
     [TestFixture]
+    [Parallelizable]
     public class MigrationHistoryHelperIntegrationTest : AbstractIntegrationTest
     {
         [Test]

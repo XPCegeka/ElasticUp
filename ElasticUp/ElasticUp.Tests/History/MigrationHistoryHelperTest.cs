@@ -8,6 +8,7 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.History
 {
     [TestFixture]
+    [Parallelizable]
     public class MigrationHistoryHelperTest
     {
         private IElasticClient _elasticClient;

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using ElasticUp.History;
 using ElasticUp.Tests.Sample;
@@ -5,9 +6,10 @@ using FluentAssertions;
 using Nest;
 using NUnit.Framework;
 
-namespace ElasticUp.Tests
+namespace ElasticUp.Tests.ElasticUpFullStackTests
 {
     [TestFixture]
+    [Parallelizable]
     public class ElasticUpIntegrationTest : AbstractIntegrationTest
     {
         [Test]
@@ -62,6 +64,24 @@ namespace ElasticUp.Tests
             var indicesPointingToAlias = ElasticClient.GetIndicesPointingToAlias(TestIndex.AliasName);
             indicesPointingToAlias.Should().HaveCount(1);
             indicesPointingToAlias[0].Should().Be(TestIndex.NextIndexNameWithVersion());
+        }
+
+        [Test]
+        public void WhenAddingAMigration_MakeSureAllMigrationNumbersAreUnique()
+        {
+            Assert.Throws<ArgumentException>(() =>
+                new ElasticUp(ElasticClient)
+                    .Migration(new Sample.SampleEmptyMigration(1))
+                    .Migration(new Sample.SampleEmptyMigration(1)));
+        }
+
+        [Test]
+        public void WhenAddingAMigration_MakeSureAllMigrationNumbersAreAscending()
+        {
+            Assert.Throws<ArgumentException>(() =>
+                new ElasticUp(ElasticClient)
+                    .Migration(new Sample.SampleEmptyMigration(2))
+                    .Migration(new Sample.SampleEmptyMigration(1)));
         }
     }
 }

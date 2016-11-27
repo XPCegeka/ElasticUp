@@ -8,6 +8,7 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.Alias
 {
     [TestFixture]
+    [Parallelizable]
     public class AliasHelperIntegrationTest : AbstractIntegrationTest
     {
         [Test]

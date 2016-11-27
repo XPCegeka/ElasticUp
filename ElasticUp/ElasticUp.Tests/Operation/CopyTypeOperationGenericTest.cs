@@ -6,13 +6,14 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.Operation
 {
     [TestFixture]
+    [Parallelizable]
     public class CopyTypeOperationGenericTest
     {
         [Test]
         public void Generic_UsesNameOfTypeForTypeName()
         {
             // WHEN
-            var operation = new CopyTypeOperation<SampleDocument>(0);
+            var operation = new ReindexTypeOperation<SampleDocument>(0);
             operation.TypeName.Should().Be("sampledocument");
         }
     }
