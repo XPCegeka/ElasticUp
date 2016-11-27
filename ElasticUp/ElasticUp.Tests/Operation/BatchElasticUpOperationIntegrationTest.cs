@@ -120,7 +120,7 @@ namespace ElasticUp.Tests.Operation
 
             ElasticClient.Refresh(Indices.All);
             var countResponse = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion()));
-            countResponse.Count.Should().Be(25000);
+            countResponse.Count.Should().Be(7500);
         }
 
         [Test]
