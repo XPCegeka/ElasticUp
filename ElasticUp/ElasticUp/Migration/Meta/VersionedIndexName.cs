@@ -4,40 +4,44 @@ namespace ElasticUp.Migration.Meta
 {
     public class VersionedIndexName
     {
-        public string Name { get; protected set; }
+        public string AliasName { get; protected set; }
         public int Version { get; protected set; }
 
-        public VersionedIndexName(string name, int version)
+        public VersionedIndexName(string aliasName, int version)
         {
-            Name = name;
+            AliasName = aliasName;
             Version = version;
         }
 
-        public VersionedIndexName GetIncrementedVersion()
+        public string IndexNameWithVersion()
         {
-            return new VersionedIndexName(Name, Version + 1);
+            return $"{AliasName}-v{Version}";
+        }
+        public VersionedIndexName NextVersion()
+        {
+            return new VersionedIndexName(AliasName, Version + 1);
         }
 
-        public override string ToString()
+        public string NextIndexNameWithVersion()
         {
-            return $"{Name}-v{Version}";
+            return NextVersion().IndexNameWithVersion();
         }
 
         public static VersionedIndexName CreateFromIndexName(string indexName)
         {
-            var pattern = new Regex(@"^(?<name>.+)-v(?<version>\d+)$", RegexOptions.IgnoreCase);
+            var pattern = new Regex(@"^(?<aliasName>.+)-v(?<version>\d+)$", RegexOptions.IgnoreCase);
             if (!pattern.IsMatch(indexName))
                 return new VersionedIndexName(indexName, 0);
 
             var match = pattern.Match(indexName);
-            var name = match.Groups["name"].Value;
+            var name = match.Groups["aliasName"].Value;
             var version = int.Parse(match.Groups["version"].Value);
             return new VersionedIndexName(name, version);
         }
 
         public static implicit operator string(VersionedIndexName indexName)
         {
-            return indexName.ToString();
+            return indexName.IndexNameWithVersion();
         }
     }
 }

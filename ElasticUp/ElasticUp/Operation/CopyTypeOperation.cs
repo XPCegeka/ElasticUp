@@ -1,6 +1,5 @@
 ﻿using System;
 using Nest;
-using static ElasticUp.Elastic.ElasticClientHelper;
 
 namespace ElasticUp.Operation
 {
@@ -8,9 +7,7 @@ namespace ElasticUp.Operation
     {
         public string TypeName { get; set; }
 
-        public CopyTypeOperation(int operationNumber) : base(operationNumber)
-        {
-        }
+        public CopyTypeOperation(int operationNumber) : base(operationNumber) {}
 
         public CopyTypeOperation WithTypeName(string typeName)
         {
@@ -20,14 +17,13 @@ namespace ElasticUp.Operation
 
         public override void Execute(IElasticClient elasticClient, string fromIndex, string toIndex)
         {
-            var response = ValidateElasticResponse(
-                elasticClient.ReindexOnServer(descriptor => descriptor
+            var response = elasticClient.ReindexOnServer(descriptor => descriptor
                     .Source(sourceDescriptor => sourceDescriptor
                         .Type(TypeName)
                         .Index(fromIndex))
                     .Destination(destinationDescriptor => destinationDescriptor
                         .Index(toIndex))
-                    .WaitForCompletion()));
+                    .WaitForCompletion());
 
             if (response.ServerError != null)
             {

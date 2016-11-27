@@ -21,8 +21,8 @@ namespace ElasticUp.Migration
 
             var versionedIndexName = VersionedIndexName.CreateFromIndexName(indicesForAlias[0]);
 
-            SourceIndex = versionedIndexName.ToString();
-            TargetIndex = versionedIndexName.GetIncrementedVersion().ToString();
+            SourceIndex = versionedIndexName.IndexNameWithVersion();
+            TargetIndex = versionedIndexName.NextVersion().IndexNameWithVersion();
         }
 
         protected override void PreMigrationTasks()

@@ -1,11 +1,7 @@
 ﻿using System;
 using ElasticUp.Migration;
-using ElasticUp.Migration.Meta;
-using ElasticUp.Operation;
 using ElasticUp.Tests.Sample;
 using FluentAssertions;
-using Nest;
-using NSubstitute;
 using NUnit.Framework;
 
 namespace ElasticUp.Tests.Migration

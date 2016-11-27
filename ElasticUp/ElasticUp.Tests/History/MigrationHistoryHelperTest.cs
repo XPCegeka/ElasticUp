@@ -1,6 +1,5 @@
 using System;
 using ElasticUp.History;
-using ElasticUp.Migration;
 using ElasticUp.Tests.Sample;
 using Nest;
 using NSubstitute;

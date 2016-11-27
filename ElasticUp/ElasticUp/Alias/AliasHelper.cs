@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ElasticUp.Elastic;
+﻿using System.Collections.Generic;
 using Nest;
 
 namespace ElasticUp.Alias
@@ -19,20 +17,21 @@ namespace ElasticUp.Alias
             return _elasticClient.GetIndicesPointingToAlias(alias);
         }
 
-        public virtual void RemoveAliasOnIndices(string alias, params string[] indexNames)
+        public virtual void RemoveAliasFromIndex(string alias, string indexName)
         {
-            var indices = string.Join(",", indexNames);
-            ElasticClientHelper.ValidateElasticResponse(
-                _elasticClient.Alias(
-                    descriptor => descriptor.Remove(removeDescriptor =>
-                        removeDescriptor.Alias(alias).Index(indices))));
+            _elasticClient.Alias(descriptor => descriptor.Remove(removeDescriptor => removeDescriptor.Alias(alias).Index(indexName)));
         }
 
-        public virtual void AddAliasOnIndices(string alias, params string[] indexNames)
+        public virtual void PutAliasOnIndex(string alias, string indexName)
         {
-            var putAliasResponse = _elasticClient.PutAlias(string.Join(",", indexNames), alias);
-            if (!putAliasResponse.IsValid)
-                throw new Exception($"PutAlias failed. Reason: ''{putAliasResponse.DebugInformation}");
+            _elasticClient.PutAlias(indexName, alias);
+        }
+        public virtual void SwitchAlias(string alias, string fromIndexName, string toIndexName)
+        {
+            _elasticClient.Alias(descriptor => 
+                descriptor
+                    .Add(addDescriptor => addDescriptor.Alias(alias).Index(toIndexName))
+                    .Remove(removeDescriptor => removeDescriptor.Alias(alias).Index(fromIndexName)));
         }
     }
 }

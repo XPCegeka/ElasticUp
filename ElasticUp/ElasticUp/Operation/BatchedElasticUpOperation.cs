@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Nest;
-using static ElasticUp.Elastic.ElasticClientHelper;
 
 namespace ElasticUp.Operation
 {
@@ -71,7 +68,7 @@ namespace ElasticUp.Operation
         {
             var scrollTimeout = new Time(TimeSpan.FromSeconds(ScrollTimeoutInSeconds));
 
-            var searchResponse = ValidateElasticResponse(elasticClient.Search<TDocument>(descriptor => SearchDescriptor(descriptor.Index(fromIndex).Scroll(scrollTimeout).Size(BatchSize))));
+            var searchResponse = elasticClient.Search<TDocument>(descriptor => SearchDescriptor(descriptor.Index(fromIndex).Scroll(scrollTimeout).Size(BatchSize)));
             if (searchResponse.ServerError != null)
                 throw new Exception($"Could not complete Search call. Debug information: '{searchResponse.DebugInformation}'");
 
@@ -81,7 +78,7 @@ namespace ElasticUp.Operation
             ProcessBatch(elasticClient, searchResponse.Documents.ToList(), toIndex);
 
             var scrollId = searchResponse.ScrollId;
-            var scrollResponse = ValidateElasticResponse(elasticClient.Scroll<TDocument>(scrollTimeout, scrollId));
+            var scrollResponse = elasticClient.Scroll<TDocument>(scrollTimeout, scrollId);
 
             while (scrollResponse.Documents.Any())
             {
@@ -90,15 +87,14 @@ namespace ElasticUp.Operation
 
                 ProcessBatch(elasticClient, scrollResponse.Documents.ToList(), toIndex);
 
-                scrollResponse = ValidateElasticResponse(elasticClient.Scroll<TDocument>(scrollTimeout, scrollId));
+                scrollResponse = elasticClient.Scroll<TDocument>(scrollTimeout, scrollId);
             }
         }
 
         private void ProcessBatch(IElasticClient elasticClient, IList<TDocument> documentBatch, string toIndex)
         {
-
             var transformedDocuments = documentBatch.Select(Transformation).Where(doc => doc != null).ToList();
-            ValidateElasticResponse(elasticClient.IndexMany(transformedDocuments, index: toIndex));
+            elasticClient.IndexMany(transformedDocuments, toIndex);
 
             foreach (var transformedDocument in transformedDocuments)
             {

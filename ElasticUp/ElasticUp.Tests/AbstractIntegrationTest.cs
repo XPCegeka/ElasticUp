@@ -1,5 +1,5 @@
 ﻿using System;
-using ElasticUp.Tests.Infrastructure;
+using ElasticUp.Migration.Meta;
 using Nest;
 using NUnit.Framework;
 
@@ -7,27 +7,35 @@ namespace ElasticUp.Tests
 {
     public abstract class AbstractIntegrationTest
     {
-        private ElasticSearchContainer _esService;
-        protected readonly IElasticClient ElasticClient = new ElasticClient(new Uri("http://localhost:9201/"));
+        private const string ElasticSearchUrl = "http://localhost:9201";
+        public VersionedIndexName TestIndex;
+        protected IElasticClient ElasticClient;
         
         [SetUp]
         protected void SetUp()
         {
-            _esService = StartAndWaitForElasticSearchService();
+            TestIndex = new VersionedIndexName(TestContext.CurrentContext.Test.MethodName.ToLowerInvariant(), 0);
+
+            var settings = new ConnectionSettings(new Uri(ElasticSearchUrl))
+                .DefaultIndex(TestIndex.IndexNameWithVersion())
+                .ThrowExceptions(true);
+
+            ElasticClient = new ElasticClient(settings);
+
+            ElasticClient.CreateIndex(
+                TestIndex.IndexNameWithVersion(), 
+                indexDescriptor => indexDescriptor.Settings(indexSettings => indexSettings
+                    .NumberOfShards(1)
+                    .NumberOfReplicas(0)));
+
+            ElasticClient.PutAlias(TestIndex.IndexNameWithVersion(), TestIndex.AliasName);
         }
 
         [TearDown]
         protected void TearDown()
         {
-            _esService.Dispose();
+            ElasticClient.DeleteIndex(TestIndex.IndexNameWithVersion());
         }
-        
-        private static ElasticSearchContainer StartAndWaitForElasticSearchService()
-        {
-            var esService = ElasticSearchContainer.StartNewFromArchive(Resources.elasticsearch_2_4_1_with_head_and_delete_by_query);
-            esService.WaitUntilElasticOperational();
-
-            return esService;
-        }
+      
     }
 }

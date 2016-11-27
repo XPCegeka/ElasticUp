@@ -1,7 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
+using Elasticsearch.Net;
 using ElasticUp.Alias;
-using ElasticUp.Elastic;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
@@ -12,84 +11,65 @@ namespace ElasticUp.Tests.Alias
     public class AliasHelperIntegrationTest : AbstractIntegrationTest
     {
         [Test]
-        public void AddAliasOnIndices_CreatesNewAliasOnGivenIndex()
+        public void PutAliasOnIndex_CreatesNewAliasOnGivenIndex()
         {
             // GIVEN
-            const string indexName = "sample-index";
-            const string aliasName = "sample-alias";
-
-            var sampleObjects = Enumerable
-                .Range(1, 100)
-                .Select(n => new SampleObject { Number = n });
-            ElasticClient.IndexMany(sampleObjects, index: indexName);
+            var sampleObjects = Enumerable.Range(1, 100).Select(n => new SampleObject { Number = n });
+            ElasticClient.IndexMany(sampleObjects, index: TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
 
             // TEST
             var aliasHelper = new AliasHelper(ElasticClient);
-            aliasHelper.AddAliasOnIndices(aliasName, indexName);
+            aliasHelper.PutAliasOnIndex(TestIndex.AliasName, TestIndex.IndexNameWithVersion());
 
             // VERIFY
-            var indicesPointingToAlias = ElasticClient.GetIndicesPointingToAlias(aliasName);
+            var indicesPointingToAlias = ElasticClient.GetIndicesPointingToAlias(TestIndex.AliasName);
             indicesPointingToAlias.Should().HaveCount(1);
-            indicesPointingToAlias[0].Should().Be(indexName);
+            indicesPointingToAlias[0].Should().Be(TestIndex.IndexNameWithVersion());
         }
 
         [Test]
-        public void AddAliasOnIndices_ThrowsWhenAliasCreationFailes()
+        public void PutAliasOnIndex_ThrowsExceptionWhenAliasCreationFails()
         {
             // GIVEN
-            const string indexName = "sample-index2";
-            const string aliasName = "sample-alias2";
-
-            var sampleObjects = Enumerable
-                .Range(1, 100)
-                .Select(n => new SampleObject { Number = n });
-            ElasticClient.IndexMany(sampleObjects, index: indexName);
+            var sampleObjects = Enumerable.Range(1, 100).Select(n => new SampleObject { Number = n });
+            ElasticClient.IndexMany(sampleObjects, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
 
             // TEST
             var aliasHelper = new AliasHelper(ElasticClient);
-            Assert.Throws<Exception>(() => aliasHelper.AddAliasOnIndices(aliasName, "unknown index"));
+            Assert.Throws<ElasticsearchClientException>(() => aliasHelper.PutAliasOnIndex(TestIndex.AliasName, "unknown index"));
         }
 
         [Test]
-        public void RemoveAliasOnIndices_DeletesAliasFromGivenIndex()
+        public void RemoveAliasFromIndex_DeletesAliasFromGivenIndex()
         {
             // GIVEN
-            const string indexName = "sample-index3";
-            const string aliasName = "sample-alias3";
-
-            var sampleObjects = Enumerable
-                .Range(1, 100)
-                .Select(n => new SampleObject { Number = n });
-            ElasticClient.IndexMany(sampleObjects, index: indexName);
-            ElasticClient.PutAlias(indexName, aliasName);
+            var sampleObjects = Enumerable.Range(1, 100).Select(n => new SampleObject { Number = n });
+            ElasticClient.IndexMany(sampleObjects, TestIndex.IndexNameWithVersion());
+            ElasticClient.PutAlias(TestIndex.IndexNameWithVersion(), TestIndex.AliasName);
             ElasticClient.Refresh(Indices.All);
 
             // TEST
             var aliasHelper = new AliasHelper(ElasticClient);
-            aliasHelper.RemoveAliasOnIndices(aliasName, indexName);
+            aliasHelper.RemoveAliasFromIndex(TestIndex.AliasName, TestIndex.IndexNameWithVersion());
 
             // VERIFY
-            var getIndexResponse = ElasticClient.GetIndex(indexName);
-            getIndexResponse.Indices[indexName].Aliases.ContainsKey(aliasName).Should().BeFalse();
+            var getIndexResponse = ElasticClient.GetIndex(TestIndex.IndexNameWithVersion());
+            getIndexResponse.Indices[TestIndex.IndexNameWithVersion()].Aliases.ContainsKey(TestIndex.AliasName).Should().BeFalse();
         }
 
         [Test]
-        public void RemoveAliasOnIndices_ThrowsWhenAliasDeletionFails()
+        public void RemoveAliasFromIndex_ThrowsExceptionWhenAliasDeletionFails()
         {
             // GIVEN
-            const string indexName = "sample-index4";
-
-            var sampleObjects = Enumerable
-                .Range(1, 100)
-                .Select(n => new SampleObject { Number = n });
-            ElasticClient.IndexMany(sampleObjects, index: indexName);
+            var sampleObjects = Enumerable.Range(1, 100).Select(n => new SampleObject { Number = n });
+            ElasticClient.IndexMany(sampleObjects, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
 
             // TEST
             var aliasHelper = new AliasHelper(ElasticClient);
-            Assert.Throws<ElasticUpException>(() => aliasHelper.RemoveAliasOnIndices("unknown alias", indexName));
+            Assert.Throws<ElasticsearchClientException>(() => aliasHelper.RemoveAliasFromIndex("unknown alias", TestIndex.IndexNameWithVersion()));
         }
     }
 }

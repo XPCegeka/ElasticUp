@@ -5,7 +5,6 @@ using System.Linq;
 using ElasticUp.Alias;
 using ElasticUp.Extension;
 using ElasticUp.History;
-using ElasticUp.Migration.Meta;
 using ElasticUp.Operation;
 using Nest;
 
@@ -91,12 +90,12 @@ namespace ElasticUp.Migration
 
         protected virtual void PutAlias(string alias, string index)
         {
-            AliasHelper.AddAliasOnIndices(alias, index);
+            AliasHelper.PutAliasOnIndex(alias, index);
         }
 
         protected virtual void RemoveAlias(string alias, string index)
         {
-            AliasHelper.RemoveAliasOnIndices(alias, index);
+            AliasHelper.RemoveAliasFromIndex(alias, index);
         }
 
         public void Operation(ElasticUpOperation operation)

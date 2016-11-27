@@ -1,6 +1,5 @@
 ﻿using Nest;
 using System;
-using ElasticUp.Migration;
 
 namespace ElasticUp.History
 {

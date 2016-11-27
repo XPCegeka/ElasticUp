@@ -3,7 +3,6 @@ using System.Linq;
 using ElasticUp.Migration;
 using ElasticUp.Operation;
 using Nest;
-using static ElasticUp.Elastic.ElasticClientHelper;
 
 namespace ElasticUp.History
 {
@@ -46,7 +45,7 @@ namespace ElasticUp.History
 
             var history = new ElasticUpMigrationHistory(migrationName, exception);
 
-            ValidateElasticResponse(_elasticClient.Index(history, descriptor => descriptor.Index(indexName)));
+            _elasticClient.Index(history, descriptor => descriptor.Index(indexName));
         }
 
         public bool HasMigrationAlreadyBeenApplied(AbstractElasticUpMigration migration, string indexName)
@@ -65,9 +64,7 @@ namespace ElasticUp.History
                 sd.Index(indexName)
                   .From(0).Size(5000)
                   .Query(q => q.Term(f => f.ElasticUpMigrationName, migrationName)));
-
-            ValidateElasticResponse(searchResponse);
-
+            
             var foundMigration = searchResponse.Documents.SingleOrDefault(); //count should be 0 or 1 - but search to prevent 404
             return foundMigration != null && foundMigration.HasBeenAppliedSuccessfully;
         }

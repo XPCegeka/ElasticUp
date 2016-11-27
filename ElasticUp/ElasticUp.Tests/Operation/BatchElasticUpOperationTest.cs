@@ -1,7 +1,5 @@
 using System;
 using ElasticUp.Operation;
-using Nest;
-using NSubstitute;
 using NUnit.Framework;
 
 namespace ElasticUp.Tests.Operation

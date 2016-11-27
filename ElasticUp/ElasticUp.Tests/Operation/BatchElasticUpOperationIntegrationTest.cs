@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Elasticsearch.Net;
 using ElasticUp.Elastic;
 using ElasticUp.Operation;
 using FluentAssertions;
@@ -17,14 +18,11 @@ namespace ElasticUp.Tests.Operation
         public void Execute_ProcessesDocumentsAndInsertsInNewIndex()
         {
             // GIVEN
-            const string fromIndex = "from";
-            const string toIndex = "to";
             const int expectedDocumentCount = 50000;
             var sampleDocuments = Enumerable.Range(0, expectedDocumentCount).Select(n => new SampleObject { Number = n });
-            ElasticClient.IndexMany(sampleDocuments, fromIndex);
+            ElasticClient.IndexMany(sampleDocuments, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
-
-
+            
             // TEST
             var processedRecordCount = 0;
             var operation = new BatchedElasticUpOperation<SampleObject>(0)
@@ -34,13 +32,13 @@ namespace ElasticUp.Tests.Operation
                     return doc;
                 });
 
-            operation.Execute(ElasticClient, fromIndex, toIndex);
+            operation.Execute(ElasticClient, TestIndex.IndexNameWithVersion(), TestIndex.NextIndexNameWithVersion());
 
             // VERIFY
             processedRecordCount.Should().Be(expectedDocumentCount);
 
             ElasticClient.Refresh(Indices.All);
-            var countResponse = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(toIndex));
+            var countResponse = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion()));
             countResponse.Count.Should().Be(expectedDocumentCount);
         }
 
@@ -48,11 +46,9 @@ namespace ElasticUp.Tests.Operation
         public void Execute_WithOnDocumentProcessed_InvokesEventHandler()
         {
             // GIVEN
-            const string fromIndex = "from";
-            const string toIndex = "to";
             const int expectedDocumentCount = 50000;
             var sampleDocuments = Enumerable.Range(0, expectedDocumentCount).Select(n => new SampleObject { Number = n }).ToList();
-            ElasticClient.IndexMany(sampleDocuments, fromIndex);
+            ElasticClient.IndexMany(sampleDocuments, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
 
             // TEST
@@ -63,7 +59,7 @@ namespace ElasticUp.Tests.Operation
                     processedDocuments.Add(doc);
                 });
 
-            operation.Execute(ElasticClient, fromIndex, toIndex);
+            operation.Execute(ElasticClient, TestIndex.IndexNameWithVersion(), TestIndex.NextIndexNameWithVersion());
 
             // VERIFY
             processedDocuments.OrderBy(doc => doc.Number).ShouldAllBeEquivalentTo(sampleDocuments.OrderBy(doc => doc.Number));
@@ -73,25 +69,22 @@ namespace ElasticUp.Tests.Operation
         public void Execute_WithSearchDescriptor_ProcessesFilteredDocumentsAndInsertsInNewIndex()
         {
             // GIVEN
-            const string fromIndex = "from";
-            const string toIndex = "to";
             const int expectedDocumentCount = 50000;
             var sampleDocuments = Enumerable.Range(0, expectedDocumentCount).Select(n => new SampleObject { Number = n });
-            ElasticClient.IndexMany(sampleDocuments, fromIndex);
+            ElasticClient.IndexMany(sampleDocuments, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
-
-
+            
             // TEST
             var operation = new BatchedElasticUpOperation<SampleObject>(0)
                 .WithSearchDescriptor(descriptor =>
                     descriptor.Query(query =>
                         query.Range(rangeQuery => rangeQuery.Field(x => x.Number).LessThan(10000))));
 
-            operation.Execute(ElasticClient, fromIndex, toIndex);
+            operation.Execute(ElasticClient, TestIndex.IndexNameWithVersion(), TestIndex.NextIndexNameWithVersion());
 
             // VERIFY
             ElasticClient.Refresh(Indices.All);
-            var countResponse = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(toIndex));
+            var countResponse = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion()));
             countResponse.Count.Should().Be(10000);
         }
 
@@ -99,14 +92,11 @@ namespace ElasticUp.Tests.Operation
         public void Execute_WithDocumentTransformationWithFilters_ProcessesAllDocumentsInBatchesAndInsertsFilteredInNewIndex()
         {
             // GIVEN
-            const string fromIndex = "from";
-            const string toIndex = "to";
             const int expectedDocumentCount = 50000;
             var sampleDocuments = Enumerable.Range(0, expectedDocumentCount).Select(n => new SampleObject { Number = n });
-            ElasticClient.IndexMany(sampleDocuments, fromIndex);
+            ElasticClient.IndexMany(sampleDocuments, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
-
-
+            
             // TEST
             var processedDocumentCount = 0;
             var documentCountWithEvenNumber = 0;
@@ -123,44 +113,39 @@ namespace ElasticUp.Tests.Operation
                     return null;
                 });
 
-            operation.Execute(ElasticClient, fromIndex, toIndex);
+            operation.Execute(ElasticClient, TestIndex.IndexNameWithVersion(), TestIndex.NextIndexNameWithVersion());
 
             // VERIFY
             processedDocumentCount.Should().Be(expectedDocumentCount);
             documentCountWithEvenNumber.Should().Be(25000);
 
             ElasticClient.Refresh(Indices.All);
-            var countResponse = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(toIndex));
+            var countResponse = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion()));
             countResponse.Count.Should().Be(25000);
         }
 
         [Test]
         public void Execute_ThrowsOnServerError()
         {
-            // GIVEN
-            const string fromIndex = "does not exist";
-            const string toIndex = "to";
-
             // TEST
             var operation = new BatchedElasticUpOperation<SampleObject>(0);
             
-            Assert.Throws<ElasticUpException>(() => operation.Execute(ElasticClient, fromIndex, toIndex));
+            Assert.Throws<ElasticsearchClientException>(() => operation.Execute(ElasticClient, "does not exist", TestIndex.NextIndexNameWithVersion()));
         }
 
         [Test]
         public void ParallelTest()
         {
             // GIVEN
-            const string index = "from";
             const int documentCount = 25000;
             var documents = Enumerable.Range(0, documentCount).Select(n => new SampleObject {Number = n}).ToList();
-            ElasticClient.IndexMany(documents, index);
+            ElasticClient.IndexMany(documents, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
 
             // TEST
             var actualDocuments = new List<SampleObject>(documentCount);
             var scrollTimeout = new Time(60*1000);
-            var searchResponse = ElasticClient.Search<SampleObject>(descriptor => descriptor.Scroll(scrollTimeout).Size(5000).Index(index));
+            var searchResponse = ElasticClient.Search<SampleObject>(descriptor => descriptor.Scroll(scrollTimeout).Size(5000).Index(TestIndex.IndexNameWithVersion()));
             actualDocuments.AddRange(searchResponse.Documents);
 
             var scrollId = searchResponse.ScrollId;

@@ -1,5 +1,4 @@
-﻿using System;
-using ElasticUp.Migration;
+﻿using ElasticUp.Migration;
 
 namespace ElasticUp.Tests.Sample
 {

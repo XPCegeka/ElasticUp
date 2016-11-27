@@ -1,4 +1,5 @@
 using System;
+using Elasticsearch.Net;
 using ElasticUp.Migration.Meta;
 using ElasticUp.Operation;
 using ElasticUp.Tests.Sample;
@@ -15,19 +16,16 @@ namespace ElasticUp.Tests.Operation
         public void Execute_CopiesTypeToNewIndex()
         {
             // GIVEN
-            var oldIndex = new VersionedIndexName("test", 0);
-            var newIndex = oldIndex.GetIncrementedVersion();
-
-            ElasticClient.IndexMany(new[] { new SampleDocument() }, oldIndex.ToString());
+            ElasticClient.IndexMany(new[] { new SampleDocument() }, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
 
             // WHEN
             var operation = new CopyTypeOperation(0).WithTypeName("sampledocument");
-            operation.Execute(ElasticClient, oldIndex, newIndex);
+            operation.Execute(ElasticClient, TestIndex.IndexNameWithVersion(), TestIndex.NextIndexNameWithVersion());
 
             // THEN
             ElasticClient.Refresh(Indices.All);
-            var countResponse = ElasticClient.Count<SampleDocument>(descriptor => descriptor.Index(newIndex.ToString()));
+            var countResponse = ElasticClient.Count<SampleDocument>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion()));
             countResponse.Count.Should().Be(1);
         }
 
@@ -36,31 +34,25 @@ namespace ElasticUp.Tests.Operation
         {
             // GIVEN
             var oldIndex = new VersionedIndexName("this-index-does-not-exist", 0);
-            var newIndex = oldIndex.GetIncrementedVersion();
+            var newIndex = oldIndex.NextVersion();
 
             // WHEN
             var operation = new CopyTypeOperation(0).WithTypeName("sampledocument");
-            Assert.Throws<Exception>(() => operation.Execute(ElasticClient, oldIndex, newIndex));
+            Assert.Throws<ElasticsearchClientException>(() => operation.Execute(ElasticClient, oldIndex, newIndex));
         }
 
         [Test]
         public void Execute_DoesNotThrowWhenNoDocumentsOfTypeAvailableInFromIndex()
         {
-            // GIVEN
-            var oldIndex = new VersionedIndexName("test", 0);
-            var newIndex = oldIndex.GetIncrementedVersion();
-
-            ElasticClient.CreateIndex(oldIndex.ToString());
-            ElasticClient.Refresh(Indices.All);
-
             // WHEN
             var operation = new CopyTypeOperation(0).WithTypeName("sampledocument");
-            operation.Execute(ElasticClient, oldIndex, newIndex);
+            operation.Execute(ElasticClient, TestIndex.IndexNameWithVersion(), TestIndex.NextIndexNameWithVersion());
 
             // THEN
             ElasticClient.Refresh(Indices.All);
-            var countResponse = ElasticClient.Count<SampleDocument>(descriptor => descriptor.Index(newIndex.ToString()));
+            var countResponse = ElasticClient.Count<SampleDocument>(descriptor => descriptor.Index(TestIndex.IndexNameWithVersion()));
             countResponse.Count.Should().Be(0);
+            ElasticClient.IndexExists(TestIndex.NextIndexNameWithVersion()).Exists.Should().BeFalse();
         }
     }
 }
