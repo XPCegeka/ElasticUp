@@ -82,7 +82,7 @@
     <Compile Include="History\MigrationHistoryHelperTest.cs" />
     <Compile Include="Operation\BatchElasticUpOperationIntegrationTest.cs" />
     <Compile Include="Operation\BatchElasticUpOperationTest.cs" />
-    <Compile Include="Operation\CopyTypeOperationIntegrationTest.cs" />
+    <Compile Include="Operation\ReindexTypeOperationIntegrationTest.cs" />
     <Compile Include="Sample\SampleMigrationWithCopyTypeOperation.cs" />
     <Compile Include="Sample\SampleDocument.cs" />
     <Compile Include="History\MigrationHistoryHelperIntegrationTest.cs" />
@@ -93,7 +93,7 @@
     <Compile Include="Migration\Meta\VersionedIndexNameTest.cs" />
     <Compile Include="Sample\SampleEmptyMigration.cs" />
     <Compile Include="Migration\AbstractElasticUpMigrationTest.cs" />
-    <Compile Include="Operation\CopyTypeOperationGenericTest.cs" />
+    <Compile Include="Operation\RexindexTypeOperationGenericTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>

@@ -5,7 +5,6 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.Migration.Meta
 {
     [TestFixture]
-    [Parallelizable]
     public class VersionedIndexNameTest
     {
         [Test]

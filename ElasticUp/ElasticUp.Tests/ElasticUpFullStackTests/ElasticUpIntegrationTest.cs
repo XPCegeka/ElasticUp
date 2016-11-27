@@ -9,7 +9,6 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.ElasticUpFullStackTests
 {
     [TestFixture]
-    [Parallelizable]
     public class ElasticUpIntegrationTest : AbstractIntegrationTest
     {
         [Test]
@@ -23,7 +22,7 @@ namespace ElasticUp.Tests.ElasticUpFullStackTests
 
             // TEST
             new ElasticUp(ElasticClient)
-                .Migration(new SampleMigrationWithCopyTypeOperation(0))
+                .Migration(new SampleMigrationWithCopyTypeOperation())
                 .Run();
 
             // VERIFY
@@ -50,7 +49,7 @@ namespace ElasticUp.Tests.ElasticUpFullStackTests
 
             // TEST
             new ElasticUp(ElasticClient)
-                .Migration(new SampleMigrationWithCopyTypeOperation(0))
+                .Migration(new SampleMigrationWithCopyTypeOperation())
                 .Run();
 
             // VERIFY
@@ -67,21 +66,12 @@ namespace ElasticUp.Tests.ElasticUpFullStackTests
         }
 
         [Test]
-        public void WhenAddingAMigration_MakeSureAllMigrationNumbersAreUnique()
+        public void WhenAddingAMigration_MakeSureAllMigrationNamesAreUnique()
         {
             Assert.Throws<ArgumentException>(() =>
                 new ElasticUp(ElasticClient)
-                    .Migration(new Sample.SampleEmptyMigration(1))
-                    .Migration(new Sample.SampleEmptyMigration(1)));
-        }
-
-        [Test]
-        public void WhenAddingAMigration_MakeSureAllMigrationNumbersAreAscending()
-        {
-            Assert.Throws<ArgumentException>(() =>
-                new ElasticUp(ElasticClient)
-                    .Migration(new Sample.SampleEmptyMigration(2))
-                    .Migration(new Sample.SampleEmptyMigration(1)));
+                    .Migration(new SampleEmptyMigration(TestIndex.IndexNameWithVersion()))
+                    .Migration(new SampleEmptyMigration(TestIndex.NextIndexNameWithVersion())));
         }
     }
 }

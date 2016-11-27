@@ -5,7 +5,7 @@
         private readonly string _sourceIndex;
         private readonly string _targetIndex;
 
-        protected CustomElasticUpMigration(int migrationNumber, string sourceIndex, string targetIndex) : base(migrationNumber)
+        protected CustomElasticUpMigration(string sourceIndex, string targetIndex)
         {
             _sourceIndex = sourceIndex;
             _targetIndex = targetIndex;

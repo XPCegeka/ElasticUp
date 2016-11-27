@@ -9,8 +9,7 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.Operation
 {
     [TestFixture]
-    [Parallelizable]
-    public class CopyTypeOperationIntegrationTest : AbstractIntegrationTest
+    public class ReindexTypeOperationIntegrationTest : AbstractIntegrationTest
     {
         [Test]
         public void Execute_CopiesTypeToNewIndex()

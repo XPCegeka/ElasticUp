@@ -14,7 +14,7 @@ namespace ElasticUp.Tests.Migration
         [SetUp]
         public void Setup()
         {
-            _elasticUpMigration = new SampleEmptyMigration(0, "test");
+            _elasticUpMigration = new SampleEmptyMigration("test");
         }
 
         [Test]
@@ -45,8 +45,8 @@ namespace ElasticUp.Tests.Migration
         [Test]
         public void ToString_ReturnsMigrationNumberPlusClassName()
         {
-            new SampleEmptyMigration(5).ToString().Should().Be("005_sampleemptymigration");
-            new SampleEmptyMigration(14).ToString().Should().Be("014_sampleemptymigration");
+            new SampleEmptyMigration("index").ToString().Should().Be("sampleemptymigration");
+            new SampleEmptyMigration("index").ToString().Should().Be("sampleemptymigration");
         }
     }
 }

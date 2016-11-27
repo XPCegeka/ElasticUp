@@ -19,7 +19,7 @@ namespace ElasticUp
      - only support elastic 5+ : maak gebruik van sliced scroll search
      - DONE tests starten nu telkens opnieuw elastic -> elke test eigen index, in setup wordt elasticclient aangemaakt en daar defaultindex zetten
      - DONE unittest indexes : 1 shard 0 replicas
-     - 
+
      - LOW PRIO: make ElasticUp in dotnetcore met support voor 4.5.x ! 
     */
 
@@ -50,10 +50,8 @@ namespace ElasticUp
 
         private void AssertNoDoubles(AbstractElasticUpMigration newMigration)
         {
-            var migrationNumbers = Migrations.Select(migration => migration.MigrationNumber).ToList();
-
-            if (migrationNumbers.Any(number => number >= newMigration.MigrationNumber))
-                throw new ArgumentException("Your migrations should have unique ascending numbers!");
+            if (Migrations.Any(migration => migration.ToString() == newMigration.ToString()))
+                throw new ArgumentException("Your migrations should have a unique name!");
         }
 
         public void Run()

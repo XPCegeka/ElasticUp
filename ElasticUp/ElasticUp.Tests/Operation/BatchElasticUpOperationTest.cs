@@ -5,7 +5,6 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.Operation
 {
     [TestFixture]
-    [Parallelizable]
     public class BatchElasticUpOperationTest
     {
         [Test]

@@ -8,7 +8,6 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.History
 {
     [TestFixture]
-    [Parallelizable]
     public class MigrationHistoryHelperTest
     {
         private IElasticClient _elasticClient;
@@ -35,24 +34,24 @@ namespace ElasticUp.Tests.History
         public void AddMigrationHistory_ThrowsWithInvalidParameters()
         {
             Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.AddMigrationToHistory(null, "x"));
-            Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.AddMigrationToHistory(new SampleEmptyMigration(0), null));
-            Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.AddMigrationToHistory(new SampleEmptyMigration(0), string.Empty));
+            Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.AddMigrationToHistory(new SampleEmptyMigration("index"), null));
+            Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.AddMigrationToHistory(new SampleEmptyMigration("index"), string.Empty));
         }
 
         [Test]
         public void AddMigrationHistory_WithException_ThrowsWithInvalidParameters()
         {
             Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.AddMigrationToHistory(null, "x", null));
-            Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.AddMigrationToHistory(new SampleEmptyMigration(0), null, null));
-            Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.AddMigrationToHistory(new SampleEmptyMigration(0), string.Empty, null));
+            Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.AddMigrationToHistory(new SampleEmptyMigration("index"), null, null));
+            Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.AddMigrationToHistory(new SampleEmptyMigration("index"), string.Empty, null));
         }
 
         [Test]
         public void HasMigrationAlreadyBeenApplied_ThrowsWithInvalidParameters()
         {
             Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.HasMigrationAlreadyBeenApplied(null, "x"));
-            Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.HasMigrationAlreadyBeenApplied(new SampleEmptyMigration(0), null));
-            Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.HasMigrationAlreadyBeenApplied(new SampleEmptyMigration(0), string.Empty));
+            Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.HasMigrationAlreadyBeenApplied(new SampleEmptyMigration("index"), null));
+            Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.HasMigrationAlreadyBeenApplied(new SampleEmptyMigration("index"), string.Empty));
         }
     }
 }

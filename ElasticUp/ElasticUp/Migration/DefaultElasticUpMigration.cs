@@ -8,7 +8,7 @@ namespace ElasticUp.Migration
     {
         protected readonly string IndexAlias;
 
-        protected DefaultElasticUpMigration(int migrationNumber, string indexAlias) : base(migrationNumber)
+        protected DefaultElasticUpMigration(string indexAlias)
         {
             IndexAlias = indexAlias;
         }

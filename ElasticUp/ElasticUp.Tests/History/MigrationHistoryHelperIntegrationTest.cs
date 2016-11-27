@@ -6,11 +6,11 @@ using ElasticUp.Tests.Sample;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace ElasticUp.Tests.History
 {
     [TestFixture]
-    [Parallelizable]
     public class MigrationHistoryHelperIntegrationTest : AbstractIntegrationTest
     {
         [Test]
@@ -56,7 +56,7 @@ namespace ElasticUp.Tests.History
         public void AddMigrationHistory_AddsMigrationHistoryForExecutedOperation()
         {
             // GIVEN
-            var migration = new SampleEmptyMigration(0);
+            var migration = new SampleEmptyMigration(TestIndex.IndexNameWithVersion());
 
             // TEST
             var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient);
@@ -74,7 +74,7 @@ namespace ElasticUp.Tests.History
         public void AddMigrationHistory_WithException_AddsMigrationHistoryWithExceptionForExecutedOperation()
         {
             // GIVEN
-            var migration = new SampleEmptyMigration(0);
+            var migration = new SampleEmptyMigration(TestIndex.IndexNameWithVersion());
             var exception = new Exception("Sample");
 
             // TEST
@@ -94,7 +94,7 @@ namespace ElasticUp.Tests.History
         public void HasMigrationAlreadyBeenApplied_ReturnsTrueIfMigrationAlreadyApplied()
         {
             // GIVEN
-            var migration = new SampleEmptyMigration(0);
+            var migration = new SampleEmptyMigration(TestIndex.IndexNameWithVersion());
             var migrationHistory = new ElasticUpMigrationHistory(migration.ToString());
 
             ElasticClient.Index(migrationHistory, descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion()));
@@ -112,7 +112,7 @@ namespace ElasticUp.Tests.History
         public void HasMigrationAlreadyBeenApplied_ReturnsFalseIfMigrationNotApplied()
         {
             // GIVEN
-            var migration = new SampleEmptyMigration(0);
+            var migration = new SampleEmptyMigration(TestIndex.IndexNameWithVersion());
             
             // TEST
             var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient);
@@ -126,7 +126,7 @@ namespace ElasticUp.Tests.History
         public void HasMigrationAlreadyBeenApplied_ReturnsFalseIfMigrationNotSucessfullyApplied()
         {
             // GIVEN
-            var migration = new SampleEmptyMigration(0);
+            var migration = new SampleEmptyMigration(TestIndex.IndexNameWithVersion());
             var migrationHistory = new ElasticUpMigrationHistory(migration.ToString(), new Exception());
 
             ElasticClient.Index(migrationHistory, descriptor => descriptor.Index(TestIndex.IndexNameWithVersion()));
@@ -144,7 +144,7 @@ namespace ElasticUp.Tests.History
         public void HasMigrationAlreadyBeenApplied_ThrowsIfIndexDoesNotExist()
         {
             // GIVEN
-            var migration = new SampleEmptyMigration(0);
+            var migration = new SampleEmptyMigration(TestIndex.IndexNameWithVersion());
 
             // TEST
             var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient);

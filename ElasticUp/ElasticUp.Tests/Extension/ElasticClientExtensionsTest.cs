@@ -11,7 +11,6 @@ using NUnit.Framework;
 
 namespace ElasticUp.Tests.Extension
 {
-    [Parallelizable]
     [TestFixture]
     public class ElasticClientExtensionsTest : AbstractIntegrationTest
     {

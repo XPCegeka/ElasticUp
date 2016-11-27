@@ -20,12 +20,6 @@ namespace ElasticUp.Migration
 
         protected string SourceIndex;
         protected string TargetIndex;
-        internal int MigrationNumber { get; }
-
-        public AbstractElasticUpMigration(int migrationNumber)
-        {
-            this.MigrationNumber = migrationNumber;
-        }
 
         public void SetElasticClient(IElasticClient elasticClient)
         {
@@ -111,7 +105,7 @@ namespace ElasticUp.Migration
 
         public sealed override string ToString()
         {
-            return ($"{MigrationNumber:D3}_{this.GetType().Name}").ToLowerInvariant();
+            return GetType().Name.ToLowerInvariant();
         }
     }
 }
