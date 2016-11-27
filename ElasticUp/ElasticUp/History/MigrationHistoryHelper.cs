@@ -60,6 +60,7 @@ namespace ElasticUp.History
             if (string.IsNullOrEmpty(indexName))
                 throw new ArgumentNullException(nameof(indexName));
 
+            var migrationHistoryIndexExists = _elasticClient.IndexExists(indexName).Exists;
             var searchResponse = _elasticClient.Search<ElasticUpMigrationHistory>(sd =>
                 sd.Index(indexName)
                   .From(0).Size(5000)
