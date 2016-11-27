@@ -36,6 +36,7 @@ namespace ElasticUp.Tests.Infrastructure
         public void WaitUntilElasticOperational()
         {
             SpinWait.SpinUntil(() => IsElasticSearchUpAndRunning().Result);
+            Thread.Sleep(1000);
         }
 
         public void Dispose()
