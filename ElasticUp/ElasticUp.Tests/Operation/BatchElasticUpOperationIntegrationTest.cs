@@ -17,14 +17,14 @@ namespace ElasticUp.Tests.Operation
         public void Execute_ProcessesDocumentsAndInsertsInNewIndex()
         {
             // GIVEN
-            const int expectedDocumentCount = 50000;
+            const int expectedDocumentCount = 15000;
             var sampleDocuments = Enumerable.Range(0, expectedDocumentCount).Select(n => new SampleObject { Number = n });
             ElasticClient.IndexMany(sampleDocuments, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
             
             // TEST
             var processedRecordCount = 0;
-            var operation = new BatchedElasticUpOperation<SampleObject>(0)
+            var operation = new BatchedElasticUpOperation<SampleObject>()
                 .WithDocumentTransformation(doc =>
                 {
                     processedRecordCount++;
@@ -45,14 +45,14 @@ namespace ElasticUp.Tests.Operation
         public void Execute_WithOnDocumentProcessed_InvokesEventHandler()
         {
             // GIVEN
-            const int expectedDocumentCount = 50000;
+            const int expectedDocumentCount = 15000;
             var sampleDocuments = Enumerable.Range(0, expectedDocumentCount).Select(n => new SampleObject { Number = n }).ToList();
             ElasticClient.IndexMany(sampleDocuments, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
 
             // TEST
             var processedDocuments = new List<SampleObject>();
-            var operation = new BatchedElasticUpOperation<SampleObject>(0)
+            var operation = new BatchedElasticUpOperation<SampleObject>()
                 .WithOnDocumentProcessed(doc =>
                 {
                     processedDocuments.Add(doc);
@@ -68,13 +68,13 @@ namespace ElasticUp.Tests.Operation
         public void Execute_WithSearchDescriptor_ProcessesFilteredDocumentsAndInsertsInNewIndex()
         {
             // GIVEN
-            const int expectedDocumentCount = 50000;
+            const int expectedDocumentCount = 15000;
             var sampleDocuments = Enumerable.Range(0, expectedDocumentCount).Select(n => new SampleObject { Number = n });
             ElasticClient.IndexMany(sampleDocuments, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
             
             // TEST
-            var operation = new BatchedElasticUpOperation<SampleObject>(0)
+            var operation = new BatchedElasticUpOperation<SampleObject>()
                 .WithSearchDescriptor(descriptor =>
                     descriptor.Query(query =>
                         query.Range(rangeQuery => rangeQuery.Field(x => x.Number).LessThan(10000))));
@@ -91,7 +91,7 @@ namespace ElasticUp.Tests.Operation
         public void Execute_WithDocumentTransformationWithFilters_ProcessesAllDocumentsInBatchesAndInsertsFilteredInNewIndex()
         {
             // GIVEN
-            const int expectedDocumentCount = 50000;
+            const int expectedDocumentCount = 15000;
             var sampleDocuments = Enumerable.Range(0, expectedDocumentCount).Select(n => new SampleObject { Number = n });
             ElasticClient.IndexMany(sampleDocuments, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
@@ -99,7 +99,7 @@ namespace ElasticUp.Tests.Operation
             // TEST
             var processedDocumentCount = 0;
             var documentCountWithEvenNumber = 0;
-            var operation = new BatchedElasticUpOperation<SampleObject>(0)
+            var operation = new BatchedElasticUpOperation<SampleObject>()
                 .WithDocumentTransformation(doc =>
                 {
                     processedDocumentCount++;
@@ -116,7 +116,7 @@ namespace ElasticUp.Tests.Operation
 
             // VERIFY
             processedDocumentCount.Should().Be(expectedDocumentCount);
-            documentCountWithEvenNumber.Should().Be(25000);
+            documentCountWithEvenNumber.Should().Be(7500);
 
             ElasticClient.Refresh(Indices.All);
             var countResponse = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion()));
@@ -127,7 +127,7 @@ namespace ElasticUp.Tests.Operation
         public void Execute_ThrowsOnServerError()
         {
             // TEST
-            var operation = new BatchedElasticUpOperation<SampleObject>(0);
+            var operation = new BatchedElasticUpOperation<SampleObject>();
             
             Assert.Throws<ElasticsearchClientException>(() => operation.Execute(ElasticClient, "does not exist", TestIndex.NextIndexNameWithVersion()));
         }

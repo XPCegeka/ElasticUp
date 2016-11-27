@@ -94,15 +94,9 @@ namespace ElasticUp.Migration
 
         public void Operation(ElasticUpOperation operation)
         {
-            if (HasDuplicateOperationNumber(operation)) throw new ArgumentException("Duplicate operation number.");
             Operations.Add(operation);
         }
-
-        private bool HasDuplicateOperationNumber(ElasticUpOperation operation)
-        {
-            return Operations.Any(o => o.OperationNumber == operation.OperationNumber);
-        }
-
+        
         public sealed override string ToString()
         {
             return GetType().Name.ToLowerInvariant();

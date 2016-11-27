@@ -12,7 +12,7 @@ namespace ElasticUp.Tests.Operation
         public void Generic_UsesNameOfTypeForTypeName()
         {
             // WHEN
-            var operation = new ReindexTypeOperation<SampleDocument>(0);
+            var operation = new ReindexTypeOperation<SampleDocument>();
             operation.TypeName.Should().Be("sampledocument");
         }
     }

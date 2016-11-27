@@ -22,7 +22,7 @@ namespace ElasticUp.History
             if (string.IsNullOrEmpty(toIndex))
                 throw new ArgumentNullException(nameof(toIndex));
 
-            var copyTypeOperation = new ReindexTypeOperation<ElasticUpMigrationHistory>(0);
+            var copyTypeOperation = new ReindexTypeOperation<ElasticUpMigrationHistory>();
             copyTypeOperation.Execute(_elasticClient, fromIndex, toIndex);
         }
 

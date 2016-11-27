@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using ElasticUp.Extension;
-using ElasticUp.Tests.Sample;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;

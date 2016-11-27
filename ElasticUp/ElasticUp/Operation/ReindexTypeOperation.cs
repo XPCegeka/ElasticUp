@@ -7,8 +7,6 @@ namespace ElasticUp.Operation
     {
         public string TypeName { get; set; }
 
-        public ReindexTypeOperation(int operationNumber) : base(operationNumber) {}
-
         public ReindexTypeOperation WithTypeName(string typeName)
         {
             TypeName = typeName;
@@ -34,7 +32,7 @@ namespace ElasticUp.Operation
 
     public class ReindexTypeOperation<T> : ReindexTypeOperation where T : class
     {
-        public ReindexTypeOperation(int operationNumber) : base(operationNumber)
+        public ReindexTypeOperation()
         {
             TypeName = typeof (T).Name.ToLowerInvariant();
         }

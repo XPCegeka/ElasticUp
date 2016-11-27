@@ -21,25 +21,13 @@ namespace ElasticUp.Tests.Migration
         public void Operation_AddsOperationToOperations()
         {
             // GIVEN
-            var operation = new SampleEmptyOperation(0);
+            var operation = new SampleEmptyOperation();
 
             // WHEN
             _elasticUpMigration.Operation(operation);
 
             // THEN
             _elasticUpMigration.Operations.Should().HaveCount(1);
-        }
-
-        [Test]
-        public void Operation_ThrowsWhenAddingOperationWithSameIndex()
-        {
-            // GIVEN
-            var operation1 = new SampleEmptyOperation(0);
-            var operation2 = new SampleEmptyOperation(0);
-
-            // WHEN / THEN
-            _elasticUpMigration.Operation(operation1);
-            Assert.Throws<ArgumentException>(() => _elasticUpMigration.Operation(operation2), "Duplicate operation number.");
         }
 
         [Test]

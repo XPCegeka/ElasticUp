@@ -6,7 +6,6 @@ using ElasticUp.Tests.Sample;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace ElasticUp.Tests.History
 {

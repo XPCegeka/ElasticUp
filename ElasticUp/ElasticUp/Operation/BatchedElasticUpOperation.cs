@@ -13,10 +13,6 @@ namespace ElasticUp.Operation
         public Func<TDocument, TDocument> Transformation { get; set; } = doc => doc;
         public Action<TDocument> OnDocumentProcessed { get; set; }
 
-        public BatchedElasticUpOperation(int operationNumber) : base(operationNumber)
-        {
-        }
-
         public BatchedElasticUpOperation<TDocument> WithSearchDescriptor(Func<SearchDescriptor<TDocument>, ISearchRequest> selector)
         {
             if (selector == null)

@@ -8,7 +8,7 @@ namespace ElasticUp.Tests.Sample
     {
         public SampleMigrationWithCopyTypeOperation() : base(TestContext.CurrentContext.Test.MethodName.ToLowerInvariant())
         {
-            Operation(new ReindexTypeOperation<SampleObject>(0));
+            Operation(new ReindexTypeOperation<SampleObject>());
         }
     }
 }
