@@ -1,3 +1,4 @@
+using System.Threading;
 using Elasticsearch.Net;
 using ElasticUp.Migration.Meta;
 using ElasticUp.Operation;
@@ -46,12 +47,12 @@ namespace ElasticUp.Tests.Operation
             // WHEN
             var operation = new ReindexTypeOperation().WithTypeName("sampledocument");
             operation.Execute(ElasticClient, TestIndex.IndexNameWithVersion(), TestIndex.NextIndexNameWithVersion());
-
+            
             // THEN
             ElasticClient.Refresh(Indices.All);
             var countResponse = ElasticClient.Count<SampleDocument>(descriptor => descriptor.Index(TestIndex.IndexNameWithVersion()));
             countResponse.Count.Should().Be(0);
-            ElasticClient.IndexExists(TestIndex.NextIndexNameWithVersion()).Exists.Should().BeFalse();
+            ElasticClient.IndexExists(TestIndex.NextIndexNameWithVersion()).Exists.Should().BeTrue();
         }
     }
 }

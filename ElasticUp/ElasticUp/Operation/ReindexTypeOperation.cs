@@ -1,5 +1,4 @@
-﻿using System;
-using Nest;
+﻿using Nest;
 
 namespace ElasticUp.Operation
 {
@@ -15,18 +14,16 @@ namespace ElasticUp.Operation
 
         public override void Execute(IElasticClient elasticClient, string fromIndex, string toIndex)
         {
-            var response = elasticClient.ReindexOnServer(descriptor => descriptor
-                    .Source(sourceDescriptor => sourceDescriptor
-                        .Type(TypeName)
-                        .Index(fromIndex))
-                    .Destination(destinationDescriptor => destinationDescriptor
-                        .Index(toIndex))
-                    .WaitForCompletion());
+            if (!elasticClient.IndexExists(toIndex).Exists)
+                elasticClient.CreateIndex(toIndex);
 
-            if (response.ServerError != null)
-            {
-                throw new Exception($"Could not execute {typeof(ReindexTypeOperation<>).Name}. Error information: '{response.DebugInformation}'");
-            }
+            elasticClient.ReindexOnServer(descriptor => descriptor
+                .Source(sourceDescriptor => sourceDescriptor
+                    .Type(TypeName)
+                    .Index(fromIndex))
+                .Destination(destinationDescriptor => destinationDescriptor
+                    .Index(toIndex))
+                .WaitForCompletion());
         }
     }
 

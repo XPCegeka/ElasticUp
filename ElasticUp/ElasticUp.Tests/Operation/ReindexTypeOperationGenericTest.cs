@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.Operation
 {
     [TestFixture]
-    public class RexindexTypeOperationGenericTest
+    public class ReindexTypeOperationGenericTest
     {
         [Test]
         public void Generic_UsesNameOfTypeForTypeName()

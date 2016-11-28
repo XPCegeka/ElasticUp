@@ -93,7 +93,7 @@
     <Compile Include="Migration\Meta\VersionedIndexNameTest.cs" />
     <Compile Include="Sample\SampleEmptyMigration.cs" />
     <Compile Include="Migration\AbstractElasticUpMigrationTest.cs" />
-    <Compile Include="Operation\RexindexTypeOperationGenericTest.cs" />
+    <Compile Include="Operation\ReindexTypeOperationGenericTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>

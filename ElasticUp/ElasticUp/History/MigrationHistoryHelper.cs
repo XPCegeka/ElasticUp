@@ -9,10 +9,12 @@ namespace ElasticUp.History
     public class MigrationHistoryHelper
     {
         private readonly IElasticClient _elasticClient;
+        public readonly string MigrationHistoryIndexName;
 
-        public MigrationHistoryHelper(IElasticClient elasticClient)
+        public MigrationHistoryHelper(IElasticClient elasticClient, string migrationHistoryIndexName)
         {
             _elasticClient = elasticClient;
+            MigrationHistoryIndexName = migrationHistoryIndexName;
         }
 
         public void CopyMigrationHistory(string fromIndex, string toIndex)
@@ -22,47 +24,48 @@ namespace ElasticUp.History
             if (string.IsNullOrEmpty(toIndex))
                 throw new ArgumentNullException(nameof(toIndex));
 
-            var copyTypeOperation = new ReindexTypeOperation<ElasticUpMigrationHistory>();
-            copyTypeOperation.Execute(_elasticClient, fromIndex, toIndex);
+            var reindexTypeOperation = new ReindexTypeOperation<ElasticUpMigrationHistory>();
+            reindexTypeOperation.Execute(_elasticClient, fromIndex, toIndex);
         }
 
-        public void AddMigrationToHistory(AbstractElasticUpMigration migration, string indexName)
+        public void AddMigrationToHistory(AbstractElasticUpMigration migration)
         {
-            AddMigrationToHistory(migration?.ToString(), indexName, null);
+            AddMigrationToHistory(migration?.ToString(), null);
         }
 
-        public void AddMigrationToHistory(AbstractElasticUpMigration migration, string indexName, Exception exception)
+        public void AddMigrationToHistory(AbstractElasticUpMigration migration, Exception exception)
         {
-            AddMigrationToHistory(migration?.ToString(), indexName, exception);
+            AddMigrationToHistory(migration?.ToString(), exception);
         }
 
-        private void AddMigrationToHistory(string migrationName, string indexName, Exception exception)
+        private void AddMigrationToHistory(string migrationName, Exception exception)
         {
             if (string.IsNullOrWhiteSpace(migrationName))
                 throw new ArgumentNullException(nameof(migrationName));
-            if (string.IsNullOrEmpty(indexName))
-                throw new ArgumentNullException(nameof(indexName));
+            if (string.IsNullOrEmpty(MigrationHistoryIndexName))
+                throw new ArgumentNullException(nameof(MigrationHistoryIndexName));
 
             var history = new ElasticUpMigrationHistory(migrationName, exception);
 
-            _elasticClient.Index(history, descriptor => descriptor.Index(indexName));
+            _elasticClient.Index(history, descriptor => descriptor.Index(MigrationHistoryIndexName));
         }
 
-        public bool HasMigrationAlreadyBeenApplied(AbstractElasticUpMigration migration, string indexName)
+        public bool HasMigrationAlreadyBeenApplied(AbstractElasticUpMigration migration)
         {
-            return HasMigrationAlreadyBeenApplied(migration?.ToString(), indexName);
+            return HasMigrationAlreadyBeenApplied(migration?.ToString());
         }
 
-        private bool HasMigrationAlreadyBeenApplied(string migrationName, string indexName)
+        private bool HasMigrationAlreadyBeenApplied(string migrationName)
         {
             if (string.IsNullOrWhiteSpace(migrationName))
                 throw new ArgumentNullException(nameof(migrationName));
-            if (string.IsNullOrEmpty(indexName))
-                throw new ArgumentNullException(nameof(indexName));
+            if (string.IsNullOrEmpty(MigrationHistoryIndexName))
+                throw new ArgumentNullException(nameof(MigrationHistoryIndexName));
 
-            var migrationHistoryIndexExists = _elasticClient.IndexExists(indexName).Exists;
+            if (!_elasticClient.IndexExists(MigrationHistoryIndexName).Exists) return false;
+
             var searchResponse = _elasticClient.Search<ElasticUpMigrationHistory>(sd =>
-                sd.Index(indexName)
+                sd.Index(MigrationHistoryIndexName)
                   .From(0).Size(5000)
                   .Query(q => q.Term(f => f.ElasticUpMigrationName, migrationName)));
             

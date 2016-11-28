@@ -12,21 +12,14 @@ namespace ElasticUp.Migration
 {
     public abstract class AbstractElasticUpMigration
     {
-        protected IElasticClient ElasticClient;
-        protected MigrationHistoryHelper MigrationHistoryHelper;
-        protected AliasHelper AliasHelper;
+        public IElasticClient ElasticClient { get; set; }
+        public MigrationHistoryHelper MigrationHistoryHelper { get; set; }
+        public AliasHelper AliasHelper { get; set; }
 
         public List<ElasticUpOperation> Operations { get; } = new List<ElasticUpOperation>();
 
         protected string SourceIndex;
         protected string TargetIndex;
-
-        public void SetElasticClient(IElasticClient elasticClient)
-        {
-            ElasticClient = elasticClient;
-            MigrationHistoryHelper = new MigrationHistoryHelper(ElasticClient);
-            AliasHelper = new AliasHelper(ElasticClient);
-        }
 
         public virtual void Run()
         {
@@ -51,9 +44,9 @@ namespace ElasticUp.Migration
 
         protected virtual bool SkipMigration()
         {
-            if (MigrationHistoryHelper.HasMigrationAlreadyBeenApplied(this, SourceIndex))
+            if (MigrationHistoryHelper.HasMigrationAlreadyBeenApplied(this))
             {
-                Console.WriteLine($"Already ran migration {this} on old index {SourceIndex}. Not migrating to new index {TargetIndex}");
+                Console.WriteLine($"Skipping migration: {this}. Already applied according to index: {MigrationHistoryHelper.MigrationHistoryIndexName}");
                 return true;
             }
             return false;
@@ -72,8 +65,8 @@ namespace ElasticUp.Migration
 
         protected virtual void AddMigrationToHistory(AbstractElasticUpMigration migration, string index)
         {
-            Console.WriteLine($"Adding ElasticUp Migration {migration} to MigrationHistory of index {index}");
-            MigrationHistoryHelper.AddMigrationToHistory(migration, index);
+            Console.WriteLine($"Adding ElasticUp Migration: {migration} to MigrationHistory index: ({MigrationHistoryHelper.MigrationHistoryIndexName})");
+            MigrationHistoryHelper.AddMigrationToHistory(migration);
         }
 
         protected virtual void MoveAlias(string alias, string sourceIndex, string targetIndex)
