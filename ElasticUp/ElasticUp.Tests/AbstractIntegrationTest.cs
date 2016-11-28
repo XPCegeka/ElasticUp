@@ -9,14 +9,14 @@ namespace ElasticUp.Tests
     {
         private const string ElasticSearchUrl = "http://localhost:9201";
         protected VersionedIndexName TestIndex;
-        protected string MigrationHistoryTestIndexName;
+        protected VersionedIndexName MigrationHistoryTestIndex;
 
         protected IElasticClient ElasticClient;
         
         [SetUp]
         protected void SetUp()
         {
-            MigrationHistoryTestIndexName = TestContext.CurrentContext.Test.MethodName.ToLowerInvariant() + "-" + "migrationhistory";
+            MigrationHistoryTestIndex = new VersionedIndexName(TestContext.CurrentContext.Test.MethodName.ToLowerInvariant() + "-" + "migrationhistory", 0);
             TestIndex = new VersionedIndexName(TestContext.CurrentContext.Test.MethodName.ToLowerInvariant(), 0);
 
             var settings = new ConnectionSettings(new Uri(ElasticSearchUrl))
@@ -26,11 +26,12 @@ namespace ElasticUp.Tests
             ElasticClient = new ElasticClient(settings);
 
             ElasticClient.CreateIndex(
-                MigrationHistoryTestIndexName,
+                MigrationHistoryTestIndex.IndexNameWithVersion(),
                 indexDescriptor => indexDescriptor.Settings(indexSettings => indexSettings
                     .NumberOfShards(1)
                     .NumberOfReplicas(0)));
-
+            ElasticClient.PutAlias(MigrationHistoryTestIndex.IndexNameWithVersion(), MigrationHistoryTestIndex.AliasName);
+            
             ElasticClient.CreateIndex(
                 TestIndex.IndexNameWithVersion(), 
                 indexDescriptor => indexDescriptor.Settings(indexSettings => indexSettings

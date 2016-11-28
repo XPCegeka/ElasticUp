@@ -11,7 +11,19 @@ namespace ElasticUp.Tests.History
     [TestFixture]
     public class MigrationHistoryHelperIntegrationTest : AbstractIntegrationTest
     {
-        
+        [Test]
+        public void InitMigrationHistory_CreatesMigrationHistoryIndexWithVersionAndAlias()
+        {
+            ElasticClient.DeleteIndex(MigrationHistoryTestIndex.IndexNameWithVersion());
+            ElasticClient.IndexExists(MigrationHistoryTestIndex.IndexNameWithVersion()).Exists.Should().BeFalse();
+            ElasticClient.AliasExists(descriptor => descriptor.Name(MigrationHistoryTestIndex.AliasName)).Exists.Should().BeFalse();  
+
+            new MigrationHistoryHelper(ElasticClient, MigrationHistoryTestIndex.AliasName).InitMigrationHistory();
+
+            ElasticClient.IndexExists(MigrationHistoryTestIndex.IndexNameWithVersion()).Exists.Should().BeTrue();
+            ElasticClient.AliasExists(descriptor => descriptor.Name(MigrationHistoryTestIndex.AliasName)).Exists.Should().BeTrue();
+        }
+
         [Test]
         public void CopyMigrationHistory_CopiesExistingMigrationHistoryFromOneIndexToAnother()
         {
@@ -58,34 +70,13 @@ namespace ElasticUp.Tests.History
             var migration = new SampleEmptyMigration(TestIndex.IndexNameWithVersion());
 
             // TEST
-            var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient, MigrationHistoryTestIndexName);
+            var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient, MigrationHistoryTestIndex.AliasName);
             migrationHistoryHelper.AddMigrationToHistory(migration);
 
             // VERIFY
             ElasticClient.Refresh(Indices.All);
 
-            var historyFromElastic = ElasticClient.Search<ElasticUpMigrationHistory>(sd => sd.Index(MigrationHistoryTestIndexName).Query(q => q.Term(t => t.ElasticUpMigrationName, migration.ToString()))).Documents.ToList();
-            historyFromElastic.Should().HaveCount(1);
-            historyFromElastic[0].ElasticUpMigrationName.Should().Be(migration.ToString());
-        }
-
-        [Test]
-        public void AddMigrationHistory_AddsMigrationHistoryForExecutedOperationEvenWhenMigrationHistoryIndexDoesNotExistYet()
-        {
-            // GIVEN
-            ElasticClient.DeleteIndex(MigrationHistoryTestIndexName);
-            ElasticClient.Refresh(Indices.All);
-
-            var migration = new SampleEmptyMigration(TestIndex.IndexNameWithVersion());
-
-            // TEST
-            var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient, MigrationHistoryTestIndexName);
-            migrationHistoryHelper.AddMigrationToHistory(migration);
-
-            // VERIFY
-            ElasticClient.Refresh(Indices.All);
-
-            var historyFromElastic = ElasticClient.Search<ElasticUpMigrationHistory>(sd => sd.Index(MigrationHistoryTestIndexName).Query(q => q.Term(t => t.ElasticUpMigrationName, migration.ToString()))).Documents.ToList();
+            var historyFromElastic = ElasticClient.Search<ElasticUpMigrationHistory>(sd => sd.Index(MigrationHistoryTestIndex.AliasName).Query(q => q.Term(t => t.ElasticUpMigrationName, migration.ToString()))).Documents.ToList();
             historyFromElastic.Should().HaveCount(1);
             historyFromElastic[0].ElasticUpMigrationName.Should().Be(migration.ToString());
         }
@@ -98,13 +89,13 @@ namespace ElasticUp.Tests.History
             var exception = new Exception("Sample");
 
             // TEST
-            var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient, MigrationHistoryTestIndexName);
+            var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient, MigrationHistoryTestIndex);
             migrationHistoryHelper.AddMigrationToHistory(migration, exception);
 
             // VERIFY
             ElasticClient.Refresh(Indices.All);
             
-            var historyFromElastic = ElasticClient.Search<ElasticUpMigrationHistory>(sd => sd.Index(MigrationHistoryTestIndexName).Query(q => q.Term(t => t.ElasticUpMigrationName, migration.ToString()))).Documents.ToList();
+            var historyFromElastic = ElasticClient.Search<ElasticUpMigrationHistory>(sd => sd.Index(MigrationHistoryTestIndex.AliasName).Query(q => q.Term(t => t.ElasticUpMigrationName, migration.ToString()))).Documents.ToList();
             historyFromElastic.Should().HaveCount(1);
             historyFromElastic[0].ElasticUpMigrationName.Should().Be(migration.ToString());
             historyFromElastic[0].ElasticUpMigrationException.Message.Should().Be(exception.Message);
@@ -117,11 +108,11 @@ namespace ElasticUp.Tests.History
             var migration = new SampleEmptyMigration(TestIndex.IndexNameWithVersion());
             var migrationHistory = new ElasticUpMigrationHistory(migration.ToString());
 
-            ElasticClient.Index(migrationHistory, descriptor => descriptor.Index(MigrationHistoryTestIndexName));
+            ElasticClient.Index(migrationHistory, descriptor => descriptor.Index(MigrationHistoryTestIndex.AliasName));
             ElasticClient.Refresh(Indices.All);
 
             // TEST
-            var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient, MigrationHistoryTestIndexName);
+            var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient, MigrationHistoryTestIndex);
             var hasMigrationAlreadyBeenApplied = migrationHistoryHelper.HasMigrationAlreadyBeenApplied(migration);
 
             // VERIFY
@@ -135,7 +126,7 @@ namespace ElasticUp.Tests.History
             var migration = new SampleEmptyMigration(TestIndex.IndexNameWithVersion());
             
             // TEST
-            var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient, MigrationHistoryTestIndexName);
+            var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient, MigrationHistoryTestIndex);
             var hasMigrationAlreadyBeenApplied = migrationHistoryHelper.HasMigrationAlreadyBeenApplied(migration);
 
             // VERIFY
@@ -149,11 +140,11 @@ namespace ElasticUp.Tests.History
             var migration = new SampleEmptyMigration(TestIndex.IndexNameWithVersion());
             var migrationHistory = new ElasticUpMigrationHistory(migration.ToString(), new Exception());
 
-            ElasticClient.Index(migrationHistory, descriptor => descriptor.Index(MigrationHistoryTestIndexName));
+            ElasticClient.Index(migrationHistory, descriptor => descriptor.Index(MigrationHistoryTestIndex.AliasName));
             ElasticClient.Refresh(Indices.All);
 
             // TEST
-            var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient, MigrationHistoryTestIndexName);
+            var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient, MigrationHistoryTestIndex);
             var hasMigrationAlreadyBeenApplied = migrationHistoryHelper.HasMigrationAlreadyBeenApplied(migration);
 
             // VERIFY
@@ -164,13 +155,13 @@ namespace ElasticUp.Tests.History
         public void HasMigrationAlreadyBeenApplied_FalseIfMigrationIndexDoesNotExist()
         {
             // GIVEN
-            ElasticClient.DeleteIndex(MigrationHistoryTestIndexName);
+            ElasticClient.DeleteIndex(MigrationHistoryTestIndex.AliasName);
             ElasticClient.Refresh(Indices.All);
 
             var migration = new SampleEmptyMigration(TestIndex.IndexNameWithVersion());
 
             // TEST
-            var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient, MigrationHistoryTestIndexName);
+            var migrationHistoryHelper = new MigrationHistoryHelper(ElasticClient, MigrationHistoryTestIndex);
             migrationHistoryHelper.HasMigrationAlreadyBeenApplied(migration).Should().BeFalse();
         }
     }

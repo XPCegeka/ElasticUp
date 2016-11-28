@@ -28,7 +28,7 @@ namespace ElasticUp
     public class ElasticUp
     {
         private readonly IElasticClient _elasticClient;
-        private string _migrationHistoryIndexName = typeof(ElasticUpMigrationHistory).Name.ToLowerInvariant();
+        private string _migrationHistoryIndexAliasName = typeof(ElasticUpMigrationHistory).Name.ToLowerInvariant();
 
         private readonly List<AbstractElasticUpMigration> _migrations = new List<AbstractElasticUpMigration>();
 
@@ -49,7 +49,7 @@ namespace ElasticUp
             AssertNoDoubles(migration);
 
             migration.ElasticClient = _elasticClient;
-            migration.MigrationHistoryHelper = new MigrationHistoryHelper(_elasticClient, _migrationHistoryIndexName);
+            migration.MigrationHistoryHelper = new MigrationHistoryHelper(_elasticClient, _migrationHistoryIndexAliasName);
             migration.AliasHelper = new AliasHelper(_elasticClient);
 
             _migrations.Add(migration);
@@ -62,14 +62,17 @@ namespace ElasticUp
                 throw new ArgumentException("Your migrations should have a unique name!");
         }
 
-        public ElasticUp WithMigrationHistoryIndexName(string migrationHistoryIndexName)
+        public ElasticUp WithMigrationHistoryIndexAliasName(string migrationHistoryIndexAliasName)
         {
-            _migrationHistoryIndexName = migrationHistoryIndexName.ToLowerInvariant();
+            _migrationHistoryIndexAliasName = migrationHistoryIndexAliasName.ToLowerInvariant();
             return this;
         }
 
         public void Run()
         {
+            Console.WriteLine($"Initializing ElasticUpMigrationHistory index: {_migrationHistoryIndexAliasName}");
+            new MigrationHistoryHelper(_elasticClient, _migrationHistoryIndexAliasName).InitMigrationHistory();
+
             Console.WriteLine("Starting ElasticUp migrations");
             foreach (var migration in _migrations)
             {

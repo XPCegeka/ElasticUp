@@ -22,7 +22,7 @@ namespace ElasticUp.Tests.ElasticUpFullStackTests
 
             // TEST
             new ElasticUp(ElasticClient)
-                .WithMigrationHistoryIndexName(MigrationHistoryTestIndexName)
+                .WithMigrationHistoryIndexAliasName(MigrationHistoryTestIndex.AliasName)
                 .Migration(new SampleMigrationWithCopyTypeOperation())
                 .Run();
 
@@ -31,7 +31,7 @@ namespace ElasticUp.Tests.ElasticUpFullStackTests
             var objectCountInNewIndex = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion())).Count;
             objectCountInNewIndex.Should().Be(sampleObjects.Count);
 
-            var migrationHistoryCountInNewIndex = ElasticClient.Count<ElasticUpMigrationHistory>(descriptor => descriptor.Index(MigrationHistoryTestIndexName)).Count;
+            var migrationHistoryCountInNewIndex = ElasticClient.Count<ElasticUpMigrationHistory>(descriptor => descriptor.Index(MigrationHistoryTestIndex.AliasName)).Count;
             migrationHistoryCountInNewIndex.Should().Be(1);
             
             var indicesPointingToAlias = ElasticClient.GetIndicesPointingToAlias(TestIndex.AliasName);
@@ -45,12 +45,12 @@ namespace ElasticUp.Tests.ElasticUpFullStackTests
             // GIVEN
             var sampleObjects = Enumerable.Range(1, 25000).Select(n => new SampleObject { Number = n }).ToList();
             ElasticClient.IndexMany(sampleObjects, TestIndex.AliasName);
-            ElasticClient.Index(new ElasticUpMigrationHistory {ElasticUpMigrationName = "Sample"}, descriptor => descriptor.Index(MigrationHistoryTestIndexName));
+            ElasticClient.Index(new ElasticUpMigrationHistory {ElasticUpMigrationName = "Sample"}, descriptor => descriptor.Index(MigrationHistoryTestIndex.AliasName));
             ElasticClient.Refresh(Indices.All);
 
             // TEST
             new ElasticUp(ElasticClient)
-                .WithMigrationHistoryIndexName(MigrationHistoryTestIndexName)
+                .WithMigrationHistoryIndexAliasName(MigrationHistoryTestIndex.AliasName)
                 .Migration(new SampleMigrationWithCopyTypeOperation())
                 .Run();
 
@@ -59,7 +59,7 @@ namespace ElasticUp.Tests.ElasticUpFullStackTests
             var objCountInNewIndex = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion())).Count;
             objCountInNewIndex.Should().Be(sampleObjects.Count);
 
-            var migrationHistoryCountInNewIndex = ElasticClient.Count<ElasticUpMigrationHistory>(descriptor => descriptor.Index(MigrationHistoryTestIndexName)).Count;
+            var migrationHistoryCountInNewIndex = ElasticClient.Count<ElasticUpMigrationHistory>(descriptor => descriptor.Index(MigrationHistoryTestIndex.AliasName)).Count;
             migrationHistoryCountInNewIndex.Should().Be(2);
 
             var indicesPointingToAlias = ElasticClient.GetIndicesPointingToAlias(TestIndex.AliasName);

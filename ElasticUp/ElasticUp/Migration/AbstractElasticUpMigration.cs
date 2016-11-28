@@ -46,7 +46,7 @@ namespace ElasticUp.Migration
         {
             if (MigrationHistoryHelper.HasMigrationAlreadyBeenApplied(this))
             {
-                Console.WriteLine($"Skipping migration: {this}. Already applied according to index: {MigrationHistoryHelper.MigrationHistoryIndexName}");
+                Console.WriteLine($"Skipping migration: {this}. Already applied according to index: {MigrationHistoryHelper.MigrationHistoryIndexAlias}");
                 return true;
             }
             return false;
@@ -65,7 +65,7 @@ namespace ElasticUp.Migration
 
         protected virtual void AddMigrationToHistory(AbstractElasticUpMigration migration)
         {
-            Console.WriteLine($"Adding ElasticUp Migration: {migration} to MigrationHistory index: ({MigrationHistoryHelper.MigrationHistoryIndexName})");
+            Console.WriteLine($"Adding ElasticUp Migration: {migration} to MigrationHistory index: ({MigrationHistoryHelper.MigrationHistoryIndexAlias})");
             MigrationHistoryHelper.AddMigrationToHistory(migration);
         }
 
