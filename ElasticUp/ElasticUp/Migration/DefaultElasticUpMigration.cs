@@ -25,15 +25,10 @@ namespace ElasticUp.Migration
             TargetIndex = versionedIndexName.NextVersion().IndexNameWithVersion();
         }
 
-        protected override void PreMigrationTasks()
-        {
-            CopyHistory(SourceIndex, TargetIndex);
-        }
-
         protected override void PostMigrationTasks()
         {
-            AddMigrationToHistory(this, TargetIndex);
-            MoveAlias(IndexAlias, SourceIndex, TargetIndex);
+            AddMigrationToHistory(this);
+            SwitchAlias(IndexAlias, SourceIndex, TargetIndex);
         }
     }
 }

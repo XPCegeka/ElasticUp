@@ -38,9 +38,9 @@ namespace ElasticUp.Migration
             PostMigrationTasks();
         }
 
-        protected abstract void InitIndices();
-        protected abstract void PreMigrationTasks();
-        protected abstract void PostMigrationTasks();
+        protected virtual void InitIndices() { }
+        protected virtual void PreMigrationTasks() { }
+        protected virtual void PostMigrationTasks() { }
 
         protected virtual bool SkipMigration()
         {
@@ -63,16 +63,15 @@ namespace ElasticUp.Migration
             Operations.ForEach(o => o.Execute(ElasticClient, SourceIndex, TargetIndex));
         }
 
-        protected virtual void AddMigrationToHistory(AbstractElasticUpMigration migration, string index)
+        protected virtual void AddMigrationToHistory(AbstractElasticUpMigration migration)
         {
             Console.WriteLine($"Adding ElasticUp Migration: {migration} to MigrationHistory index: ({MigrationHistoryHelper.MigrationHistoryIndexName})");
             MigrationHistoryHelper.AddMigrationToHistory(migration);
         }
 
-        protected virtual void MoveAlias(string alias, string sourceIndex, string targetIndex)
+        protected virtual void SwitchAlias(string alias, string sourceIndex, string targetIndex)
         {
-            RemoveAlias(alias, sourceIndex);
-            PutAlias(alias, targetIndex);
+            AliasHelper.SwitchAlias(alias, sourceIndex, targetIndex);
         }
 
         protected virtual void PutAlias(string alias, string index)

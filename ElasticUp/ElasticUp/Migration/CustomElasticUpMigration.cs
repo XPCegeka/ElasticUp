@@ -17,14 +17,9 @@
             TargetIndex = _targetIndex;
         }
 
-        protected override void PreMigrationTasks()
-        {
-            CopyHistory(SourceIndex, TargetIndex);
-        }
-
         protected override void PostMigrationTasks()
         {
-            AddMigrationToHistory(this, TargetIndex);
+            AddMigrationToHistory(this);
         }
     }
 }
