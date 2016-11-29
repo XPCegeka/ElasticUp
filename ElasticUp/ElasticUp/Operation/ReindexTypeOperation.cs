@@ -1,9 +1,11 @@
-﻿using Nest;
+﻿using Elasticsearch.Net;
+using Nest;
 
 namespace ElasticUp.Operation
 {
     public class ReindexTypeOperation : ElasticUpOperation
     {
+        public VersionType VersionType { get; set; } = VersionType.External;
         public string TypeName { get; set; }
 
         public ReindexTypeOperation WithTypeName(string typeName)
@@ -22,6 +24,7 @@ namespace ElasticUp.Operation
                     .Type(TypeName)
                     .Index(fromIndex))
                 .Destination(destinationDescriptor => destinationDescriptor
+                    .VersionType(VersionType)
                     .Index(toIndex))
                 .WaitForCompletion());
         }

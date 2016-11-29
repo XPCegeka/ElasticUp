@@ -12,7 +12,7 @@ namespace ElasticUp
 {
     /*
      TODO ElasticUp:
-     - MigrationHistory in it's own index and allow configuration of index name (default ElasticUpMigrationHistory)
+     - DONE MigrationHistory in it's own index and allow configuration of index name (default ElasticUpMigrationHistory)
      - DONE elasticclient connection settings kunnen automatisch exception gooien ipv ElasticClientHelper
      - DONE moet elasticclient niet zelf geinstantieerd worden door elasticup en gewoon url meegeven ?        
      - DONE copy type operation rename to ReindexOperation 
