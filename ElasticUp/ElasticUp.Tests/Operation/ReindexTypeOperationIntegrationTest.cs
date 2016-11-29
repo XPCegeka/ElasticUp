@@ -1,4 +1,3 @@
-using System.Threading;
 using Elasticsearch.Net;
 using ElasticUp.Migration.Meta;
 using ElasticUp.Operation;
@@ -16,7 +15,7 @@ namespace ElasticUp.Tests.Operation
         public void ReindexCopiesDocumentsFromAnIndexToAnotherIndex()
         {
             // GIVEN
-            ElasticClient.IndexMany(new[] { new SampleDocument() }, TestIndex.IndexNameWithVersion());
+            ElasticClient.IndexMany(new[] { new SampleDocument(), new SampleDocument() }, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
 
             // WHEN
@@ -26,7 +25,7 @@ namespace ElasticUp.Tests.Operation
             // THEN
             ElasticClient.Refresh(Indices.All);
             var countResponse = ElasticClient.Count<SampleDocument>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion()));
-            countResponse.Count.Should().Be(1);
+            countResponse.Count.Should().Be(2);
         }
 
         [Test]

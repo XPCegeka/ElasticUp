@@ -14,8 +14,8 @@ namespace ElasticUp.Tests.Alias
         public void PutAliasOnIndex_CreatesNewAliasOnGivenIndex()
         {
             // GIVEN
-            var sampleObjects = Enumerable.Range(1, 100).Select(n => new SampleObject { Number = n });
-            ElasticClient.IndexMany(sampleObjects, index: TestIndex.IndexNameWithVersion());
+            var sampleObjects = Enumerable.Range(1, 5).Select(n => new SampleObject { Number = n });
+            ElasticClient.IndexMany(sampleObjects, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
 
             // TEST
@@ -32,7 +32,7 @@ namespace ElasticUp.Tests.Alias
         public void PutAliasOnIndex_ThrowsExceptionWhenAliasCreationFails()
         {
             // GIVEN
-            var sampleObjects = Enumerable.Range(1, 100).Select(n => new SampleObject { Number = n });
+            var sampleObjects = Enumerable.Range(1, 5).Select(n => new SampleObject { Number = n });
             ElasticClient.IndexMany(sampleObjects, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
 
@@ -45,7 +45,7 @@ namespace ElasticUp.Tests.Alias
         public void RemoveAliasFromIndex_DeletesAliasFromGivenIndex()
         {
             // GIVEN
-            var sampleObjects = Enumerable.Range(1, 100).Select(n => new SampleObject { Number = n });
+            var sampleObjects = Enumerable.Range(1, 5).Select(n => new SampleObject { Number = n });
             ElasticClient.IndexMany(sampleObjects, TestIndex.IndexNameWithVersion());
             ElasticClient.PutAlias(TestIndex.IndexNameWithVersion(), TestIndex.AliasName);
             ElasticClient.Refresh(Indices.All);
@@ -63,7 +63,7 @@ namespace ElasticUp.Tests.Alias
         public void RemoveAliasFromIndex_ThrowsExceptionWhenAliasDeletionFails()
         {
             // GIVEN
-            var sampleObjects = Enumerable.Range(1, 100).Select(n => new SampleObject { Number = n });
+            var sampleObjects = Enumerable.Range(1, 5).Select(n => new SampleObject { Number = n });
             ElasticClient.IndexMany(sampleObjects, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
 

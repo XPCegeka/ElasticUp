@@ -12,7 +12,7 @@ namespace ElasticUp.Tests.ElasticUpFullStackTests
     public class ElasticUpIntegrationTest : AbstractIntegrationTest
     {
         [Test]
-        public void ElasticUp_FullStackTest_FromIndexWithoutPriorMigrations()
+        public void ElasticUp_FullStackTest_MigrateObjectsToNewVersionedIndexWithoutPriorMigrationHistory()
         {
             // GIVEN
             var sampleObjects = Enumerable.Range(1, 25000).Select(n => new SampleObject {Number = n}).ToList();
@@ -40,7 +40,7 @@ namespace ElasticUp.Tests.ElasticUpFullStackTests
         }
 
         [Test]
-        public void ElasticUp_FullStackTest_FromIndexWithPriorMigrations()
+        public void ElasticUp_FullStackTest_MigrateObjectsToNewVersionedIndexWithPriorMigrationHistory()
         {
             // GIVEN
             var sampleObjects = Enumerable.Range(1, 25000).Select(n => new SampleObject { Number = n }).ToList();
