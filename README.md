@@ -103,7 +103,7 @@ In some cases you may want to do something different than migrating from vX to v
 ```cs
 public class Migration010_DoSomethingCustom : CustomElasticUpMigration
 {
-   public Migration001_CoBenParametersInSeparateIndex() : base("source-index-name", "target-index-name")
+   public Migration001_DoCrazyStuff() : base("source-index-name", "target-index-name")
    {
        Operation(new MyFirstOperationCreateTargetIndexAndAlias());
        Operation(new ReindexTypeOperation().WithTypeName("yourobjecttype"));
