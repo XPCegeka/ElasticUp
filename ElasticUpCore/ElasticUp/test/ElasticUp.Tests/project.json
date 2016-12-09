@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0-*",
+  "testRunner": "nunit",
+
+  "dependencies": {
+    "dotnet-test-nunit": "3.4.0-beta-3",
+    "ElasticUp": "1.0.0-*",
+    "FluentAssertions": "4.18.0",
+    "NSubstitute": "2.0.0-rc",
+    "NUnit": "3.5.0"
+  },
+
+  "frameworks": {
+    "net452": {
+      "frameworkAssemblies": {
+        "System.IO.Compression": "4.0.0.0",
+        "System.IO.Compression.FileSystem": "4.0.0.0",
+        "System.Management": "4.0.0.0",
+        "System.Net": "4.0.0.0",
+        "System.Net.Http": "4.0.0.0"
+      }
+    }
+  }
+}
