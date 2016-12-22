@@ -80,9 +80,12 @@
     <Compile Include="ElasticUpTestConfig.cs" />
     <Compile Include="Extension\ElasticClientExtensionsTest.cs" />
     <Compile Include="History\MigrationHistoryHelperTest.cs" />
-    <Compile Include="Operation\BatchElasticUpOperationIntegrationTest.cs" />
-    <Compile Include="Operation\BatchElasticUpOperationTest.cs" />
+    <Compile Include="Operation\BatchUpdateJObjectOperationIntegrationTest.cs" />
+    <Compile Include="Operation\BatchUpdateTypeOperationIntegrationTest.cs" />
+    <Compile Include="Operation\BatchUpdateTypeOperationTest.cs" />
     <Compile Include="Operation\ReindexTypeOperationIntegrationTest.cs" />
+    <Compile Include="Sample\StringValue\SampleDocumentWithValue.cs" />
+    <Compile Include="Sample\IntValue\SampleDocumentWithValue.cs" />
     <Compile Include="Sample\SampleMigrationWithCopyTypeOperation.cs" />
     <Compile Include="Sample\SampleDocument.cs" />
     <Compile Include="History\MigrationHistoryHelperIntegrationTest.cs" />

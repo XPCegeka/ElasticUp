@@ -53,7 +53,9 @@
     <Compile Include="Migration\CustomElasticUpMigration.cs" />
     <Compile Include="Migration\DefaultElasticUpMigration.cs" />
     <Compile Include="Alias\AliasHelper.cs" />
-    <Compile Include="Operation\BatchedElasticUpOperation.cs" />
+    <Compile Include="Operation\BatchUpdateTypeOperation.cs" />
+    <Compile Include="Operation\BatchUpdateFromTypeToTypeOperation.cs" />
+    <Compile Include="Operation\BatchUpdateFromJObjectToTypeOperation.cs" />
     <Compile Include="Operation\ReindexTypeOperation.cs" />
     <Compile Include="Extension\ElasticClientExtensions.cs" />
     <Compile Include="Operation\ElasticUpOperation.cs" />

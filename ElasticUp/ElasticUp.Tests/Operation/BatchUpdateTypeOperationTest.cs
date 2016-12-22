@@ -5,12 +5,12 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.Operation
 {
     [TestFixture]
-    public class BatchElasticUpOperationTest
+    public class BatchUpdateTypeOperationTest
     {
         [Test]
         public void WithBatchSize_ThrowsWithInvalidParameters()
         {
-            var operation = new BatchedElasticUpOperation<SampleObject>();
+            var operation = new BatchUpdateTypeOperation<SampleObject>();
 
             Assert.Throws<ArgumentException>(() => operation.WithBatchSize(0));
             Assert.Throws<ArgumentException>(() => operation.WithBatchSize(-1));
@@ -19,7 +19,7 @@ namespace ElasticUp.Tests.Operation
         [Test]
         public void WithScrollTimeout_ThrowsWithInvalidParameters()
         {
-            var operation = new BatchedElasticUpOperation<SampleObject>();
+            var operation = new BatchUpdateTypeOperation<SampleObject>();
 
             Assert.Throws<ArgumentException>(() => operation.WithScrollTimeout(0));
             Assert.Throws<ArgumentException>(() => operation.WithScrollTimeout(-1));
@@ -28,7 +28,7 @@ namespace ElasticUp.Tests.Operation
         [Test]
         public void WithBatchTransformation_ThrowsWithInvalidParameters()
         {
-            var operation = new BatchedElasticUpOperation<SampleObject>();
+            var operation = new BatchUpdateTypeOperation<SampleObject>();
 
             Assert.Throws<ArgumentNullException>(() => operation.WithDocumentTransformation(null));
         }
@@ -36,7 +36,7 @@ namespace ElasticUp.Tests.Operation
         [Test]
         public void WithSearchDescriptor_ThrowsWithInvalidParameters()
         {
-            var operation = new BatchedElasticUpOperation<SampleObject>();
+            var operation = new BatchUpdateTypeOperation<SampleObject>();
 
             Assert.Throws<ArgumentNullException>(() => operation.WithSearchDescriptor(null));
         }
@@ -44,7 +44,7 @@ namespace ElasticUp.Tests.Operation
         [Test]
         public void WithOnBatchProcessed_ThrowsWithInvalidParameters()
         {
-            var operation = new BatchedElasticUpOperation<SampleObject>();
+            var operation = new BatchUpdateTypeOperation<SampleObject>();
 
             Assert.Throws<ArgumentNullException>(() => operation.WithOnDocumentProcessed(null));
         }

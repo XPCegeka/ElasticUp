@@ -11,10 +11,10 @@ using NUnit.Framework;
 namespace ElasticUp.Tests.Operation
 {
     [TestFixture]
-    public class BatchElasticUpOperationIntegrationTest : AbstractIntegrationTest
+    public class BatchUpdateTypeOperationIntegrationTest : AbstractIntegrationTest
     {
         [Test]
-        public void Execute_ProcessesDocumentsAndInsertsInNewIndex()
+        public void Execute_ProcessTypeAndInsertInNewIndex()
         {
             // GIVEN
             const int expectedDocumentCount = 15000;
@@ -24,7 +24,7 @@ namespace ElasticUp.Tests.Operation
             
             // TEST
             var processedRecordCount = 0;
-            var operation = new BatchedElasticUpOperation<SampleObject>()
+            var operation = new BatchUpdateTypeOperation<SampleObject>()
                 .WithDocumentTransformation(doc =>
                 {
                     processedRecordCount++;
@@ -52,7 +52,7 @@ namespace ElasticUp.Tests.Operation
 
             // TEST
             var processedDocuments = new List<SampleObject>();
-            var operation = new BatchedElasticUpOperation<SampleObject>()
+            var operation = new BatchUpdateTypeOperation<SampleObject>()
                 .WithOnDocumentProcessed(doc =>
                 {
                     processedDocuments.Add(doc);
@@ -74,7 +74,7 @@ namespace ElasticUp.Tests.Operation
             ElasticClient.Refresh(Indices.All);
             
             // TEST
-            var operation = new BatchedElasticUpOperation<SampleObject>()
+            var operation = new BatchUpdateTypeOperation<SampleObject>()
                 .WithSearchDescriptor(descriptor =>
                     descriptor.Query(query =>
                         query.Range(rangeQuery => rangeQuery.Field(x => x.Number).LessThan(10000))));
@@ -99,7 +99,7 @@ namespace ElasticUp.Tests.Operation
             // TEST
             var processedDocumentCount = 0;
             var documentCountWithEvenNumber = 0;
-            var operation = new BatchedElasticUpOperation<SampleObject>()
+            var operation = new BatchUpdateTypeOperation<SampleObject>()
                 .WithDocumentTransformation(doc =>
                 {
                     processedDocumentCount++;
@@ -127,7 +127,7 @@ namespace ElasticUp.Tests.Operation
         public void Execute_ThrowsOnServerError()
         {
             // TEST
-            var operation = new BatchedElasticUpOperation<SampleObject>();
+            var operation = new BatchUpdateTypeOperation<SampleObject>();
             
             Assert.Throws<ElasticsearchClientException>(() => operation.Execute(ElasticClient, "does not exist", TestIndex.NextIndexNameWithVersion()));
         }
