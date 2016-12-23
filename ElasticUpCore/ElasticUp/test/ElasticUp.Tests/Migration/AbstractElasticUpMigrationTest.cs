@@ -1,4 +1,5 @@
-﻿using ElasticUp.Migration;
+﻿using System;
+using ElasticUp.Migration;
 using ElasticUp.Tests.Sample;
 using FluentAssertions;
 using NUnit.Framework;
