@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using ElasticUp.Alias;
 using ElasticUp.Extension;
 using ElasticUp.History;
@@ -16,51 +15,50 @@ namespace ElasticUp.Migration
         public MigrationHistoryHelper MigrationHistoryHelper { get; set; }
         public AliasHelper AliasHelper { get; set; }
 
-        public List<ElasticUpOperation> Operations { get; } = new List<ElasticUpOperation>();
-
-        protected string SourceIndex;
-        protected string TargetIndex;
-
+        public List<AbstractElasticUpOperation> Operations { get; } = new List<AbstractElasticUpOperation>();
+        
         public virtual void Run()
         {
-            InitIndices();
-
             if (SkipMigration()) return;
 
-            PreMigrationTasks();
-
-            Console.WriteLine($"Starting ElasticUp migration {this} from index {SourceIndex} to index {TargetIndex}");
-            var stopwatch = Stopwatch.StartNew();
-            DoMigrationTasks();
-            stopwatch.Stop();
-            Console.WriteLine($"Finished ElasticUp migration {this} from index {SourceIndex} to index {TargetIndex} in {stopwatch.Elapsed.ToHumanTimeString()}");
-            
-            PostMigrationTasks();
+            BeforeMigrationHook();
+            BeforeMigration();
+            DefineOperations();
+            RunMigration();
+            AfterMigration();
+            AfterMigrationHook();
         }
-
-        protected virtual void InitIndices() { }
-        protected virtual void PreMigrationTasks() { }
-        protected virtual void PostMigrationTasks() { }
-
+        
+        protected virtual void BeforeMigrationHook() { }
+        protected virtual void BeforeMigration() { }
+        protected abstract void DefineOperations();
+        protected virtual void AfterMigration() { }
+        protected virtual void AfterMigrationHook() { }
+        
         protected virtual bool SkipMigration()
         {
-            if (MigrationHistoryHelper.HasMigrationAlreadyBeenApplied(this))
+            if (!MigrationHistoryHelper.HasMigrationAlreadyBeenApplied(this)) return false;
+
+            Console.WriteLine($"Skipping migration: {this}. Already applied according to index: {MigrationHistoryHelper.MigrationHistoryIndexAlias}");
+            return true;
+        }
+
+        protected virtual void RunMigration()
+        {
+            Console.WriteLine($"Starting ElasticUp migration {this}");
+            var stopwatch = Stopwatch.StartNew();
+
+            Operations.ForEach(operation =>
             {
-                Console.WriteLine($"Skipping migration: {this}. Already applied according to index: {MigrationHistoryHelper.MigrationHistoryIndexAlias}");
-                return true;
-            }
-            return false;
-        }
+                Console.Write($"Running Operation: {operation} ");
+                var operationStopwatch = Stopwatch.StartNew();
+                operation.Execute(ElasticClient);
+                operationStopwatch.Stop();
+                Console.Write($"[Finished in {operationStopwatch.Elapsed.ToHumanTimeString()}]\n");
+            });
 
-        protected virtual void CopyHistory(string sourceIndex, string targetIndex)
-        {
-            Console.WriteLine($"Copying ElasticUp MigrationHistory from index {sourceIndex} to index {targetIndex}");
-            MigrationHistoryHelper.CopyMigrationHistory(sourceIndex, targetIndex);
-        }
-
-        protected virtual void DoMigrationTasks()
-        {
-            Operations.ForEach(o => o.Execute(ElasticClient, SourceIndex, TargetIndex));
+            stopwatch.Stop();
+            Console.WriteLine($"Finished ElasticUp migration {this} in {stopwatch.Elapsed.ToHumanTimeString()}]");
         }
 
         protected virtual void AddMigrationToHistory(AbstractElasticUpMigration migration)
@@ -69,22 +67,22 @@ namespace ElasticUp.Migration
             MigrationHistoryHelper.AddMigrationToHistory(migration);
         }
 
-        protected virtual void SwitchAlias(string alias, string sourceIndex, string targetIndex)
+        protected virtual void SwitchAlias(string alias, string fromIndexName, string toIndexName)
         {
-            AliasHelper.SwitchAlias(alias, sourceIndex, targetIndex);
+            AliasHelper.SwitchAlias(alias, fromIndexName, toIndexName);
         }
 
-        protected virtual void PutAlias(string alias, string index)
+        protected virtual void PutAlias(string alias, string indexName)
         {
-            AliasHelper.PutAliasOnIndex(alias, index);
+            AliasHelper.PutAliasOnIndex(alias, indexName);
         }
 
-        protected virtual void RemoveAlias(string alias, string index)
+        protected virtual void RemoveAlias(string alias, string indexName)
         {
-            AliasHelper.RemoveAliasFromIndex(alias, index);
+            AliasHelper.RemoveAliasFromIndex(alias, indexName);
         }
 
-        public void Operation(ElasticUpOperation operation)
+        public void Operation(AbstractElasticUpOperation operation)
         {
             Operations.Add(operation);
         }

@@ -1,0 +1,13 @@
+﻿{
+  "sampledocument": {
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string",
+        "index": "not_analyzed"
+      }
+    }
+  }
+}

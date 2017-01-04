@@ -34,21 +34,21 @@ namespace ElasticUp.Tests.History
         public void AddMigrationHistory_ThrowsWithInvalidParameters()
         {
             Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.AddMigrationToHistory(null));
-            Assert.Throws<ArgumentNullException>(() => new MigrationHistoryHelper(_elasticClient, null).AddMigrationToHistory(new SampleEmptyMigration("index")));
+            Assert.Throws<ArgumentNullException>(() => new MigrationHistoryHelper(_elasticClient, null).AddMigrationToHistory(new SampleEmptyVersionedIndexMigration("index")));
         }
 
         [Test]
         public void AddMigrationHistory_WithException_ThrowsWithInvalidParameters()
         {
             Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.AddMigrationToHistory(null, null));
-            Assert.Throws<ArgumentNullException>(() => new MigrationHistoryHelper(_elasticClient, null).AddMigrationToHistory(new SampleEmptyMigration("index")));
+            Assert.Throws<ArgumentNullException>(() => new MigrationHistoryHelper(_elasticClient, null).AddMigrationToHistory(new SampleEmptyVersionedIndexMigration("index")));
         }
 
         [Test]
         public void HasMigrationAlreadyBeenApplied_ThrowsWithInvalidParameters()
         {
             Assert.Throws<ArgumentNullException>(() => _migrationHistoryHelper.HasMigrationAlreadyBeenApplied(null));
-            Assert.Throws<ArgumentNullException>(() => new MigrationHistoryHelper(_elasticClient, null).HasMigrationAlreadyBeenApplied(new SampleEmptyMigration("index")));
+            Assert.Throws<ArgumentNullException>(() => new MigrationHistoryHelper(_elasticClient, null).HasMigrationAlreadyBeenApplied(new SampleEmptyVersionedIndexMigration("index")));
         }
     }
 }

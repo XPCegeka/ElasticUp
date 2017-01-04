@@ -1,8 +1,8 @@
 using System;
-using ElasticUp.Operation;
+using ElasticUp.Operation.Reindex;
 using NUnit.Framework;
 
-namespace ElasticUp.Tests.Operation
+namespace ElasticUp.Tests.Operation.Reindex
 {
     [TestFixture]
     public class BatchUpdateTypeOperationTest

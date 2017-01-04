@@ -2,7 +2,7 @@
 using System.Linq;
 using ElasticUp.Migration;
 using ElasticUp.Migration.Meta;
-using ElasticUp.Operation;
+using ElasticUp.Operation.Reindex;
 using Nest;
 
 namespace ElasticUp.History
@@ -36,8 +36,8 @@ namespace ElasticUp.History
             if (string.IsNullOrEmpty(toIndex))
                 throw new ArgumentNullException(nameof(toIndex));
 
-            var reindexTypeOperation = new ReindexTypeOperation<ElasticUpMigrationHistory>();
-            reindexTypeOperation.Execute(_elasticClient, fromIndex, toIndex);
+            var reindexTypeOperation = new ReindexTypeOperation<ElasticUpMigrationHistory>().FromIndex(fromIndex).ToIndex(toIndex);
+            reindexTypeOperation.Execute(_elasticClient);
         }
 
         public void AddMigrationToHistory(AbstractElasticUpMigration migration)

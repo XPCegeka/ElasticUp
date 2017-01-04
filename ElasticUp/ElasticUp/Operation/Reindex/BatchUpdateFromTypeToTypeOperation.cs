@@ -1,23 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ElasticUp.Elastic;
 using Nest;
 
-namespace ElasticUp.Operation
+namespace ElasticUp.Operation.Reindex
 {
-    public class BatchUpdateFromTypeToTypeOperation<TSourceType, TTargetType> : ElasticUpOperation where TSourceType : class 
-                                                                                                          where TTargetType : class
+    public class BatchUpdateFromTypeToTypeOperation<TSourceType, TTargetType> : AbstractElasticUpOperation where TSourceType : class 
+                                                                                                    where TTargetType : class
     {
         protected Time ScrollTimeout => new Time(TimeSpan.FromSeconds(ScrollTimeoutInSeconds));
-        protected double ScrollTimeoutInSeconds { get; set; } = 360;
-        protected int BatchSize { get; set; } = 5000;
+        protected double ScrollTimeoutInSeconds = 360;
+        protected int BatchSize = 5000;
 
-        protected string SourceType { get; set; }
-        protected string TargetType { get; set; }
+        protected string FromIndexName;
+        protected string ToIndexName;
+        protected string SourceType;
+        protected string TargetType;
 
-        protected Func<SearchDescriptor<TSourceType>, ISearchRequest> SearchDescriptor { get; set; } = descriptor => descriptor.Type(typeof(TSourceType).Name.ToLowerInvariant());
-        private Func<TSourceType, TTargetType> Transformation { get; set; } = doc => doc as TTargetType;
-        protected Action<TTargetType> OnDocumentProcessed { get; set; }
+        protected Func<SearchDescriptor<TSourceType>, ISearchRequest> SearchDescriptor = descriptor => descriptor.Type(typeof(TSourceType).Name.ToLowerInvariant());
+        protected Func<TSourceType, TTargetType> Transformation = doc => doc as TTargetType;
+        protected Action<TTargetType> OnDocumentProcessed;
 
 
         public BatchUpdateFromTypeToTypeOperation()
@@ -26,24 +29,31 @@ namespace ElasticUp.Operation
             TargetType = typeof(TTargetType).Name.ToLowerInvariant();
         }
 
-        public override void Execute(IElasticClient elasticClient, string fromIndex, string toIndex)
+        public override void Execute(IElasticClient elasticClient)
         {
+            if (string.IsNullOrWhiteSpace(FromIndexName)) throw new ElasticUpException($"BatchUpdateFromTypeToTypeOperation: Invalid fromIndexName {FromIndexName}");
+            if (string.IsNullOrWhiteSpace(ToIndexName)) throw new ElasticUpException($"BatchUpdateFromTypeToTypeOperation: Invalid toIndexName {ToIndexName}");
+            if (string.IsNullOrWhiteSpace(SourceType)) throw new ElasticUpException($"BatchUpdateFromTypeToTypeOperation: Invalid sourceType {SourceType}");
+            if (string.IsNullOrWhiteSpace(TargetType)) throw new ElasticUpException($"BatchUpdateFromTypeToTypeOperation: Invalid targetType {TargetType}");
+            if (!elasticClient.IndexExists(FromIndexName).Exists) throw new ElasticUpException($"BatchUpdateFromTypeToTypeOperation: Invalid fromIndex {FromIndexName} does not exist.");
+            if (!elasticClient.IndexExists(ToIndexName).Exists) throw new ElasticUpException($"BatchUpdateFromTypeToTypeOperation: Invalid toIndex {ToIndexName} does not exist.");
+            
             var searchResponse = elasticClient
                                     .Search<TSourceType>(descriptor => SearchDescriptor(descriptor
-                                        .Index(fromIndex)
+                                        .Index(FromIndexName)
                                         .Type(SourceType)
                                         .Scroll(ScrollTimeout)
                                         .Size(BatchSize)));
 
             if (!searchResponse.Documents.Any()) return;
 
-            ProcessBatch(elasticClient, searchResponse.Documents, toIndex);
+            ProcessBatch(elasticClient, searchResponse.Documents, ToIndexName);
 
             var scrollId = searchResponse.ScrollId;
             var scrollResponse = elasticClient.Scroll<TSourceType>(ScrollTimeout, scrollId);
             while (scrollResponse.Documents.Any())
             {
-                ProcessBatch(elasticClient, scrollResponse.Documents, toIndex);
+                ProcessBatch(elasticClient, scrollResponse.Documents, ToIndexName);
                 scrollResponse = elasticClient.Scroll<TSourceType>(ScrollTimeout, scrollResponse.ScrollId);
             }
         }
@@ -64,8 +74,18 @@ namespace ElasticUp.Operation
                 .Select(Transformation)
                 .Where(o => o != null);
         }
+        
+        public virtual BatchUpdateFromTypeToTypeOperation<TSourceType, TTargetType> FromIndex(string fromIndex)
+        {
+            FromIndexName = fromIndex?.ToLowerInvariant();
+            return this;
+        }
 
-
+        public virtual BatchUpdateFromTypeToTypeOperation<TSourceType, TTargetType> ToIndex(string toIndex)
+        {
+            ToIndexName = toIndex?.ToLowerInvariant();
+            return this;
+        }
 
         public virtual BatchUpdateFromTypeToTypeOperation<TSourceType, TTargetType> WithDocumentTransformation(Func<TSourceType, TTargetType> transformation)
         {

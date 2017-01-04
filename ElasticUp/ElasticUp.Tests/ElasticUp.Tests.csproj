@@ -77,16 +77,25 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AbstractIntegrationTest.cs" />
+    <Compile Include="ElasticUpFullStackTests\MappingAndReindexIntegrationTest.cs" />
     <Compile Include="ElasticUpTestConfig.cs" />
     <Compile Include="Extension\ElasticClientExtensionsTest.cs" />
     <Compile Include="History\MigrationHistoryHelperTest.cs" />
-    <Compile Include="Operation\BatchUpdateJObjectOperationIntegrationTest.cs" />
-    <Compile Include="Operation\BatchUpdateTypeOperationIntegrationTest.cs" />
-    <Compile Include="Operation\BatchUpdateTypeOperationTest.cs" />
-    <Compile Include="Operation\ReindexTypeOperationIntegrationTest.cs" />
+    <Compile Include="Infrastructure\ResourceUtilities.cs" />
+    <Compile Include="Operation\Alias\SwitchAliasOperationIntegrationTest.cs" />
+    <Compile Include="Operation\Alias\RemoveAliasOperationIntegrationTest.cs" />
+    <Compile Include="Operation\Alias\CreateAliasOperationIntegrationTest.cs" />
+    <Compile Include="Operation\Index\DeleteIndexOperationIntegrationTest.cs" />
+    <Compile Include="Operation\Index\CreateIndexOperationIntegrationTest.cs" />
+    <Compile Include="Operation\Mapping\CopyTypeMappingOperationIntegrationTest.cs" />
+    <Compile Include="Operation\Mapping\PutTypeMappingOperationIntegrationTest.cs" />
+    <Compile Include="Operation\Reindex\BatchUpdateFromTypeToTypeUsingJObjectOperationIntegrationTest.cs" />
+    <Compile Include="Operation\Reindex\BatchUpdateTypeOperationIntegrationTest.cs" />
+    <Compile Include="Operation\Reindex\BatchUpdateTypeOperationTest.cs" />
+    <Compile Include="Operation\Reindex\ReindexTypeOperationIntegrationTest.cs" />
     <Compile Include="Sample\StringValue\SampleDocumentWithValue.cs" />
     <Compile Include="Sample\IntValue\SampleDocumentWithValue.cs" />
-    <Compile Include="Sample\SampleMigrationWithCopyTypeOperation.cs" />
+    <Compile Include="Sample\SampleVersionedIndexMigrationWithReindexTypeOperation.cs" />
     <Compile Include="Sample\SampleDocument.cs" />
     <Compile Include="History\MigrationHistoryHelperIntegrationTest.cs" />
     <Compile Include="Alias\AliasHelperIntegrationTest.cs" />
@@ -94,9 +103,9 @@
     <Compile Include="ElasticUpFullStackTests\ElasticUpIntegrationTest.cs" />
     <Compile Include="SampleObject.cs" />
     <Compile Include="Migration\Meta\VersionedIndexNameTest.cs" />
-    <Compile Include="Sample\SampleEmptyMigration.cs" />
+    <Compile Include="Sample\SampleEmptyVersionedIndexMigration.cs" />
     <Compile Include="Migration\AbstractElasticUpMigrationTest.cs" />
-    <Compile Include="Operation\ReindexTypeOperationGenericTest.cs" />
+    <Compile Include="Operation\Reindex\ReindexTypeOperationGenericTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -107,6 +116,15 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Resources\elasticsearch-2.4.1-with-head-and-delete_by_query.zip" />
+    <EmbeddedResource Include="Resources\mapping_v0_sampledocument.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\mapping_v1_sampledocument.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\mapping_v2_sampledocument.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ElasticUp.Tests.Infrastructure\ElasticUp.Tests.Infrastructure.csproj">

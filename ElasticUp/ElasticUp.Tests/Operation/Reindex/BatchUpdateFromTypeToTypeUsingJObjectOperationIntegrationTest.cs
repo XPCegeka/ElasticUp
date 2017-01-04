@@ -1,13 +1,13 @@
 ﻿using System.Linq;
-using ElasticUp.Operation;
+using ElasticUp.Operation.Reindex;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
 
-namespace ElasticUp.Tests.Operation
+namespace ElasticUp.Tests.Operation.Reindex
 {
     [TestFixture]
-    public class BatchUpdateJObjectOperationIntegrationTest : AbstractIntegrationTest
+    public class BatchUpdateFromTypeToTypeUsingJObjectOperationIntegrationTest : AbstractIntegrationTest
     {
         [Test]
         public void Execute_ProcessesTypeAsJObjectAndInsertsInNewIndex()
@@ -20,7 +20,9 @@ namespace ElasticUp.Tests.Operation
             
             // TEST
             var processedRecordCount = 0;
-            var operation = new BatchUpdateFromJObjectToTypeOperation("sampleobject", "sampleobject")
+            var operation = new BatchUpdateFromTypeToTypeUsingJObjectOperation("sampleobject", "sampleobject")
+                .FromIndex(TestIndex.IndexNameWithVersion())
+                .ToIndex(TestIndex.NextIndexNameWithVersion())
                 .WithDocumentTransformation(doc =>
                 {
                     doc["number"] = 666;
@@ -30,7 +32,7 @@ namespace ElasticUp.Tests.Operation
                 .WithSearchDescriptor(sd => sd.MatchAll())
                 .WithBatchSize(50);
 
-            operation.Execute(ElasticClient, TestIndex.IndexNameWithVersion(), TestIndex.NextIndexNameWithVersion());
+            operation.Execute(ElasticClient);
 
             // VERIFY
             processedRecordCount.Should().Be(expectedDocumentCount);

@@ -23,7 +23,7 @@ namespace ElasticUp.Tests.ElasticUpFullStackTests
             // TEST
             new ElasticUp(ElasticClient)
                 .WithMigrationHistoryIndexAliasName(MigrationHistoryTestIndex.AliasName)
-                .Migration(new SampleMigrationWithCopyTypeOperation())
+                .Migration(new SampleVersionedIndexMigrationWithReindexTypeOperation())
                 .Run();
 
             // VERIFY
@@ -51,7 +51,7 @@ namespace ElasticUp.Tests.ElasticUpFullStackTests
             // TEST
             new ElasticUp(ElasticClient)
                 .WithMigrationHistoryIndexAliasName(MigrationHistoryTestIndex.AliasName)
-                .Migration(new SampleMigrationWithCopyTypeOperation())
+                .Migration(new SampleVersionedIndexMigrationWithReindexTypeOperation())
                 .Run();
 
             // VERIFY
@@ -72,8 +72,10 @@ namespace ElasticUp.Tests.ElasticUpFullStackTests
         {
             Assert.Throws<ArgumentException>(() =>
                 new ElasticUp(ElasticClient)
-                    .Migration(new SampleEmptyMigration(TestIndex.IndexNameWithVersion()))
-                    .Migration(new SampleEmptyMigration(TestIndex.NextIndexNameWithVersion())));
+                    .Migration(new SampleEmptyVersionedIndexMigration(TestIndex.IndexNameWithVersion()))
+                    .Migration(new SampleEmptyVersionedIndexMigration(TestIndex.NextIndexNameWithVersion())));
         }
+
+
     }
 }

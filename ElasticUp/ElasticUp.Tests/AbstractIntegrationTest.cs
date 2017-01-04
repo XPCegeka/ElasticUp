@@ -26,20 +26,39 @@ namespace ElasticUp.Tests
 
             ElasticClient = new ElasticClient(settings);
 
+            CreateMigrationHistoryTestIndex();
+            CreateTestIndex();
+            CreateNextTestIndex();
+        }
+
+        private void CreateMigrationHistoryTestIndex()
+        {
             ElasticClient.CreateIndex(
                 MigrationHistoryTestIndex.IndexNameWithVersion(),
                 indexDescriptor => indexDescriptor.Settings(indexSettings => indexSettings
                     .NumberOfShards(1)
                     .NumberOfReplicas(0)));
             ElasticClient.PutAlias(MigrationHistoryTestIndex.IndexNameWithVersion(), MigrationHistoryTestIndex.AliasName);
-            
+        }
+
+        protected void CreateTestIndex()
+        {
             ElasticClient.CreateIndex(
-                TestIndex.IndexNameWithVersion(), 
+                TestIndex.IndexNameWithVersion(),
                 indexDescriptor => indexDescriptor.Settings(indexSettings => indexSettings
                     .NumberOfShards(1)
                     .NumberOfReplicas(0)));
 
             ElasticClient.PutAlias(TestIndex.IndexNameWithVersion(), TestIndex.AliasName);
+        }
+
+        protected void CreateNextTestIndex()
+        {
+            ElasticClient.CreateIndex(
+                TestIndex.NextIndexNameWithVersion(),
+                indexDescriptor => indexDescriptor.Settings(indexSettings => indexSettings
+                    .NumberOfShards(1)
+                    .NumberOfReplicas(0)));
         }
 
         [TearDown]

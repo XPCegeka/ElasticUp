@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Elasticsearch.Net;
-using ElasticUp.Operation;
+using ElasticUp.Elastic;
+using ElasticUp.Operation.Reindex;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
 
-namespace ElasticUp.Tests.Operation
+namespace ElasticUp.Tests.Operation.Reindex
 {
     [TestFixture]
     public class BatchUpdateTypeOperationIntegrationTest : AbstractIntegrationTest
@@ -25,13 +25,15 @@ namespace ElasticUp.Tests.Operation
             // TEST
             var processedRecordCount = 0;
             var operation = new BatchUpdateTypeOperation<SampleObject>()
+                .FromIndex(TestIndex.IndexNameWithVersion())
+                .ToIndex(TestIndex.NextIndexNameWithVersion())
                 .WithDocumentTransformation(doc =>
                 {
                     processedRecordCount++;
                     return doc;
                 });
 
-            operation.Execute(ElasticClient, TestIndex.IndexNameWithVersion(), TestIndex.NextIndexNameWithVersion());
+            operation.Execute(ElasticClient);
 
             // VERIFY
             processedRecordCount.Should().Be(expectedDocumentCount);
@@ -53,12 +55,14 @@ namespace ElasticUp.Tests.Operation
             // TEST
             var processedDocuments = new List<SampleObject>();
             var operation = new BatchUpdateTypeOperation<SampleObject>()
+                .FromIndex(TestIndex.IndexNameWithVersion())
+                .ToIndex(TestIndex.NextIndexNameWithVersion())
                 .WithOnDocumentProcessed(doc =>
                 {
                     processedDocuments.Add(doc);
                 });
 
-            operation.Execute(ElasticClient, TestIndex.IndexNameWithVersion(), TestIndex.NextIndexNameWithVersion());
+            operation.Execute(ElasticClient);
 
             // VERIFY
             processedDocuments.OrderBy(doc => doc.Number).ShouldAllBeEquivalentTo(sampleDocuments.OrderBy(doc => doc.Number));
@@ -75,11 +79,13 @@ namespace ElasticUp.Tests.Operation
             
             // TEST
             var operation = new BatchUpdateTypeOperation<SampleObject>()
+                .FromIndex(TestIndex.IndexNameWithVersion())
+                .ToIndex(TestIndex.NextIndexNameWithVersion())
                 .WithSearchDescriptor(descriptor =>
                     descriptor.Query(query =>
                         query.Range(rangeQuery => rangeQuery.Field(x => x.Number).LessThan(10000))));
 
-            operation.Execute(ElasticClient, TestIndex.IndexNameWithVersion(), TestIndex.NextIndexNameWithVersion());
+            operation.Execute(ElasticClient);
 
             // VERIFY
             ElasticClient.Refresh(Indices.All);
@@ -100,6 +106,8 @@ namespace ElasticUp.Tests.Operation
             var processedDocumentCount = 0;
             var documentCountWithEvenNumber = 0;
             var operation = new BatchUpdateTypeOperation<SampleObject>()
+                .FromIndex(TestIndex.IndexNameWithVersion())
+                .ToIndex(TestIndex.NextIndexNameWithVersion())
                 .WithDocumentTransformation(doc =>
                 {
                     processedDocumentCount++;
@@ -112,7 +120,7 @@ namespace ElasticUp.Tests.Operation
                     return null;
                 });
 
-            operation.Execute(ElasticClient, TestIndex.IndexNameWithVersion(), TestIndex.NextIndexNameWithVersion());
+            operation.Execute(ElasticClient);
 
             // VERIFY
             processedDocumentCount.Should().Be(expectedDocumentCount);
@@ -124,12 +132,14 @@ namespace ElasticUp.Tests.Operation
         }
 
         [Test]
-        public void Execute_ThrowsOnServerError()
+        public void Execute_ValidatesFromAndToIndex()
         {
-            // TEST
-            var operation = new BatchUpdateTypeOperation<SampleObject>();
-            
-            Assert.Throws<ElasticsearchClientException>(() => operation.Execute(ElasticClient, "does not exist", TestIndex.NextIndexNameWithVersion()));
+            Assert.Throws<ElasticUpException>(() => new BatchUpdateTypeOperation<SampleObject>().FromIndex(null).ToIndex(TestIndex.NextIndexNameWithVersion()).Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new BatchUpdateTypeOperation<SampleObject>().FromIndex(" ").ToIndex(TestIndex.NextIndexNameWithVersion()).Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new BatchUpdateTypeOperation<SampleObject>().FromIndex(TestIndex.IndexNameWithVersion()).ToIndex(null).Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new BatchUpdateTypeOperation<SampleObject>().FromIndex(TestIndex.IndexNameWithVersion()).ToIndex("").Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new BatchUpdateTypeOperation<SampleObject>().FromIndex("does not exist").ToIndex(TestIndex.NextIndexNameWithVersion()).Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new BatchUpdateTypeOperation<SampleObject>().FromIndex(TestIndex.IndexNameWithVersion()).ToIndex("does not exist").Execute(ElasticClient));
         }
 
         [Test]

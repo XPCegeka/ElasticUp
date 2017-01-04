@@ -3,8 +3,8 @@ using Nest;
 
 namespace ElasticUp.Tests.Sample
 {
-    public class SampleEmptyOperation : ElasticUpOperation
+    public class SampleEmptyOperation : AbstractElasticUpOperation
     {
-        public override void Execute(IElasticClient elasticClient, string fromIndex, string toIndex) {}
+        public override void Execute(IElasticClient elasticClient) {}
     }
 }
