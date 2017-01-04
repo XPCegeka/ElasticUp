@@ -1,4 +1,4 @@
-![ElasticUp Logo](/ElasticUp/ElasticUp/Resources/elasticup-icon.png) 
+![ElasticUp Logo](/ElasticUp/ElasticUp/Resources/elasticup-icon2.png) 
 # ElasticUp for C&#35;
 Easy ElasticSearch data migrations for continuous integration and deployment! Inspired by tools like DbUp for Sql.
 
