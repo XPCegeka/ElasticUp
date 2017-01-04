@@ -16,7 +16,7 @@ namespace ElasticUp.Tests.Operation.Index
             var customIndexName = TestIndex.IndexNameWithVersion() + "-custom";
             ElasticClient.IndexExists(customIndexName).Exists.Should().BeFalse();
 
-            new CreateIndexOperation(customIndexName).Execute(ElasticClient);
+            new CreateIndexOperation(customIndexName).WithMapping(mapping => mapping).Execute(ElasticClient);
             
             ElasticClient.IndexExists(customIndexName).Exists.Should().BeTrue();
         }
@@ -29,7 +29,7 @@ namespace ElasticUp.Tests.Operation.Index
 
             ElasticClient.IndexExists(customIndexName).Exists.Should().BeFalse();
 
-            new CreateIndexOperation(customIndexName).WithAlias(customAlias).Execute(ElasticClient);
+            new CreateIndexOperation(customIndexName).WithAlias(customAlias).WithMapping(mapping => mapping).Execute(ElasticClient);
             
             ElasticClient.IndexExists(customIndexName).Exists.Should().BeTrue();
             ElasticClient.GetIndicesPointingToAlias(customAlias).Single().Should().Be(customIndexName);
@@ -39,10 +39,11 @@ namespace ElasticUp.Tests.Operation.Index
         public void CreateIndex_ValidatesSettings()
         {
             var customIndexName = TestIndex.IndexNameWithVersion() + "-custom";
-            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(null).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(" ").Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(TestIndex.IndexNameWithVersion()).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(customIndexName).WithAlias(" ").Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(null).WithMapping(mapping => mapping).Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(" ").WithMapping(mapping => mapping).Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(TestIndex.IndexNameWithVersion()).WithMapping(mapping => mapping).Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(customIndexName).WithAlias(" ").WithMapping(mapping => mapping).Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(customIndexName).WithMapping(null).Execute(ElasticClient));
         }
     }
 }
