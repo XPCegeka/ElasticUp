@@ -64,8 +64,17 @@ namespace ElasticUp.Tests
         [TearDown]
         protected void TearDown()
         {
-            ElasticClient.DeleteIndex(TestIndex.IndexNameWithVersion());
+            TryDeleteIndex(TestIndex.IndexNameWithVersion());
         }
-      
+
+
+        protected void TryDeleteIndex(string indexName)
+        {
+            try
+            {
+                ElasticClient.DeleteIndex(indexName);
+            }
+            catch(Exception) { }
+        } 
     }
 }

@@ -9,6 +9,13 @@ namespace ElasticUp.Tests.Operation.Reindex
     [TestFixture]
     public class BatchUpdateFromTypeToTypeUsingJObjectOperationIntegrationTest : AbstractIntegrationTest
     {
+        [TearDown]
+        public void TearDownAfterTest()
+        {
+            TryDeleteIndex(TestIndex.NextIndexNameWithVersion());
+            TryDeleteIndex(MigrationHistoryTestIndex.IndexNameWithVersion());
+        }
+
         [Test]
         public void Execute_ProcessesTypeAsJObjectAndInsertsInNewIndex()
         {
@@ -44,6 +51,41 @@ namespace ElasticUp.Tests.Operation.Reindex
             countResponse.Count.Should().Be(expectedDocumentCount);
         }
 
-       }
+        [Test]
+        public void Execute_ProcessesTypeAsJObjectAndInsertsInNewIndex_WithKeepingTheId()
+        {
+            // GIVEN
+            var sampleObjectWithId1 = new SampleObjectWithId {Id = new ObjectId {Type = "TestId", Sequence = 0}};
+            var sampleObjectWithId2 = new SampleObjectWithId {Id = new ObjectId {Type = "TestId", Sequence = 1}};
+            ElasticClient.Index(sampleObjectWithId1, idx => idx.Index(TestIndex.IndexNameWithVersion()));
+            ElasticClient.Index(sampleObjectWithId2, idx => idx.Index(TestIndex.IndexNameWithVersion()));
+            ElasticClient.Refresh(Indices.All);
+
+            // TEST
+            var processedRecordCount = 0;
+            var operation = new BatchUpdateFromTypeToTypeUsingJObjectOperation("sampleobjectwithid", "sampleobjectwithid")
+                .FromIndex(TestIndex.IndexNameWithVersion())
+                .ToIndex(TestIndex.NextIndexNameWithVersion())
+                .WithSameId()
+                .WithDocumentTransformation(doc =>
+                {
+                    doc["number"] = 666;
+                    processedRecordCount++;
+                    return doc;
+                })
+                .WithSearchDescriptor(sd => sd.MatchAll())
+                .WithBatchSize(50);
+
+            operation.Execute(ElasticClient);
+
+            // VERIFY
+            processedRecordCount.Should().Be(2);
+
+            ElasticClient.Refresh(Indices.All);
+            ElasticClient.Get<SampleObjectWithId>("TestId-0", desc => desc.Index(TestIndex.NextIndexNameWithVersion())).Should().NotBeNull();
+            ElasticClient.Get<SampleObjectWithId>("TestId-1", desc => desc.Index(TestIndex.NextIndexNameWithVersion())).Should().NotBeNull();
+        }
+
+    }
 }
 

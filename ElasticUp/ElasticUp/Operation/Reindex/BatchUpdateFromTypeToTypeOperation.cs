@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Elasticsearch.Net;
 using ElasticUp.Elastic;
 using Nest;
 
@@ -47,32 +48,69 @@ namespace ElasticUp.Operation.Reindex
 
             if (!searchResponse.Documents.Any()) return;
 
-            ProcessBatch(elasticClient, searchResponse.Documents, ToIndexName);
+            ProcessBatch(elasticClient, searchResponse.Hits, ToIndexName);
 
             var scrollId = searchResponse.ScrollId;
             var scrollResponse = elasticClient.Scroll<TSourceType>(ScrollTimeout, scrollId);
             while (scrollResponse.Documents.Any())
             {
-                ProcessBatch(elasticClient, scrollResponse.Documents, ToIndexName);
+                ProcessBatch(elasticClient, scrollResponse.Hits, ToIndexName);
                 scrollResponse = elasticClient.Scroll<TSourceType>(ScrollTimeout, scrollResponse.ScrollId);
             }
         }
 
-        protected virtual void ProcessBatch(IElasticClient elasticClient, IEnumerable<TSourceType> documents, string toIndex)
+        protected virtual void ProcessBatch(IElasticClient elasticClient, IEnumerable<IHit<TSourceType>> hits, string toIndex)
         {
-            var transformedDocuments = TransformDocuments(documents).ToList();
-            elasticClient.IndexMany(transformedDocuments, toIndex, TargetType);
+            var transformedDocuments = TransformDocuments(hits).ToList();
+            IndexMany(elasticClient, transformedDocuments, toIndex, TargetType);
+            
             foreach (var transformedDocument in transformedDocuments)
             {
-                OnDocumentProcessed?.Invoke(transformedDocument);
+                OnDocumentProcessed?.Invoke(transformedDocument.TransformedDocment); //TODO Pass transformedDocument here?
             }
         }
 
-        protected IEnumerable<TTargetType> TransformDocuments(IEnumerable<TSourceType> documents)
+        protected void IndexMany(IElasticClient elasticClient, IEnumerable<TransformedDocument<TSourceType, TTargetType>> transformedDocuments, string indexName, string typeName)
         {
-            return documents
-                .Select(Transformation)
-                .Where(o => o != null);
+            var bulkDescriptor = new BulkDescriptor();
+
+            foreach (var document in transformedDocuments)
+            {
+                if (document.TransformedDocment == null)
+                    continue;
+
+                if (document.Hit.Version.HasValue)
+                {
+                    bulkDescriptor.Index<object>(
+                        descr => descr.Index(indexName)
+                            .Id(document.Hit.Id)
+                            .Type(typeName)
+                            .VersionType(VersionType.External)
+                            .Version(document.Hit.Version)
+                            .Document(document.TransformedDocment));
+                }
+                else
+                {
+                    bulkDescriptor.Index<object>(
+                    descr => descr.Index(indexName)
+                        .Id(document.Hit.Id)
+                        .Type(typeName)
+                        .Document(document.TransformedDocment));
+                }
+            }
+
+            elasticClient.Bulk(bulkDescriptor);
+        }
+
+        protected IEnumerable<TransformedDocument<TSourceType, TTargetType>> TransformDocuments(IEnumerable<IHit<TSourceType>> hits)
+        {
+            return hits
+                .Where(hit => hit.Source != null)
+                .Select(hit => new TransformedDocument<TSourceType, TTargetType>
+                {
+                    Hit = hit,
+                    TransformedDocment = Transformation(hit.Source)
+                });
         }
         
         public virtual BatchUpdateFromTypeToTypeOperation<TSourceType, TTargetType> FromIndex(string fromIndex)
@@ -121,6 +159,11 @@ namespace ElasticUp.Operation.Reindex
         {
             if (batchSize <= 0) throw new ArgumentException($"{nameof(batchSize)} cannot be negative or zero");
             BatchSize = batchSize;
+            return this;
+        }
+
+        public virtual BatchUpdateFromTypeToTypeOperation<TSourceType, TTargetType> WithSameId()
+        {
             return this;
         }
     }
