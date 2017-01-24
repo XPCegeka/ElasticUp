@@ -53,7 +53,6 @@ namespace ElasticUp.Operation.Reindex
                     .Destination(destinationDescriptor => destinationDescriptor
                         .VersionType(VersionType)
                         .Index(ToIndexName))
-                        .Timeout(new Time(TimeSpan.FromHours(8))) // TODO parameterize
                     .WaitForCompletion();
 
                 if (!string.IsNullOrWhiteSpace(Script))
