@@ -85,6 +85,7 @@
     <Compile Include="Operation\Alias\SwitchAliasOperationIntegrationTest.cs" />
     <Compile Include="Operation\Alias\RemoveAliasOperationIntegrationTest.cs" />
     <Compile Include="Operation\Alias\CreateAliasOperationIntegrationTest.cs" />
+    <Compile Include="Operation\Delete\DeleteByTypeOperationIntegrationTest.cs" />
     <Compile Include="Operation\Index\DeleteIndexOperationIntegrationTest.cs" />
     <Compile Include="Operation\Index\CreateIndexOperationIntegrationTest.cs" />
     <Compile Include="Operation\Mapping\CopyTypeMappingOperationIntegrationTest.cs" />

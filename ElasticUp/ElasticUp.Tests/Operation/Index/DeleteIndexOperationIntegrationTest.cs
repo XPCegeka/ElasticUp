@@ -1,6 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using ElasticUp.Elastic;
 using ElasticUp.Operation.Index;
 using FluentAssertions;
+using Nest;
 using NUnit.Framework;
 
 namespace ElasticUp.Tests.Operation.Index

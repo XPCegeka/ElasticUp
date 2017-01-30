@@ -10,6 +10,8 @@ namespace ElasticUp.Elastic
 
         public ElasticUpException(string message) : base(message) { }
 
+        public ElasticUpException(string message, Exception innerException) : base(message, innerException) { }
+
         public ElasticUpException(string message, ServerError serverError, string debugInformation) : base(message)
         {
             ServerError = serverError;

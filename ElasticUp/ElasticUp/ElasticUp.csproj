@@ -53,6 +53,7 @@
     <Compile Include="Migration\ElasticUpCustomMigration.cs" />
     <Compile Include="Migration\ElasticUpVersionedIndexMigration.cs" />
     <Compile Include="Alias\AliasHelper.cs" />
+    <Compile Include="Operation\Delete\DeleteByTypeOperation.cs" />
     <Compile Include="Operation\Mapping\CopyTypeMappingOperation.cs" />
     <Compile Include="Operation\Mapping\PutTypeMappingOperation.cs" />
     <Compile Include="Operation\Reindex\BatchUpdateTypeOperation.cs" />

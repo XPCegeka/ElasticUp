@@ -22,7 +22,8 @@ namespace ElasticUp.Tests
             var settings = new ConnectionSettings(new Uri(ElasticSearchUrl))
                 .DefaultIndex(TestIndex.IndexNameWithVersion())
                 .DisableDirectStreaming(true)
-                .ThrowExceptions(true);
+                .ThrowExceptions(true)
+                .RequestTimeout(TimeSpan.FromMinutes(30));
 
             ElasticClient = new ElasticClient(settings);
 
