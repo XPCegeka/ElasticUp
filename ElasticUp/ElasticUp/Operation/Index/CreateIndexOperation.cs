@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using ElasticUp.Alias;
 using ElasticUp.Elastic;
 using Nest;
 
@@ -12,6 +10,7 @@ namespace ElasticUp.Operation.Index
         protected string Alias;
 
         protected Func<MappingsDescriptor, IPromise<IMappings>> MappingSelector;
+        protected Func<IndexSettingsDescriptor, IPromise<IIndexSettings>> SettingSelector;
         protected CreateIndexDescriptor CreateIndexDescriptor;
 
 
@@ -28,9 +27,13 @@ namespace ElasticUp.Operation.Index
 
         public virtual CreateIndexOperation WithMapping(Func<MappingsDescriptor, IPromise<IMappings>> selector)
         {
-
-
             MappingSelector = selector;
+            return this;
+        }
+
+        public virtual CreateIndexOperation WithIndexSettings(Func<IndexSettingsDescriptor, IPromise<IIndexSettings>> selector)
+        {
+            SettingSelector = selector;
             return this;
         }
 
@@ -43,6 +46,7 @@ namespace ElasticUp.Operation.Index
             
             var descriptor = new CreateIndexDescriptor(IndexName);
             descriptor.Mappings(MappingSelector);
+            descriptor.Settings(SettingSelector);
             
             if (!string.IsNullOrWhiteSpace(Alias)) { descriptor.Aliases(aliases => aliases.Alias(Alias)); }
 
