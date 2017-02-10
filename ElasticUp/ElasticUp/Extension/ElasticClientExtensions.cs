@@ -2,12 +2,32 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ElasticUp.Elastic;
 using Nest;
 
 namespace ElasticUp.Extension
 {
     internal static class ElasticClientExtensions
     {
+        public static void SetIndexBlocksReadOnly(this IElasticClient elasticClient, string indexName, bool readOnly)
+        {
+            if (string.IsNullOrEmpty(indexName))
+                throw new ElasticUpException($"{nameof(indexName)} cannot be null or empty.", new ArgumentNullException(nameof(indexName)));
+
+            elasticClient.UpdateIndexSettings(indexName,
+                descriptor => descriptor
+                    .IndexSettings(settingsDescriptor => settingsDescriptor
+                        .BlocksReadOnly(readOnly)));
+        }
+
+        public static ReadOnlyIndexContext WithReadOnlyIndex(this IElasticClient elasticClient, string indexName)
+        {
+            if (string.IsNullOrEmpty(indexName))
+                throw new ElasticUpException($"{nameof(indexName)} cannot be null or empty.", new ArgumentNullException(nameof(indexName)));
+
+            return new ReadOnlyIndexContext(elasticClient, indexName);
+        }
+
         public static async Task DoScrollAsync<TDocument>(this IElasticClient elasticClient, Func<SearchDescriptor<TDocument>, ISearchRequest> searchDescriptor,
             Action<IEnumerable<TDocument>> onBatchLoaded, int scrollSize = 5000, Time scrollTimeout = null)
             where TDocument : class

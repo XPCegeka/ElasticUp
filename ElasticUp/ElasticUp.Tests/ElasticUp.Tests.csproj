@@ -79,6 +79,7 @@
     <Compile Include="AbstractIntegrationTest.cs" />
     <Compile Include="ElasticUpFullStackTests\MappingAndReindexIntegrationTest.cs" />
     <Compile Include="ElasticUpTestConfig.cs" />
+    <Compile Include="Extension\ReadOnlyIndexContextTest.cs" />
     <Compile Include="Extension\ElasticClientExtensionsTest.cs" />
     <Compile Include="History\MigrationHistoryHelperTest.cs" />
     <Compile Include="Infrastructure\ResourceUtilities.cs" />

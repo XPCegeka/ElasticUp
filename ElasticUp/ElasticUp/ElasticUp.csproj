@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Elastic\ElasticUpException.cs" />
+    <Compile Include="Extension\ReadOnlyIndexContext.cs" />
     <Compile Include="Extension\TimeSpanExtensions.cs" />
     <Compile Include="History\MigrationHistory.cs" />
     <Compile Include="Migration\AbstractElasticUpMigration.cs" />

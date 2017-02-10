@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ElasticUp.Elastic;
 using ElasticUp.Extension;
 using FluentAssertions;
 using Nest;
@@ -25,6 +26,30 @@ namespace ElasticUp.Tests.Extension
 
             // VERIFY
             actualDocuments.ShouldBeEquivalentTo(actualDocuments);
+        }
+
+        [Test]
+        public void SetIndexBlocksReadOnly_SetsIndexAsReadonly()
+        {
+            var indexName = TestIndex.IndexNameWithVersion();
+
+            ElasticClient.SetIndexBlocksReadOnly(indexName, true);
+
+            var indexSettings = ElasticClient.GetIndexSettings(descriptor => descriptor.Index(indexName));
+            indexSettings.Indices[indexName].Settings.BlocksReadOnly.Should().BeTrue();
+
+
+            ElasticClient.SetIndexBlocksReadOnly(indexName, false);
+
+            indexSettings = ElasticClient.GetIndexSettings(descriptor => descriptor.Index(indexName));
+            indexSettings.Indices[indexName].Settings.BlocksReadOnly.Should().BeFalse();
+        }
+
+        [Test]
+        public void SetIndexBlocksReadOnly_ThrowsWhenIndexNameNullOrEmpty()
+        {
+            Assert.Throws<ElasticUpException>(() => ElasticClient.SetIndexBlocksReadOnly(null, true));
+            Assert.Throws<ElasticUpException>(() => ElasticClient.SetIndexBlocksReadOnly("", true));
         }
     }
 }
