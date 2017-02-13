@@ -13,8 +13,8 @@ namespace ElasticUp.Tests.Extension
         public void WhenUsing_ThrowsWhenIndexingDocument()
         {
             // GIVEN
-            var indexName = TestIndex.ToString();
-
+            var indexName = TestIndex.IndexNameWithVersion();
+            
             // TEST
             using (new ReadOnlyIndexContext(ElasticClient, indexName))
             {
@@ -26,7 +26,7 @@ namespace ElasticUp.Tests.Extension
         [Test]
         public void WhenUsing_SetsIndexToReadOnly()
         {
-            var indexName = TestIndex.ToString();
+            var indexName = TestIndex.IndexNameWithVersion();
 
             using (new ReadOnlyIndexContext(ElasticClient, indexName))
             {

@@ -45,6 +45,7 @@ namespace ElasticUp.Operation.Index
             if (elasticClient.IndexExists(IndexName).Exists) throw new ElasticUpException($"CreateIndexOperation: index {IndexName} already exists.");   
             
             var descriptor = new CreateIndexDescriptor(IndexName);
+            
             descriptor.Mappings(MappingSelector);
             descriptor.Settings(SettingSelector);
             

@@ -30,7 +30,21 @@ namespace ElasticUp.Tests.Operation.Index
             ElasticClient.IndexExists(customIndexName).Exists.Should().BeFalse();
 
             new CreateIndexOperation(customIndexName).WithAlias(customAlias).WithMapping(mapping => mapping).Execute(ElasticClient);
-            
+
+            ElasticClient.IndexExists(customIndexName).Exists.Should().BeTrue();
+            ElasticClient.GetIndicesPointingToAlias(customAlias).Single().Should().Be(customIndexName);
+        }
+
+        [Test]
+        public void CreatesIndex_WithCustomMapping_CanMapMultiFields()
+        {
+            var customIndexName = TestIndex.IndexNameWithVersion() + "-custom";
+            var customAlias = TestIndex.AliasName + "-custom";
+
+            ElasticClient.IndexExists(customIndexName).Exists.Should().BeFalse();
+
+            new CreateIndexOperation(customIndexName).WithAlias(customAlias).WithMapping(mapping => mapping).Execute(ElasticClient);
+
             ElasticClient.IndexExists(customIndexName).Exists.Should().BeTrue();
             ElasticClient.GetIndicesPointingToAlias(customAlias).Single().Should().Be(customIndexName);
         }
