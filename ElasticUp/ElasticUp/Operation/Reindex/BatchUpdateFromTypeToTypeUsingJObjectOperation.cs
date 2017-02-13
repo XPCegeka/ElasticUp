@@ -11,6 +11,7 @@ namespace ElasticUp.Operation.Reindex
             if (string.IsNullOrWhiteSpace(targetType)) throw new ArgumentNullException(nameof(targetType), "Target type should not be null");
             SourceType = sourceType.ToLowerInvariant();
             TargetType = targetType.ToLowerInvariant();
+            
         }
     }
 }

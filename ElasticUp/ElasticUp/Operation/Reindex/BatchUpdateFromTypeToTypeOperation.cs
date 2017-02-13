@@ -43,6 +43,7 @@ namespace ElasticUp.Operation.Reindex
                                     .Search<TSourceType>(descriptor => SearchDescriptor(descriptor
                                         .Index(FromIndexName)
                                         .Type(SourceType)
+                                        .Version()
                                         .Scroll(ScrollTimeout)
                                         .Size(BatchSize)));
 
