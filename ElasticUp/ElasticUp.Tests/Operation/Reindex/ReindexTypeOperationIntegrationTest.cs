@@ -1,6 +1,8 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using Elasticsearch.Net;
 using ElasticUp.Elastic;
 using ElasticUp.Migration.Meta;
 using ElasticUp.Operation.Mapping;
@@ -10,6 +12,7 @@ using ElasticUp.Tests.Sample;
 using ElasticUp.Tests.Sample.IntValue;
 using FluentAssertions;
 using Nest;
+using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace ElasticUp.Tests.Operation.Reindex
@@ -162,6 +165,40 @@ namespace ElasticUp.Tests.Operation.Reindex
                 .Documents.ToList();
             documents.Count.Should().Be(1);
             documents[0].Value.Should().Be("123456");
+        }
+
+
+        [Test]
+        [Ignore("test with refresh interval")]
+        public void TomsRefreshIntervalExperimentWithReindex()
+        {
+            // GIVEN
+            const int expectedDocumentCount = 1000000;
+            var sampleDocuments = Enumerable.Range(0, expectedDocumentCount).Select(n => new SampleObject { Number = n });
+            ElasticClient.IndexMany(sampleDocuments, TestIndex.IndexNameWithVersion());
+            ElasticClient.Refresh(Indices.All);
+
+            //zonder 58,995
+            //met    52,767
+            //bedenking: dit zijn natuurlijk erg kleine test objecten
+            //ook een test draaien met grote objecten
+            var response = ElasticClient.UpdateIndexSettings(TestIndex.NextIndexNameWithVersion(), s => s.IndexSettings(p => p.RefreshInterval(new Time(-1))));
+
+            // WHEN
+            var timer = new Stopwatch();
+            timer.Start();
+            new ReindexTypeOperation("sampleobject")
+                    .FromIndex(TestIndex.IndexNameWithVersion())
+                    .ToIndex(TestIndex.NextIndexNameWithVersion())
+                    .Execute(ElasticClient);
+            timer.Stop();
+
+            Console.WriteLine($"Took {TimeSpan.FromMilliseconds(timer.ElapsedMilliseconds).TotalSeconds}");
+
+            // THEN
+            ElasticClient.Refresh(Indices.All);
+            var countResponse = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion()));
+            countResponse.Count.Should().Be(expectedDocumentCount);
         }
     }
 }

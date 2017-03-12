@@ -1,5 +1,6 @@
 using System;
 using ElasticUp.Operation.Reindex;
+using ElasticUp.Tests.Sample;
 using NUnit.Framework;
 
 namespace ElasticUp.Tests.Operation.Reindex

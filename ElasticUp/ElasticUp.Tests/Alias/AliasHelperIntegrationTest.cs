@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Elasticsearch.Net;
 using ElasticUp.Alias;
+using ElasticUp.Tests.Sample;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;

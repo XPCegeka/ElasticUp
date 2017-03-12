@@ -1,4 +1,4 @@
-namespace ElasticUp.Tests
+namespace ElasticUp.Tests.Sample
 {
     public class SampleObject
     {

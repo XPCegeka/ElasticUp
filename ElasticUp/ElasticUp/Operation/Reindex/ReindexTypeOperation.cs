@@ -44,7 +44,7 @@ namespace ElasticUp.Operation.Reindex
             if (!elasticClient.IndexExists(FromIndexName).Exists) throw new ElasticUpException($"ReindexTypeOperation: Invalid fromIndex {FromIndexName} does not exist.");
             if (!elasticClient.IndexExists(ToIndexName).Exists) throw new ElasticUpException($"ReindexTypeOperation: Invalid toIndex {ToIndexName} does not exist."); 
 
-            elasticClient.ReindexOnServer(descriptor =>
+            var response = elasticClient.ReindexOnServer(descriptor =>
             {
                 descriptor
                     .Source(sourceDescriptor => sourceDescriptor

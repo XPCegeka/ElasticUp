@@ -2,6 +2,7 @@
 using System.Linq;
 using ElasticUp.Elastic;
 using ElasticUp.Operation.Delete;
+using ElasticUp.Tests.Sample;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;

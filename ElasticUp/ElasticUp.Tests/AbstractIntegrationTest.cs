@@ -23,7 +23,7 @@ namespace ElasticUp.Tests
                 .DefaultIndex(TestIndex.IndexNameWithVersion())
                 .DisableDirectStreaming(true)
                 .ThrowExceptions(true)
-                .RequestTimeout(TimeSpan.FromMinutes(30));
+                .RequestTimeout(TimeSpan.FromHours(8));
 
             ElasticClient = new ElasticClient(settings);
 
@@ -34,29 +34,25 @@ namespace ElasticUp.Tests
 
         private void CreateMigrationHistoryTestIndex()
         {
-            ElasticClient.CreateIndex(
-                MigrationHistoryTestIndex.IndexNameWithVersion(),
-                indexDescriptor => indexDescriptor.Settings(indexSettings => indexSettings
-                    .NumberOfShards(1)
-                    .NumberOfReplicas(0)));
+            CreateIndex(MigrationHistoryTestIndex.IndexNameWithVersion());
             ElasticClient.PutAlias(MigrationHistoryTestIndex.IndexNameWithVersion(), MigrationHistoryTestIndex.AliasName);
         }
 
         protected void CreateTestIndex()
         {
-            ElasticClient.CreateIndex(
-                TestIndex.IndexNameWithVersion(),
-                indexDescriptor => indexDescriptor.Settings(indexSettings => indexSettings
-                    .NumberOfShards(1)
-                    .NumberOfReplicas(0)));
-
+            CreateIndex(TestIndex.IndexNameWithVersion());
             ElasticClient.PutAlias(TestIndex.IndexNameWithVersion(), TestIndex.AliasName);
         }
 
         protected void CreateNextTestIndex()
         {
+            CreateIndex(TestIndex.NextIndexNameWithVersion());
+        }
+
+        protected void CreateIndex(string index)
+        {
             ElasticClient.CreateIndex(
-                TestIndex.NextIndexNameWithVersion(),
+                index,
                 indexDescriptor => indexDescriptor.Settings(indexSettings => indexSettings
                     .NumberOfShards(1)
                     .NumberOfReplicas(0)));

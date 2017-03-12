@@ -47,6 +47,7 @@
       <HintPath>..\packages\FluentAssertions.4.15.0\lib\net45\FluentAssertions.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Nest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
       <HintPath>..\packages\NEST.2.4.6\lib\net45\Nest.dll</HintPath>
       <Private>True</Private>
@@ -92,9 +93,12 @@
     <Compile Include="Operation\Mapping\CopyTypeMappingOperationIntegrationTest.cs" />
     <Compile Include="Operation\Mapping\PutTypeMappingOperationIntegrationTest.cs" />
     <Compile Include="Operation\Reindex\BatchUpdateFromTypeToTypeUsingJObjectOperationIntegrationTest.cs" />
+    <Compile Include="Operation\Reindex\BatchUpdateOperationPerformanceIntegrationTest.cs" />
     <Compile Include="Operation\Reindex\BatchUpdateTypeOperationIntegrationTest.cs" />
     <Compile Include="Operation\Reindex\BatchUpdateTypeOperationTest.cs" />
+    <Compile Include="Operation\Reindex\ReindexTypeOperationPerformanceIntegrationTest.cs" />
     <Compile Include="Operation\Reindex\ReindexTypeOperationIntegrationTest.cs" />
+    <Compile Include="Operation\Validator\OperationValidatorIntegrationTest.cs" />
     <Compile Include="Sample\StringValue\SampleDocumentWithValue.cs" />
     <Compile Include="Sample\IntValue\SampleDocumentWithValue.cs" />
     <Compile Include="Sample\SampleVersionedIndexMigrationWithReindexTypeOperation.cs" />
@@ -103,7 +107,7 @@
     <Compile Include="Alias\AliasHelperIntegrationTest.cs" />
     <Compile Include="Sample\SampleEmptyOperation.cs" />
     <Compile Include="ElasticUpFullStackTests\ElasticUpIntegrationTest.cs" />
-    <Compile Include="SampleObject.cs" />
+    <Compile Include="Sample\SampleObject.cs" />
     <Compile Include="Migration\Meta\VersionedIndexNameTest.cs" />
     <Compile Include="Sample\SampleEmptyVersionedIndexMigration.cs" />
     <Compile Include="Migration\AbstractElasticUpMigrationTest.cs" />
@@ -127,6 +131,9 @@
     <EmbeddedResource Include="Resources\mapping_v2_sampledocument.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\large_document.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ElasticUp.Tests.Infrastructure\ElasticUp.Tests.Infrastructure.csproj">
@@ -145,7 +152,6 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

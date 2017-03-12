@@ -1,0 +1,252 @@
+﻿{
+  "id": {
+    "$type": "ConstruCommon.Domain.ModelId, ConstruCommon",
+    "type": "LKOAD",
+    "year": 2016,
+    "sequence": 214,
+    "asString": "LKOAD-2016-214"
+  },
+  "creatieDatum": "2016-09-19T10:10:32.4040605Z",
+  "synergyId": 603732,
+  "status": "AutomatischGeweigerd",
+  "aanvraag": {
+    "$type": "CoBen.Voordelen.Legitimatiekaart.OpAanvraag.Dossier.Aanvraag.NieuweArbeiderAanvraag.NieuweArbeiderAanvraag, CoBen.Voordelen.Legitimatiekaart",
+    "tewerkstelling": {
+      "isNieuweBouwvakker": true,
+      "isTerugBegonnen": true,
+      "isBeroepsOpleiding": true,
+      "isOntslagen": true,
+      "isWerkloos": true,
+      "isAndereSector": true,
+      "isZelfstandige": true,
+      "ontslagDatum": "2016-06-25T22:00:00Z",
+      "datumInDienstOfHerbegonnen": "2016-06-30T22:00:00Z"
+    },
+    "metadata": {
+      "legitimatiekaartJaar": 2016,
+      "syndicaleOrganisatie": "Individueel",
+      "regionaleAfdeling": null,
+      "aanvraagOntvangenOp": "2016-06-25T22:00:00Z",
+      "referteJaar": 2015
+    },
+    "identiteit": {
+      "voornaam": "MARIO JOZEF",
+      "achternaam": "JANSENS",
+      "adres": "GIERLEDIJK27",
+      "postcode": "2340",
+      "gemeente": "BEERSE",
+      "insz": "84012115120",
+      "synergyId": 603732,
+      "land": null,
+      "taal": null
+    },
+    "arbeidsPrestatiesAttesten": [
+      {
+        "kboNummer": "0807596165",
+        "naamWerkgever": "HEIN",
+        "inDienstVan": "2016-06-15T22:00:00Z",
+        "inDienstTot": "2016-07-01T22:00:00Z",
+        "arbeidsPrestaties": [
+          {
+            "jaar": 2016,
+            "kwartaal": 3,
+            "gepresteerdeDagen": 2.0,
+            "gelijkgesteldeDagen": 4.0
+          },
+          {
+            "jaar": 2016,
+            "kwartaal": 4,
+            "gepresteerdeDagen": 6.0,
+            "gelijkgesteldeDagen": 8.0
+          },
+          {
+            "jaar": 2017,
+            "kwartaal": 1,
+            "gepresteerdeDagen": 10.0,
+            "gelijkgesteldeDagen": 12.0
+          },
+          {
+            "jaar": 2017,
+            "kwartaal": 2,
+            "gepresteerdeDagen": 14.0,
+            "gelijkgesteldeDagen": 16.0
+          },
+          {
+            "jaar": 2017,
+            "kwartaal": 3,
+            "gepresteerdeDagen": 2.0,
+            "gelijkgesteldeDagen": 26.0
+          }
+        ],
+        "arbeidsPrestatiesDmfa": [
+          {
+            "jaar": 2016,
+            "kwartaal": 3,
+            "gepresteerdeDagen": 2.0,
+            "gelijkgesteldeDagen": 4.0
+          },
+          {
+            "jaar": 2016,
+            "kwartaal": 4,
+            "gepresteerdeDagen": 6.0,
+            "gelijkgesteldeDagen": 8.0
+          },
+          {
+            "jaar": 2017,
+            "kwartaal": 1,
+            "gepresteerdeDagen": 10.0,
+            "gelijkgesteldeDagen": 12.0
+          },
+          {
+            "jaar": 2017,
+            "kwartaal": 2,
+            "gepresteerdeDagen": 14.0,
+            "gelijkgesteldeDagen": 6.0
+          },
+          {
+            "jaar": 2017,
+            "kwartaal": 3,
+            "gepresteerdeDagen": 2.0,
+            "gelijkgesteldeDagen": 6.0
+          }
+        ],
+        "declarationIds": null,
+        "synergyId": null
+      },
+      {
+        "kboNummer": "7894564555",
+        "naamWerkgever": "Albert",
+        "inDienstVan": "2016-06-17T22:00:00Z",
+        "inDienstTot": "2016-06-26T22:00:00Z",
+        "arbeidsPrestaties": [
+          {
+            "jaar": 2016,
+            "kwartaal": 3,
+            "gepresteerdeDagen": 1.0,
+            "gelijkgesteldeDagen": 2.0
+          },
+          {
+            "jaar": 2016,
+            "kwartaal": 4,
+            "gepresteerdeDagen": 6.0,
+            "gelijkgesteldeDagen": 9.0
+          },
+          {
+            "jaar": 2017,
+            "kwartaal": 1,
+            "gepresteerdeDagen": 8.0,
+            "gelijkgesteldeDagen": 12.0
+          },
+          {
+            "jaar": 2017,
+            "kwartaal": 2,
+            "gepresteerdeDagen": 15.0,
+            "gelijkgesteldeDagen": 2.0
+          },
+          {
+            "jaar": 2017,
+            "kwartaal": 3,
+            "gepresteerdeDagen": 3.0,
+            "gelijkgesteldeDagen": 8.0
+          }
+        ],
+        "arbeidsPrestatiesDmfa": [
+          {
+            "jaar": 2016,
+            "kwartaal": 3,
+            "gepresteerdeDagen": 2.0,
+            "gelijkgesteldeDagen": 4.0
+          },
+          {
+            "jaar": 2016,
+            "kwartaal": 4,
+            "gepresteerdeDagen": 6.0,
+            "gelijkgesteldeDagen": 8.0
+          },
+          {
+            "jaar": 2017,
+            "kwartaal": 1,
+            "gepresteerdeDagen": 10.0,
+            "gelijkgesteldeDagen": 12.0
+          },
+          {
+            "jaar": 2017,
+            "kwartaal": 2,
+            "gepresteerdeDagen": 14.0,
+            "gelijkgesteldeDagen": 16.0
+          },
+          {
+            "jaar": 2017,
+            "kwartaal": 3,
+            "gepresteerdeDagen": 2.0,
+            "gelijkgesteldeDagen": 6.0
+          }
+        ],
+        "declarationIds": null,
+        "synergyId": null
+      }
+    ],
+    "bijgevoegdeDocumenten": [
+      {
+        "id": 0,
+        "type": "OntslagWerkgever",
+        "beginDatum": "2016-06-23T22:00:00Z",
+        "periode": null,
+        "totaalDagenRegime5": 0.0,
+        "totaalDagenRegime6": 0
+      }
+    ],
+    "invoerDatum": "2016-09-19T10:10:32.3809683Z",
+    "type": "nieuwe-arbeider"
+  },
+  "flags": {
+    "ongeldigInszNummer": false,
+    "persoonNietGekendInDeBouw": true,
+    "ongeldigKboNummer": true,
+    "nietInDienst": false,
+    "heeftRhLkVoorAangevraagdJaar": false,
+    "heeftGevalideerdLopendDossierVoorAanvraagJaar": false,
+    "isGeweigerd": true
+  },
+  "automatischeControles": [],
+  "pdokFeedback": null,
+  "resultaat": {
+    "resultaatPerRefertejaar": [
+      {
+        "$type": "CoBen.Voordelen.Legitimatiekaart.OpAanvraag.Dossier.Model.LegitimatiekaartOpAanvraagDossierWeigeringResultaatVoorRefertejaar, CoBen.Voordelen.Legitimatiekaart",
+        "redenenWeigering": [
+          "PersoonNietGekendInDeBouw",
+          "OngeldigKbo"
+        ],
+        "motievenWeigering": null,
+        "vrijeTekstWeigeringen": null,
+        "refertejaar": 2015,
+        "legitimatiekaartType": "Geen",
+        "memo": null,
+        "isResultaatVanAutomatischeControle": true
+      }
+    ]
+  },
+  "referteJaar": 2015,
+  "memo": null,
+  "workflow": {
+    "kanGewijzigdWorden": true,
+    "isNaTeKijken": true,
+    "isKlaarVoorPDOK": false,
+    "kanGeweigerdWorden": true,
+    "actiesMogelijk": true,
+    "kanOverruledWorden": false,
+    "isBijPDOK": false,
+    "kanGepreviewedWorden": true,
+    "isKlaarVoorBriefWeigering": false,
+    "isKlaarVoorEffectieveUitgifte": false,
+    "isKlaarVoorPrint": false,
+    "heeftPdokFeedback": false,
+    "isWeigering": true,
+    "isIngescand": false
+  },
+  "isIngescand": false,
+  "version": 3,
+  "src": "CoBen/ManueleIngave/Onbekend",
+  "modifiedBy": null
+}
