@@ -7,6 +7,7 @@ using Nest;
 
 namespace ElasticUp.Operation.Reindex
 {
+    [Obsolete("Use BatchUpdateOperation")]
     public class BatchUpdateFromTypeToTypeOperation<TSourceType, TTargetType> : AbstractElasticUpOperation where TSourceType : class 
                                                                                                     where TTargetType : class
     {
@@ -67,7 +68,7 @@ namespace ElasticUp.Operation.Reindex
             
             foreach (var transformedDocument in transformedDocuments)
             {
-                OnDocumentProcessed?.Invoke(transformedDocument.TransformedDocment); //TODO Pass transformedDocument here?
+                OnDocumentProcessed?.Invoke(transformedDocument.TransformedHit); //TODO Pass transformedDocument here?
             }
         }
 
@@ -77,7 +78,7 @@ namespace ElasticUp.Operation.Reindex
 
             foreach (var document in transformedDocuments)
             {
-                if (document.TransformedDocment == null)
+                if (document.TransformedHit == null)
                     continue;
 
                 if (document.Hit.Version.HasValue)
@@ -88,7 +89,7 @@ namespace ElasticUp.Operation.Reindex
                             .Type(typeName)
                             .VersionType(VersionType.External)
                             .Version(document.Hit.Version)
-                            .Document(document.TransformedDocment));
+                            .Document(document.TransformedHit));
                 }
                 else
                 {
@@ -96,7 +97,7 @@ namespace ElasticUp.Operation.Reindex
                     descr => descr.Index(indexName)
                         .Id(document.Hit.Id)
                         .Type(typeName)
-                        .Document(document.TransformedDocment));
+                        .Document(document.TransformedHit));
                 }
             }
 
@@ -110,7 +111,7 @@ namespace ElasticUp.Operation.Reindex
                 .Select(hit => new TransformedDocument<TSourceType, TTargetType>
                 {
                     Hit = hit,
-                    TransformedDocment = Transformation(hit.Source)
+                    TransformedHit = Transformation(hit.Source)
                 });
         }
         

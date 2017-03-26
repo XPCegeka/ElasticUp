@@ -53,7 +53,7 @@ namespace ElasticUp.Operation.Reindex
             }
             while (searchResponse.Documents.Any());
 
-            Task.WaitAll(tasks.ToArray());
+            if (tasks.Any()) Task.WaitAll(tasks.ToArray());
         }
 
         protected ISearchResponse<TTransformFromType> Search(IElasticClient elasticClient)
@@ -71,7 +71,7 @@ namespace ElasticUp.Operation.Reindex
         {
             var transformedDocuments = TransformDocuments(hits).ToList();
             BulkIndex(elasticClient, transformedDocuments);
-            transformedDocuments.ForEach(doc => _arguments.OnDocumentProcessed?.Invoke(doc.TransformedDocment));
+            transformedDocuments.ForEach(doc => _arguments.OnDocumentProcessed?.Invoke(doc.TransformedHit));
         }
 
         protected void BulkIndex(IElasticClient elasticClient, IEnumerable<TransformedDocument<TTransformFromType, TTransformToType>> transformedDocuments)
@@ -80,7 +80,7 @@ namespace ElasticUp.Operation.Reindex
 
             foreach (var document in transformedDocuments)
             {
-                if (document.TransformedDocment == null)
+                if (document.TransformedHit == null)
                     continue;
 
                 if (document.Hit.Version.HasValue)
@@ -92,7 +92,7 @@ namespace ElasticUp.Operation.Reindex
                             .Type(_arguments.ToTypeName)
                             .VersionType(VersionType.External)
                             .Version(document.Hit.Version)
-                            .Document(document.TransformedDocment));
+                            .Document(document.TransformedHit));
                 }
                 else
                 {
@@ -101,7 +101,7 @@ namespace ElasticUp.Operation.Reindex
                             .Index(_arguments.ToIndexName)
                             .Id(document.Hit.Id)
                             .Type(_arguments.ToTypeName)
-                            .Document(document.TransformedDocment));
+                            .Document(document.TransformedHit));
                 }
             }
 
@@ -115,7 +115,7 @@ namespace ElasticUp.Operation.Reindex
                 .Select(hit => new TransformedDocument<TTransformFromType, TTransformToType>
                 {
                     Hit = hit,
-                    TransformedDocment = _arguments.Transformation(hit.Source)
+                    TransformedHit = _arguments.Transformation(hit.Source)
                 });
         }
     }

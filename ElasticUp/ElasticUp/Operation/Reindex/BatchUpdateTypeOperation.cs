@@ -1,7 +1,7 @@
+using System;
+
 namespace ElasticUp.Operation.Reindex
 {
-    public class BatchUpdateTypeOperation<T> : BatchUpdateFromTypeToTypeOperation<T, T> where T : class
-    {
-       
-    }
+    [Obsolete("Use BatchUpdateOperation")]
+    public class BatchUpdateTypeOperation<T> : BatchUpdateFromTypeToTypeOperation<T, T> where T : class {}
 }

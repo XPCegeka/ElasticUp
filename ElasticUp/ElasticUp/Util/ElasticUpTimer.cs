@@ -14,12 +14,6 @@ namespace ElasticUp.Util
             _stopwatch = Stopwatch.StartNew();
         }
 
-        public long StopAndGetElapsedMilliseconds()
-        {
-            Stop();
-            return GetElapsedMilliseconds();
-        }
-
         public long GetElapsedMilliseconds()
         {
             return _stopwatch.ElapsedMilliseconds;
@@ -33,7 +27,7 @@ namespace ElasticUp.Util
             }
         }
 
-        private void Log()
+        public void Log()
         {
             Console.WriteLine($@"Timer {_name} ran for {TimeSpan.FromMilliseconds(_stopwatch.ElapsedMilliseconds).TotalSeconds} seconds");
         }

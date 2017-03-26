@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 
 namespace ElasticUp.Operation.Reindex
 {
+    [Obsolete("Use BatchUpdateOperation")]
     public class BatchUpdateFromTypeToTypeUsingJObjectOperation : BatchUpdateFromTypeToTypeOperation<JObject, JObject>
     {
         public BatchUpdateFromTypeToTypeUsingJObjectOperation(string sourceType, string targetType)

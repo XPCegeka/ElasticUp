@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ElasticUp.Operation.Reindex;
 using ElasticUp.Tests.Sample;
@@ -8,6 +9,7 @@ using NUnit.Framework;
 
 namespace ElasticUp.Tests.Operation.Reindex
 {
+    [Obsolete("Use BatchUpdateOperation")]
     [TestFixture]
     public class BatchUpdateFromTypeToTypeUsingJObjectOperationIntegrationTest : AbstractIntegrationTest
     {

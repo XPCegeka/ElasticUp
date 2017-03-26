@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
+using Elasticsearch.Net;
 using ElasticUp.Elastic;
 using ElasticUp.Operation.Reindex;
 using ElasticUp.Tests.Sample;
@@ -19,77 +18,73 @@ namespace ElasticUp.Tests.Operation.Reindex
     public class BatchUpdateOperationPerformanceIntegrationTest : AbstractIntegrationTest
     {
         [Test]
-        [Ignore("Not yet operational")]
         public void BatchUpdateTypeOperationIsFasterWhenUsingParallellism()
         {
-            // GIVEN
-            const int expectedDocumentCount = 1000;
-            var sampleDocuments = Enumerable.Range(0, expectedDocumentCount).Select(n => new SampleObject { Number = n });
-            ElasticClient.IndexMany(sampleDocuments, TestIndex.IndexNameWithVersion());
-            ElasticClient.Refresh(Indices.All);
-            Thread.Sleep(TimeSpan.FromSeconds(5)); //wait for elastic background stuff
+            CreateIndex(TestIndex.NextVersion().NextIndexNameWithVersion());
 
-            // TEST
+            const int expectedDocumentCount = 1000;
+            BulkIndexSampleObjects(expectedDocumentCount, expectedDocumentCount);
+            Thread.Sleep(TimeSpan.FromSeconds(5)); //wait for elastic to do it's thing
+
+            // GIVEN
             var processedDocumentCount = 0;
 
-            var operation = new BatchUpdateOperation<SampleObject, SampleObject>(descriptor => descriptor
-                                    .FromIndex(TestIndex.IndexNameWithVersion())
-                                    .ToIndex(TestIndex.NextIndexNameWithVersion())
-                                    .Transformation(doc =>
-                                    {
-                                        processedDocumentCount++;
-                                        return doc;
-                                    }));
-
-            var timer1 = new ElasticUpTimer("WithoutParallellism");
-            using (timer1)
+            // WHEN BATCHUPDATE WITHOUT PARALLEL
+            var timerWithoutParallel = new ElasticUpTimer("WithoutParallellism");
+            using (timerWithoutParallel)
             {
-                operation.Execute(ElasticClient);
+                new BatchUpdateOperation<SampleObject, SampleObject>(descriptor => descriptor
+                    .FromIndex(TestIndex.IndexNameWithVersion())
+                    .ToIndex(TestIndex.NextIndexNameWithVersion())
+                    .DegreeOfParallellism(1)
+                    .Transformation(doc =>
+                    {
+                        processedDocumentCount++;
+                        return doc;
+                    })).Execute(ElasticClient);
             }
-            var elapsedWithoutParallellism = timer1.GetElapsedMilliseconds();
 
-            // VERIFY
+            // VERIFY BATCH UPDATE
             processedDocumentCount.Should().Be(expectedDocumentCount);
             ElasticClient.Refresh(Indices.All);
             ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion())).Count.Should().Be(expectedDocumentCount);
 
-            CreateIndex(TestIndex.NextVersion().NextIndexNameWithVersion());
+
+            //WHEN BATCHUPDATE WITH PARALLEL
             processedDocumentCount = 0;
-
-            var operation2 = new BatchUpdateOperation<SampleObject, SampleObject>(descriptor => descriptor
-                .FromIndex(TestIndex.NextVersion().IndexNameWithVersion())
-                .ToIndex(TestIndex.NextVersion().NextIndexNameWithVersion())
-                .DegreeOfParallellism(5)
-                .Transformation(doc =>
-                {
-                    processedDocumentCount++;
-                    return doc;
-                }));
-
-            var t2 = new ElasticUpTimer("WithoutParallellism");
-            using (t2)
+            var timerWithParallel = new ElasticUpTimer("WithoutParallellism");
+            using (timerWithParallel)
             {
-                operation2.Execute(ElasticClient);
-
+                new BatchUpdateOperation<SampleObject, SampleObject>(descriptor => descriptor
+                        .FromIndex(TestIndex.NextVersion().IndexNameWithVersion())
+                        .ToIndex(TestIndex.NextVersion().NextIndexNameWithVersion())
+                        .DegreeOfParallellism(5)
+                        .Transformation(doc =>
+                        {
+                            processedDocumentCount++;
+                            return doc;
+                        })
+                ).Execute(ElasticClient);
             }
-            var elapsedWithParallellism = t2.StopAndGetElapsedMilliseconds();
 
+            //VERIFY
             processedDocumentCount.Should().Be(expectedDocumentCount);
             ElasticClient.Refresh(Indices.All);
             ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextVersion().NextIndexNameWithVersion())).Count.Should().Be(expectedDocumentCount);
 
-            elapsedWithoutParallellism.Should().BeGreaterThan(elapsedWithParallellism);
+            //VERIFY parallel was faster
+            timerWithoutParallel.GetElapsedMilliseconds().Should().BeGreaterThan(timerWithParallel.GetElapsedMilliseconds());
         }
 
         [Test]
-        public void Execute_ValidatesThatFromAndToIndexAreDefinedAndExistInElasticSearch()
+        public void OperationValidatesThatFromAndToIndexAreDefinedAndExistInElasticSearch()
         {
-            Assert.Throws<ElasticUpException>(() => new BatchUpdateTypeOperation<SampleObject>().FromIndex(null).ToIndex(TestIndex.NextIndexNameWithVersion()).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new BatchUpdateTypeOperation<SampleObject>().FromIndex(" ").ToIndex(TestIndex.NextIndexNameWithVersion()).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new BatchUpdateTypeOperation<SampleObject>().FromIndex(TestIndex.IndexNameWithVersion()).ToIndex(null).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new BatchUpdateTypeOperation<SampleObject>().FromIndex(TestIndex.IndexNameWithVersion()).ToIndex("").Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new BatchUpdateTypeOperation<SampleObject>().FromIndex("does not exist").ToIndex(TestIndex.NextIndexNameWithVersion()).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new BatchUpdateTypeOperation<SampleObject>().FromIndex(TestIndex.IndexNameWithVersion()).ToIndex("does not exist").Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new BatchUpdateOperation<SampleObject,SampleObject>(s => s.FromIndex(null).ToIndex(TestIndex.NextIndexNameWithVersion())).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new BatchUpdateOperation<SampleObject,SampleObject>(s => s.FromIndex(" ").ToIndex(TestIndex.NextIndexNameWithVersion())).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new BatchUpdateOperation<SampleObject,SampleObject>(s => s.FromIndex(TestIndex.IndexNameWithVersion()).ToIndex(null)).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new BatchUpdateOperation<SampleObject,SampleObject>(s => s.FromIndex(TestIndex.IndexNameWithVersion()).ToIndex("")).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new BatchUpdateOperation<SampleObject,SampleObject>(s => s.FromIndex("does not exist").ToIndex(TestIndex.NextIndexNameWithVersion())).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new BatchUpdateOperation<SampleObject,SampleObject>(s => s.FromIndex(TestIndex.IndexNameWithVersion()).ToIndex("does not exist")).Validate(ElasticClient));
         }
 
         [Test]
@@ -227,7 +222,7 @@ namespace ElasticUp.Tests.Operation.Reindex
                 .SearchDescriptor(sd => sd.MatchAll())
                 .Transformation(doc =>
                 {
-                    if (doc["Id"].Value<ObjectId>().ToString() == "TestId-0") return null;
+                    if (doc["id"].ToObject<ObjectId>().ToString() == "TestId-0") return null;
                     return doc;
                 }));
 
@@ -235,8 +230,31 @@ namespace ElasticUp.Tests.Operation.Reindex
 
             // VERIFY
             ElasticClient.Refresh(Indices.All);
-            ElasticClient.Get<SampleObjectWithId>("TestId-0", desc => desc.Index(TestIndex.NextIndexNameWithVersion())).Should().NotBeNull();
+            Assert.Throws<ElasticsearchClientException>(() => ElasticClient.Get<SampleObjectWithId>("TestId-0", desc => desc.Index(TestIndex.NextIndexNameWithVersion())));
             ElasticClient.Get<SampleObjectWithId>("TestId-1", desc => desc.Index(TestIndex.NextIndexNameWithVersion())).Should().NotBeNull();
+        }
+
+        [Test]
+        public void WithOnDocumentProcessed_InvokesEventHandler()
+        {
+            // GIVEN
+            const int expectedDocumentCount = 15000;
+            BulkIndexSampleObjects(expectedDocumentCount);
+
+            // TEST
+            var processedDocuments = new List<SampleObject>();
+            var operation = new BatchUpdateOperation<SampleObject, SampleObject>( s => s
+                .FromIndex(TestIndex.IndexNameWithVersion())
+                .ToIndex(TestIndex.NextIndexNameWithVersion())
+                .OnDocumentProcessed(doc =>
+                {
+                    processedDocuments.Add(doc);
+                }));
+
+            operation.Execute(ElasticClient);
+
+            // VERIFY
+            processedDocuments.Count.Should().Be(expectedDocumentCount);
         }
     }
 }

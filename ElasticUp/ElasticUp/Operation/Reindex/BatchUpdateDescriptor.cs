@@ -23,7 +23,7 @@ namespace ElasticUp.Operation.Reindex
     }
 
     public class BatchUpdateDescriptor<TTransformFrom, TTransformTo> where TTransformFrom : class
-        where TTransformTo : class
+                                                                     where TTransformTo : class
     {
         public readonly BatchUpdateArguments<TTransformFrom, TTransformTo> BatchUpdateArguments;
 
@@ -99,41 +99,48 @@ namespace ElasticUp.Operation.Reindex
 
         public BatchUpdateDescriptor<TTransformFrom, TTransformTo> BatchSize(int batchSize = 5000)
         {
+            if (batchSize <= 0) throw new ArgumentException($"{nameof(batchSize)} cannot be negative or zero");
             BatchUpdateArguments.BatchSize = batchSize;
             return this;
         }
 
         public BatchUpdateDescriptor<TTransformFrom, TTransformTo> DegreeOfParallellism(int degreeOfParallellism = 5)
         {
+            if (degreeOfParallellism <= 0) throw new ArgumentException($"{nameof(degreeOfParallellism)} cannot be negative or zero");
             BatchUpdateArguments.DegreeOfParallellism = degreeOfParallellism;
             return this;
         }
 
-        public BatchUpdateDescriptor<TTransformFrom, TTransformTo> ScrollTimeoutInSeconds(
-            int scrollTimeoutInSeconds = 360)
+        public BatchUpdateDescriptor<TTransformFrom, TTransformTo> ScrollTimeoutInSeconds(int scrollTimeoutInSeconds = 360)
         {
+            if (scrollTimeoutInSeconds <= 0) throw new ArgumentException($"{nameof(scrollTimeoutInSeconds)} cannot be negative or zero");
             BatchUpdateArguments.ScrollTimeoutInSeconds = scrollTimeoutInSeconds;
             return this;
         }
 
-        public BatchUpdateDescriptor<TTransformFrom, TTransformTo> SearchDescriptor(
-            Func<SearchDescriptor<TTransformFrom>, ISearchRequest> searchDescriptor)
+        public BatchUpdateDescriptor<TTransformFrom, TTransformTo> SearchDescriptor(Func<SearchDescriptor<TTransformFrom>, ISearchRequest> searchDescriptor)
         {
+            if (searchDescriptor == null) throw new ArgumentNullException(nameof(searchDescriptor));
             BatchUpdateArguments.SearchDescriptor = searchDescriptor;
             return this;
         }
 
-        public BatchUpdateDescriptor<TTransformFrom, TTransformTo> Transformation(
-            Func<TTransformFrom, TTransformTo> transformation)
+        public BatchUpdateDescriptor<TTransformFrom, TTransformTo> Transformation(Func<TTransformFrom, TTransformTo> transformation)
         {
+            if (transformation == null) throw new ArgumentNullException(nameof(transformation));
             BatchUpdateArguments.Transformation = transformation;
             return this;
         }
 
-        public static implicit operator BatchUpdateArguments<TTransformFrom, TTransformTo>(
-            BatchUpdateDescriptor<TTransformFrom, TTransformTo> descriptor)
+        public BatchUpdateDescriptor<TTransformFrom, TTransformTo> OnDocumentProcessed(Action<TTransformTo> onDocumentProcessed)
         {
+            if (onDocumentProcessed == null) throw new ArgumentNullException(nameof(onDocumentProcessed));
+            BatchUpdateArguments.OnDocumentProcessed = onDocumentProcessed;
+            return this;
+        }
 
+        public static implicit operator BatchUpdateArguments<TTransformFrom, TTransformTo>(BatchUpdateDescriptor<TTransformFrom, TTransformTo> descriptor)
+        {
             return descriptor.BatchUpdateArguments;
         }
     }

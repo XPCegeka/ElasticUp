@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 namespace ElasticUp.Tests.Operation.Reindex
 {
+    [Obsolete("Use BatchUpdateOperation")]
     [TestFixture]
     public class BatchUpdateTypeOperationTest
     {
