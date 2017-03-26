@@ -116,6 +116,13 @@ namespace ElasticUp.Operation.Reindex
             return this;
         }
 
+        public BatchUpdateDescriptor<TTransformFrom, TTransformTo> SearchDescriptor(
+            Func<SearchDescriptor<TTransformFrom>, ISearchRequest> searchDescriptor)
+        {
+            BatchUpdateArguments.SearchDescriptor = searchDescriptor;
+            return this;
+        }
+
         public BatchUpdateDescriptor<TTransformFrom, TTransformTo> Transformation(
             Func<TTransformFrom, TTransformTo> transformation)
         {

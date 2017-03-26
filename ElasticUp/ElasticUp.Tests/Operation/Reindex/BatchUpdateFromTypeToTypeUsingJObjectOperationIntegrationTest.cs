@@ -11,13 +11,6 @@ namespace ElasticUp.Tests.Operation.Reindex
     [TestFixture]
     public class BatchUpdateFromTypeToTypeUsingJObjectOperationIntegrationTest : AbstractIntegrationTest
     {
-        [TearDown]
-        public void TearDownAfterTest()
-        {
-            TryDeleteIndex(TestIndex.NextIndexNameWithVersion());
-            TryDeleteIndex(MigrationHistoryTestIndex.IndexNameWithVersion());
-        }
-
         [Test]
         public void Execute_ProcessesTypeAsJObjectAndInsertsInNewIndex()
         {

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using ElasticUp.Migration.Meta;
+using ElasticUp.Tests.Sample;
 using Nest;
 using NUnit.Framework;
 
@@ -62,6 +65,8 @@ namespace ElasticUp.Tests
         protected void TearDown()
         {
             TryDeleteIndex(TestIndex.IndexNameWithVersion());
+            TryDeleteIndex(TestIndex.NextIndexNameWithVersion());
+            TryDeleteIndex(MigrationHistoryTestIndex);
         }
 
 
@@ -72,6 +77,45 @@ namespace ElasticUp.Tests
                 ElasticClient.DeleteIndex(indexName);
             }
             catch(Exception) { }
-        } 
+        }
+
+        protected void BulkIndexSampleObjects(int numberOfObjects, int chunkSize = 5000)
+        {
+
+            SplitList(Enumerable.Range(0, numberOfObjects).ToList(), chunkSize)
+                .AsParallel()
+                .WithDegreeOfParallelism(10)
+                .ForAll(BulkIndexFrom);
+
+            ElasticClient.Refresh(Indices.All);
+        }
+
+        private void BulkIndexFrom(List<int> numbers)
+        {
+            var bulkDescriptor = new BulkDescriptor();
+
+            foreach (var number in numbers)
+            {
+                bulkDescriptor.Index<SampleObject>(
+                    descr => descr.Index(TestIndex.IndexNameWithVersion())
+                        .Id($"{number}")
+                        .Document(new SampleObject { Number = number }));
+            }
+
+            ElasticClient.Bulk(bulkDescriptor);
+        }
+
+        private static List<List<int>> SplitList(List<int> locations, int nSize=30)
+        {
+            var output = new List<List<int>>();
+
+            for (var i=0; i < locations.Count; i+= nSize)
+            {
+                output.Add(locations.GetRange(i, Math.Min(nSize, locations.Count - i)));
+            }
+
+            return output;
+        }
+
     }
 }

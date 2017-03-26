@@ -93,7 +93,7 @@
     <Compile Include="Operation\Mapping\CopyTypeMappingOperationIntegrationTest.cs" />
     <Compile Include="Operation\Mapping\PutTypeMappingOperationIntegrationTest.cs" />
     <Compile Include="Operation\Reindex\BatchUpdateFromTypeToTypeUsingJObjectOperationIntegrationTest.cs" />
-    <Compile Include="Operation\Reindex\BatchUpdateOperationPerformanceIntegrationTest.cs" />
+    <Compile Include="Operation\Reindex\BatchUpdateOperationIntegrationTest.cs" />
     <Compile Include="Operation\Reindex\BatchUpdateTypeOperationIntegrationTest.cs" />
     <Compile Include="Operation\Reindex\BatchUpdateTypeOperationTest.cs" />
     <Compile Include="Operation\Reindex\ReindexTypeOperationPerformanceIntegrationTest.cs" />
