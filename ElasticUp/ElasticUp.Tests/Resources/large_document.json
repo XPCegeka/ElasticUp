@@ -30,20 +30,20 @@
       "referteJaar": 2015
     },
     "identiteit": {
-      "voornaam": "MARIO JOZEF",
-      "achternaam": "JANSENS",
-      "adres": "GIERLEDIJK27",
-      "postcode": "2340",
-      "gemeente": "BEERSE",
-      "insz": "84012115120",
-      "synergyId": 603732,
+      "voornaam": "BLA Bla",
+      "achternaam": "BlaBlaBla",
+      "adres": "STREET BLA",
+      "postcode": "2341",
+      "gemeente": "City",
+      "insz": "800121015120",
+      "synergyId": 604732,
       "land": null,
       "taal": null
     },
     "arbeidsPrestatiesAttesten": [
       {
-        "kboNummer": "0807596165",
-        "naamWerkgever": "HEIN",
+        "kboNummer": "0807596163",
+        "naamWerkgever": "Employer",
         "inDienstVan": "2016-06-15T22:00:00Z",
         "inDienstTot": "2016-07-01T22:00:00Z",
         "arbeidsPrestaties": [
@@ -114,8 +114,8 @@
         "synergyId": null
       },
       {
-        "kboNummer": "7894564555",
-        "naamWerkgever": "Albert",
+        "kboNummer": "7894564554",
+        "naamWerkgever": "Jos",
         "inDienstVan": "2016-06-17T22:00:00Z",
         "inDienstTot": "2016-06-26T22:00:00Z",
         "arbeidsPrestaties": [
