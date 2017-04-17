@@ -1,9 +1,9 @@
-﻿using ElasticUp.Elastic;
-using ElasticUp.Operation.Validations;
+﻿using ElasticUp.Util;
+using ElasticUp.Validations;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace ElasticUp.Tests.Operation.Validator
+namespace ElasticUp.Tests.Validations
 {
     [TestFixture]
     public class StringValidationsIntegrationTest : AbstractIntegrationTest

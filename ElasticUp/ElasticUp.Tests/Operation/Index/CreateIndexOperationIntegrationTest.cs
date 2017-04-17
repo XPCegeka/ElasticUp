@@ -1,6 +1,6 @@
 using System.Linq;
-using ElasticUp.Elastic;
 using ElasticUp.Operation.Index;
+using ElasticUp.Util;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
@@ -53,11 +53,11 @@ namespace ElasticUp.Tests.Operation.Index
         public void CreateIndex_ValidatesSettings()
         {
             var customIndexName = TestIndex.IndexNameWithVersion() + "-custom";
-            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(null).WithMapping(mapping => mapping).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(" ").WithMapping(mapping => mapping).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(TestIndex.IndexNameWithVersion()).WithMapping(mapping => mapping).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(customIndexName).WithAlias(" ").WithMapping(mapping => mapping).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(customIndexName).WithMapping(null).Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(null).WithMapping(mapping => mapping).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(" ").WithMapping(mapping => mapping).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(TestIndex.IndexNameWithVersion()).WithMapping(mapping => mapping).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(customIndexName).WithAlias(" ").WithMapping(mapping => mapping).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new CreateIndexOperation(customIndexName).WithMapping(null).Validate(ElasticClient));
         }
     }
 }

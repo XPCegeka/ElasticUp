@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ElasticUp.Elastic;
+using ElasticUp.Util;
 using Nest;
 
 namespace ElasticUp.Operation.Delete

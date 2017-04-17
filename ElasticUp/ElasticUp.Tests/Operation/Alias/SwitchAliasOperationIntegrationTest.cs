@@ -1,6 +1,6 @@
 using System.Linq;
-using ElasticUp.Elastic;
 using ElasticUp.Operation.Alias;
+using ElasticUp.Util;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
@@ -27,10 +27,10 @@ namespace ElasticUp.Tests.Operation.Alias
         public void SwitchAlias_ValidatesSettings()
         {
             var customAlias = TestIndex.AliasName + "-custom";
-            Assert.Throws<ElasticUpException>(() => new SwitchAliasOperation(null).FromIndex(TestIndex.IndexNameWithVersion()).ToIndex(TestIndex.NextIndexNameWithVersion()).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new SwitchAliasOperation(" ").FromIndex(TestIndex.IndexNameWithVersion()).ToIndex(TestIndex.NextIndexNameWithVersion()).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new SwitchAliasOperation(customAlias).FromIndex("index-does-not-exist").ToIndex(TestIndex.NextIndexNameWithVersion()).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new SwitchAliasOperation(customAlias).FromIndex(TestIndex.IndexNameWithVersion()).ToIndex("index-does-not-exist").Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new SwitchAliasOperation(null).FromIndex(TestIndex.IndexNameWithVersion()).ToIndex(TestIndex.NextIndexNameWithVersion()).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new SwitchAliasOperation(" ").FromIndex(TestIndex.IndexNameWithVersion()).ToIndex(TestIndex.NextIndexNameWithVersion()).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new SwitchAliasOperation(customAlias).FromIndex("index-does-not-exist").ToIndex(TestIndex.NextIndexNameWithVersion()).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new SwitchAliasOperation(customAlias).FromIndex(TestIndex.IndexNameWithVersion()).ToIndex("index-does-not-exist").Validate(ElasticClient));
         }
     }
 }

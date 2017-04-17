@@ -46,7 +46,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Elastic\ElasticUpException.cs" />
+    <Compile Include="Util\ElasticUpException.cs" />
+    <Compile Include="Util\ElasticUpTimer.cs" />
     <Compile Include="Extension\ReadOnlyIndexContext.cs" />
     <Compile Include="Extension\TimeSpanExtensions.cs" />
     <Compile Include="History\MigrationHistory.cs" />
@@ -72,12 +73,11 @@
     <Compile Include="Extension\ElasticClientExtensions.cs" />
     <Compile Include="Migration\Meta\VersionedIndexName.cs" />
     <Compile Include="Operation\Reindex\TransformedDocument.cs" />
-    <Compile Include="Operation\Validations\IndexValidations.cs" />
-    <Compile Include="Operation\Validations\StringValidations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ElasticUp.cs" />
     <Compile Include="History\MigrationHistoryHelper.cs" />
-    <Compile Include="Util\ElasticUpTimer.cs" />
+    <Compile Include="Validations\IndexValidations.cs" />
+    <Compile Include="Validations\StringValidations.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ElasticUp.nuspec" />

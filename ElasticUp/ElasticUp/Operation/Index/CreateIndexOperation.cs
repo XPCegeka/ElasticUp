@@ -1,5 +1,5 @@
 ﻿using System;
-using ElasticUp.Elastic;
+using ElasticUp.Util;
 using Nest;
 
 namespace ElasticUp.Operation.Index

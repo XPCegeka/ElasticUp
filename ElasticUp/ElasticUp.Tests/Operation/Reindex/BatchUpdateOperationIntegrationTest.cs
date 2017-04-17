@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using Elasticsearch.Net;
-using ElasticUp.Elastic;
 using ElasticUp.Operation.Reindex;
 using ElasticUp.Tests.Sample;
 using ElasticUp.Util;

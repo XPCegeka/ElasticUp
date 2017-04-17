@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using ElasticUp.Elastic;
 using ElasticUp.Operation.Delete;
 using ElasticUp.Tests.Sample;
+using ElasticUp.Util;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
@@ -13,43 +13,12 @@ namespace ElasticUp.Tests.Operation.Delete
     public class DeleteByTypeOperationIntegrationTest : AbstractIntegrationTest
     {
         [Test]
-        public void Execute_ThrowsWhenIndexNameNull()
+        public void DeleteByType_ValidateSettings()
         {
-            var operation = new DeleteByTypeOperation()
-                .WithIndexName(null)
-                .WithTypeName("Type");
-
-            Assert.Throws<ElasticUpException>(() => operation.Execute(ElasticClient));
-        }
-
-        [Test]
-        public void Execute_ThrowsWhenIndexNameEmpty()
-        {
-            var operation = new DeleteByTypeOperation()
-                .WithIndexName("")
-                .WithTypeName("Type");
-
-            Assert.Throws<ElasticUpException>(() => operation.Execute(ElasticClient));
-        }
-
-        [Test]
-        public void Execute_ThrowsWhenTypeNameNull()
-        {
-            var operation = new DeleteByTypeOperation()
-                .WithIndexName("Index")
-                .WithTypeName(null);
-
-            Assert.Throws<ElasticUpException>(() => operation.Execute(ElasticClient));
-        }
-
-        [Test]
-        public void Execute_ThrowsWhenTypeNameEmpty()
-        {
-            var operation = new DeleteByTypeOperation()
-                .WithIndexName("Index")
-                .WithTypeName("");
-
-            Assert.Throws<ElasticUpException>(() => operation.Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new DeleteByTypeOperation().WithIndexName(null).WithTypeName("Type").Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new DeleteByTypeOperation().WithIndexName("").WithTypeName("Type").Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new DeleteByTypeOperation().WithIndexName("Index").WithTypeName(null).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new DeleteByTypeOperation().WithIndexName("Index").WithTypeName("").Validate(ElasticClient));
         }
 
         [Test]

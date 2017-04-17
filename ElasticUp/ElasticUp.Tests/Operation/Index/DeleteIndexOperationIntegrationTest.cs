@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using ElasticUp.Elastic;
 using ElasticUp.Operation.Index;
+using ElasticUp.Util;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
@@ -29,9 +29,9 @@ namespace ElasticUp.Tests.Operation.Index
         public void DeleteIndex_ValidatesSettings()
         {
             var customIndexName = TestIndex.IndexNameWithVersion() + "-custom";
-            Assert.Throws<ElasticUpException>(() => new DeleteIndexOperation(null).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new DeleteIndexOperation(" ").Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new DeleteIndexOperation(customIndexName).Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new DeleteIndexOperation(null).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new DeleteIndexOperation(" ").Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new DeleteIndexOperation(customIndexName).Validate(ElasticClient));
         }
     }
 }

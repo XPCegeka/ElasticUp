@@ -1,5 +1,5 @@
 ﻿using ElasticUp.Alias;
-using ElasticUp.Elastic;
+using ElasticUp.Util;
 using Nest;
 
 namespace ElasticUp.Operation.Alias

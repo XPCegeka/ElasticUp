@@ -26,6 +26,7 @@ namespace ElasticUp.Alias
         {
             _elasticClient.PutAlias(indexName, alias);
         }
+
         public virtual void SwitchAlias(string alias, string fromIndexName, string toIndexName)
         {
             _elasticClient.Alias(descriptor => 

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ElasticUp.Elastic;
 using ElasticUp.Operation.Reindex;
 using ElasticUp.Tests.Sample;
+using ElasticUp.Util;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;

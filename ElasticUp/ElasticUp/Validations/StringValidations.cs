@@ -1,7 +1,7 @@
 ﻿using System;
-using ElasticUp.Elastic;
+using ElasticUp.Util;
 
-namespace ElasticUp.Operation.Validations
+namespace ElasticUp.Validations
 {
     public class StringValidations
     {

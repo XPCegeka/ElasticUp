@@ -1,5 +1,5 @@
-using ElasticUp.Elastic;
 using ElasticUp.Operation.Alias;
+using ElasticUp.Util;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -24,9 +24,9 @@ namespace ElasticUp.Tests.Operation.Alias
         public void RemoveAlias_ValidatesSettings()
         {
             var customAlias = TestIndex.AliasName + "-custom";
-            Assert.Throws<ElasticUpException>(() => new RemoveAliasOperation(null).FromIndex(TestIndex.IndexNameWithVersion()).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new RemoveAliasOperation(" ").FromIndex(TestIndex.IndexNameWithVersion()).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new RemoveAliasOperation(customAlias).FromIndex("index-does-not-exist").Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new RemoveAliasOperation(null).FromIndex(TestIndex.IndexNameWithVersion()).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new RemoveAliasOperation(" ").FromIndex(TestIndex.IndexNameWithVersion()).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new RemoveAliasOperation(customAlias).FromIndex("index-does-not-exist").Validate(ElasticClient));
         }
     }
 }

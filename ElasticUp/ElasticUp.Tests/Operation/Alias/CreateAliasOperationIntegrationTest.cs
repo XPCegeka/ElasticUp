@@ -1,6 +1,6 @@
 using System.Linq;
-using ElasticUp.Elastic;
 using ElasticUp.Operation.Alias;
+using ElasticUp.Util;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
@@ -24,9 +24,9 @@ namespace ElasticUp.Tests.Operation.Alias
         public void CreateAlias_ValidatesSettings()
         {
             var customAlias = TestIndex.AliasName + "-custom";
-            Assert.Throws<ElasticUpException>(() => new CreateAliasOperation(null).OnIndex(TestIndex.IndexNameWithVersion()).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new CreateAliasOperation(" ").OnIndex(TestIndex.IndexNameWithVersion()).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new CreateAliasOperation(customAlias).OnIndex("index-does-not-exist").Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new CreateAliasOperation(null).OnIndex(TestIndex.IndexNameWithVersion()).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new CreateAliasOperation(" ").OnIndex(TestIndex.IndexNameWithVersion()).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new CreateAliasOperation(customAlias).OnIndex("index-does-not-exist").Validate(ElasticClient));
         }
     }
 }

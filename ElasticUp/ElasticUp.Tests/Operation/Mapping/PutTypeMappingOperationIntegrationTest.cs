@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Elasticsearch.Net;
-using ElasticUp.Elastic;
 using ElasticUp.Operation.Mapping;
 using ElasticUp.Tests.Infrastructure;
 using ElasticUp.Tests.Sample;
+using ElasticUp.Util;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
@@ -63,12 +63,12 @@ namespace ElasticUp.Tests.Operation.Mapping
         [Test]
         public void PutMapping_ValidatesSettings()
         {
-            Assert.Throws<ElasticUpException>(() => new PutTypeMappingOperation(null).OnIndex(TestIndex.IndexNameWithVersion()).WithMapping("{}").Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new PutTypeMappingOperation(" ").OnIndex(TestIndex.IndexNameWithVersion()).WithMapping("{}").Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new PutTypeMappingOperation(typeof(SampleDocument).Name).OnIndex(null).WithMapping("{}").Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new PutTypeMappingOperation(typeof(SampleDocument).Name).OnIndex(" ").WithMapping("{}").Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new PutTypeMappingOperation(typeof(SampleDocument).Name).OnIndex(TestIndex.IndexNameWithVersion()).WithMapping(null).Execute(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new PutTypeMappingOperation(typeof(SampleDocument).Name).OnIndex(TestIndex.IndexNameWithVersion()).WithMapping(" ").Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new PutTypeMappingOperation(null).OnIndex(TestIndex.IndexNameWithVersion()).WithMapping("{}").Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new PutTypeMappingOperation(" ").OnIndex(TestIndex.IndexNameWithVersion()).WithMapping("{}").Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new PutTypeMappingOperation(typeof(SampleDocument).Name).OnIndex(null).WithMapping("{}").Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new PutTypeMappingOperation(typeof(SampleDocument).Name).OnIndex(" ").WithMapping("{}").Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new PutTypeMappingOperation(typeof(SampleDocument).Name).OnIndex(TestIndex.IndexNameWithVersion()).WithMapping(null).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => new PutTypeMappingOperation(typeof(SampleDocument).Name).OnIndex(TestIndex.IndexNameWithVersion()).WithMapping(" ").Validate(ElasticClient));
         }
     }
 }

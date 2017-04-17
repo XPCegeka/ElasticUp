@@ -1,9 +1,9 @@
 ﻿using System;
-using ElasticUp.Elastic;
 using ElasticUp.Migration.Meta;
+using ElasticUp.Util;
 using Nest;
 
-namespace ElasticUp.Operation.Validations
+namespace ElasticUp.Validations
 {
     public class IndexValidations
     {
@@ -49,15 +49,27 @@ namespace ElasticUp.Operation.Validations
 
         public IndexValidations IndexExistsWithAlias(VersionedIndexName versionedIndexName)
         {
-            if (!_elasticClient.IndexExists(versionedIndexName.IndexNameWithVersion()).Exists) throw new ElasticUpException(ExceptionMessage($"Index '{versionedIndexName.IndexNameWithVersion()}' does not exist"));
-            throw new NotImplementedException("Todo check alias exists for index");
+            IndexExistsWithAlias(versionedIndexName.IndexNameWithVersion(), versionedIndexName.AliasName);
+            return this;
+        }
+
+        public IndexValidations IndexExistsWithAlias(string index, string alias)
+        {
+            if (!_elasticClient.IndexExists(index).Exists) throw new ElasticUpException(ExceptionMessage($"Index '{index}' does not exist"));
+            if (!_elasticClient.AliasExists(r => r.Index(index).Name(alias)).Exists) throw new ElasticUpException(ExceptionMessage($"Alias '{alias}' does not exist on index '{index}'"));
             return this;
         }
 
         public IndexValidations IndexExistsWithoutAlias(VersionedIndexName versionedIndexName)
         {
-            if (!_elasticClient.IndexExists(versionedIndexName.IndexNameWithVersion()).Exists) throw new ElasticUpException(ExceptionMessage($"Index '{versionedIndexName.IndexNameWithVersion()}' does not exist"));
-            throw new NotImplementedException("Todo check alias does not exist for index");
+            IndexExistsWithoutAlias(versionedIndexName.IndexNameWithVersion(), versionedIndexName.AliasName);
+            return this;
+        }
+
+        public IndexValidations IndexExistsWithoutAlias(string index, string alias)
+        {
+            if (!_elasticClient.IndexExists(index).Exists) throw new ElasticUpException(ExceptionMessage($"Index '{index}' does not exist"));
+            if (_elasticClient.AliasExists(r => r.Index(index).Name(alias)).Exists) throw new ElasticUpException(ExceptionMessage($"Alias '{alias}' should not exist on index '{index}'"));
             return this;
         }
     }

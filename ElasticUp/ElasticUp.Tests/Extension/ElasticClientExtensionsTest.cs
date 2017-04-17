@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ElasticUp.Elastic;
 using ElasticUp.Extension;
 using ElasticUp.Tests.Sample;
+using ElasticUp.Util;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;

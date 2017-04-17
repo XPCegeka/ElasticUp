@@ -3,13 +3,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Elasticsearch.Net;
-using ElasticUp.Elastic;
 using ElasticUp.Migration.Meta;
 using ElasticUp.Operation.Mapping;
 using ElasticUp.Operation.Reindex;
 using ElasticUp.Tests.Infrastructure;
 using ElasticUp.Tests.Sample;
 using ElasticUp.Tests.Sample.IntValue;
+using ElasticUp.Util;
 using FluentAssertions;
 using Nest;
 using Newtonsoft.Json;
@@ -72,7 +72,7 @@ namespace ElasticUp.Tests.Operation.Reindex
 
             // WHEN
             var operation = new ReindexTypeOperation("sampledocument").FromIndex(oldIndex).ToIndex(newIndex);
-            Assert.Throws<ElasticUpException>(() => operation.Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => operation.Validate(ElasticClient));
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace ElasticUp.Tests.Operation.Reindex
             var operation = new ReindexTypeOperation("sampledocument")
                                     .FromIndex(TestIndex.IndexNameWithVersion())
                                     .ToIndex("this-index-does-not-exist");
-            Assert.Throws<ElasticUpException>(() => operation.Execute(ElasticClient));
+            Assert.Throws<ElasticUpException>(() => operation.Validate(ElasticClient));
         }
 
         [Test]

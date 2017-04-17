@@ -1,6 +1,6 @@
 ﻿using System;
-using ElasticUp.Elastic;
 using ElasticUp.Migration.Meta;
+using ElasticUp.Util;
 using Nest;
 
 namespace ElasticUp.Migration

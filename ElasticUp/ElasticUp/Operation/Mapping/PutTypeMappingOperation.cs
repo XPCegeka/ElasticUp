@@ -1,5 +1,5 @@
 ﻿using Elasticsearch.Net;
-using ElasticUp.Elastic;
+using ElasticUp.Util;
 using Nest;
 
 namespace ElasticUp.Operation.Mapping

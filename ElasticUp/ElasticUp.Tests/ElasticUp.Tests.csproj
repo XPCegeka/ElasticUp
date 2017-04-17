@@ -99,8 +99,6 @@
     <Compile Include="Operation\Reindex\BatchUpdateTypeOperationTest.cs" />
     <Compile Include="Operation\Reindex\ReindexTypeOperationPerformanceIntegrationTest.cs" />
     <Compile Include="Operation\Reindex\ReindexTypeOperationIntegrationTest.cs" />
-    <Compile Include="Operation\Validator\IndexValidationsIntegrationTest.cs" />
-    <Compile Include="Operation\Validator\StringValidationsIntegrationTest.cs" />
     <Compile Include="Sample\StringValue\SampleDocumentWithValue.cs" />
     <Compile Include="Sample\IntValue\SampleDocumentWithValue.cs" />
     <Compile Include="Sample\SampleVersionedIndexMigrationWithReindexTypeOperation.cs" />
@@ -120,6 +118,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Validations\IndexValidationsIntegrationTest.cs" />
+    <Compile Include="Validations\StringValidationsIntegrationTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

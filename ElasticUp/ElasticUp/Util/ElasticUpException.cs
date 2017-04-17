@@ -1,7 +1,7 @@
 ﻿using System;
 using Elasticsearch.Net;
 
-namespace ElasticUp.Elastic
+namespace ElasticUp.Util
 {
     public class ElasticUpException : Exception
     {

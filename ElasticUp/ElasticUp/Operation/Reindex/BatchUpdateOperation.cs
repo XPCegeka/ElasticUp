@@ -5,8 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Nest;
-using static ElasticUp.Operation.Validations.IndexValidations;
-using static ElasticUp.Operation.Validations.StringValidations;
+using static ElasticUp.Validations.IndexValidations;
+using static ElasticUp.Validations.StringValidations;
 
 namespace ElasticUp.Operation.Reindex
 {

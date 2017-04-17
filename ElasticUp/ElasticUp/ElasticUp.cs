@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using ElasticUp.Alias;
-using ElasticUp.Elastic;
 using ElasticUp.History;
 using ElasticUp.Migration;
+using ElasticUp.Util;
 using Nest;
 
 
