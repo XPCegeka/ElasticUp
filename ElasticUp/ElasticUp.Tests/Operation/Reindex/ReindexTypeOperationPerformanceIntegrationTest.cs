@@ -1,9 +1,9 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using ElasticUp.Migration.Meta;
 using ElasticUp.Operation.Reindex;
 using ElasticUp.Tests.Infrastructure;
+using ElasticUp.Util;
 using FluentAssertions;
 using Nest;
 using Newtonsoft.Json;

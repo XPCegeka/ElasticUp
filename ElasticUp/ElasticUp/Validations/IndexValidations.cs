@@ -1,5 +1,4 @@
 ﻿using System;
-using ElasticUp.Migration.Meta;
 using ElasticUp.Util;
 using Nest;
 

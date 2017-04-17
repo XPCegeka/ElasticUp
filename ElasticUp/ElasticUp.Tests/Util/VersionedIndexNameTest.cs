@@ -1,8 +1,8 @@
-﻿using ElasticUp.Migration.Meta;
+﻿using ElasticUp.Util;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace ElasticUp.Tests.Migration.Meta
+namespace ElasticUp.Tests.Util
 {
     [TestFixture]
     public class VersionedIndexNameTest

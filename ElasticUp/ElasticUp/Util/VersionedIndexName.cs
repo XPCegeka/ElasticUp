@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace ElasticUp.Migration.Meta
+namespace ElasticUp.Util
 {
     public class VersionedIndexName
     {

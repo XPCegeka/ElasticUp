@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Elasticsearch.Net;
-using ElasticUp.Migration.Meta;
 using ElasticUp.Operation.Mapping;
 using ElasticUp.Operation.Reindex;
 using ElasticUp.Tests.Infrastructure;

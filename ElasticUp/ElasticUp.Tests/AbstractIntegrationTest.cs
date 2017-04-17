@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ElasticUp.Migration.Meta;
 using ElasticUp.Tests.Sample;
+using ElasticUp.Util;
 using Nest;
 using NUnit.Framework;
 

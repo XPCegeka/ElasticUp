@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using ElasticUp.Migration;
-using ElasticUp.Migration.Meta;
 using ElasticUp.Operation.Reindex;
+using ElasticUp.Util;
 using Nest;
 
 namespace ElasticUp.History

@@ -71,11 +71,11 @@
     <Compile Include="Operation\AbstractElasticUpOperation.cs" />
     <Compile Include="Operation\Reindex\ReindexTypeOperation.cs" />
     <Compile Include="Extension\ElasticClientExtensions.cs" />
-    <Compile Include="Migration\Meta\VersionedIndexName.cs" />
     <Compile Include="Operation\Reindex\TransformedDocument.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ElasticUp.cs" />
     <Compile Include="History\MigrationHistoryHelper.cs" />
+    <Compile Include="Util\VersionedIndexName.cs" />
     <Compile Include="Validations\IndexValidations.cs" />
     <Compile Include="Validations\StringValidations.cs" />
   </ItemGroup>

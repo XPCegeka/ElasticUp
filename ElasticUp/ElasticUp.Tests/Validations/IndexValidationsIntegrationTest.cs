@@ -1,5 +1,4 @@
-﻿using ElasticUp.Migration.Meta;
-using ElasticUp.Util;
+﻿using ElasticUp.Util;
 using ElasticUp.Validations;
 using NUnit.Framework;
 
