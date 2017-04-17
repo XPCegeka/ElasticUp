@@ -5,13 +5,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Nest;
-using static ElasticUp.Operation.Validator.OperationValidator;
+using static ElasticUp.Operation.Validations.IndexValidations;
+using static ElasticUp.Operation.Validations.StringValidations;
 
 namespace ElasticUp.Operation.Reindex
 {
     public class BatchUpdateOperation<TTransformFromType, TTransformToType> : AbstractElasticUpOperation
-                                                                                where TTransformFromType : class
-                                                                                where TTransformToType : class
+                        where TTransformFromType : class
+                        where TTransformToType : class
     {
         private readonly BatchUpdateArguments<TTransformFromType, TTransformToType> _arguments;
 
@@ -22,21 +23,21 @@ namespace ElasticUp.Operation.Reindex
 
         public override void Validate(IElasticClient elasticClient)
         {
-            var validate = ValidatorFor<BatchUpdateOperation<TTransformFromType, TTransformToType>>(elasticClient);
+            StringValidationsFor<BatchUpdateOperation<TTransformFromType, TTransformToType>>()
+                .IsNotBlank(_arguments.FromIndexName, RequiredMessage("FromIndexName"))
+                .IsNotBlank(_arguments.ToIndexName, RequiredMessage("ToIndexName"))
+                .IsNotBlank(_arguments.FromTypeName, RequiredMessage("FromTypeName"))
+                .IsNotBlank(_arguments.ToTypeName, RequiredMessage("ToTypeName"));
 
-            validate.IsNotBlank(_arguments.FromIndexName, RequiredMessage("FromIndexName"));
-            validate.IsNotBlank(_arguments.ToIndexName, RequiredMessage("ToIndexName"));
-            validate.IsNotBlank(_arguments.FromTypeName, RequiredMessage("FromTypeName"));
-            validate.IsNotBlank(_arguments.ToTypeName, RequiredMessage("ToTypeName"));
-            validate.IndexExists(_arguments.FromIndexName);
-            validate.IndexExists(_arguments.ToIndexName);
+            IndexValidationsFor<BatchUpdateOperation<TTransformFromType, TTransformToType>>(elasticClient)
+                .IndexExists(_arguments.FromIndexName)
+                .IndexExists(_arguments.ToIndexName);
         }
 
         public override void Execute(IElasticClient elasticClient)
         {
             //TODO reset Threadpool after processing?
             if (_arguments.DegreeOfParallellism > 1) ThreadPool.SetMaxThreads(_arguments.DegreeOfParallellism,_arguments.DegreeOfParallellism);
-
 
             var searchResponse = Search(elasticClient);
             if (!searchResponse.Documents.Any()) return;

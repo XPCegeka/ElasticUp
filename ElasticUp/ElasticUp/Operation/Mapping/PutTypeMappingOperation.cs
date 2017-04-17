@@ -27,12 +27,15 @@ namespace ElasticUp.Operation.Mapping
             return this;
         }
 
-        public override void Execute(IElasticClient elasticClient)
+        public override void Validate(IElasticClient elasticClient)
         {
             if (string.IsNullOrWhiteSpace(IndexName)) throw new ElasticUpException($"PutTypeMappingOperation: Invalid indexName {IndexName}");
             if (string.IsNullOrWhiteSpace(Type)) throw new ElasticUpException($"PutTypeMappingOperation: Invalid type {Type}");
             if (string.IsNullOrWhiteSpace(JsonMappingAsString)) throw new ElasticUpException($"PutTypeMappingOperation: Invalid json mapping {JsonMappingAsString}");
+        }
 
+        public override void Execute(IElasticClient elasticClient)
+        {
             elasticClient.LowLevel.IndicesPutMapping<byte[]>(IndexName, Type, new PostData<object>(JsonMappingAsString));
         }
     }

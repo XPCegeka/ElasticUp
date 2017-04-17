@@ -72,7 +72,8 @@
     <Compile Include="Extension\ElasticClientExtensions.cs" />
     <Compile Include="Migration\Meta\VersionedIndexName.cs" />
     <Compile Include="Operation\Reindex\TransformedDocument.cs" />
-    <Compile Include="Operation\Validator\OperationValidator.cs" />
+    <Compile Include="Operation\Validations\IndexValidations.cs" />
+    <Compile Include="Operation\Validations\StringValidations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ElasticUp.cs" />
     <Compile Include="History\MigrationHistoryHelper.cs" />

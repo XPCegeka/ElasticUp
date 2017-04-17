@@ -45,19 +45,14 @@ namespace ElasticUp.Operation.Delete
             TypeName = typeof (TType).Name.ToLowerInvariant();
             return this;
         }
-        
-        public override void Execute(IElasticClient elasticClient)
-        {
-            if (string.IsNullOrEmpty(IndexName))
-                throw new ElasticUpException($"Could not execute {nameof(DeleteByTypeOperation)}", new ArgumentNullException(nameof(IndexName)));
-            if (string.IsNullOrEmpty(TypeName))
-                throw new ElasticUpException($"Could not execute {nameof(DeleteByTypeOperation)}", new ArgumentNullException(nameof(TypeName)));
 
-            DeleteByScroll(elasticClient);
+        public override void Validate(IElasticClient elasticClient)
+        {
+            if (string.IsNullOrEmpty(IndexName)) throw new ElasticUpException($"Could not execute {nameof(DeleteByTypeOperation)}", new ArgumentNullException(nameof(IndexName)));
+            if (string.IsNullOrEmpty(TypeName)) throw new ElasticUpException($"Could not execute {nameof(DeleteByTypeOperation)}", new ArgumentNullException(nameof(TypeName)));
         }
 
-
-        private void DeleteByScroll(IElasticClient elasticClient)
+        public override void Execute(IElasticClient elasticClient)
         {
             var idsScrollResponse = elasticClient.Search<object>(descriptor => descriptor
                 .MatchAll()
@@ -65,8 +60,7 @@ namespace ElasticUp.Operation.Delete
                 .Type(TypeName)
                 .Scroll(new Time(ScrollTimeout))
                 .Take(BatchSize)
-                .Fields(fieldsDescr => fieldsDescr
-                    .Fields(Enumerable.Empty<Field>())));
+                .Fields(fieldsDescr => fieldsDescr.Fields(Enumerable.Empty<Field>())));
 
             while (idsScrollResponse.Documents.Any())
             {

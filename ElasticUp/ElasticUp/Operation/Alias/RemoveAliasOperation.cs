@@ -20,12 +20,15 @@ namespace ElasticUp.Operation.Alias
             return this;
         }
 
-        public override void Execute(IElasticClient elasticClient)
+        public override void Validate(IElasticClient elasticClient)
         {
             if (string.IsNullOrWhiteSpace(Alias)) throw new ElasticUpException($"RemoveAliasOperation: Invalid alias {Alias}");
             if (string.IsNullOrWhiteSpace(IndexName)) throw new ElasticUpException($"RemoveAliasOperation: Invalid indexName {IndexName}");
             if (!elasticClient.IndexExists(IndexName).Exists) throw new ElasticUpException($"RemoveAliasOperation: index {IndexName} does not exist.");
-            
+        }
+
+        public override void Execute(IElasticClient elasticClient)
+        {
             new AliasHelper(elasticClient).RemoveAliasFromIndex(Alias, IndexName);
         }
     }

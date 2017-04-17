@@ -1,7 +1,8 @@
-﻿using System;
-using Elasticsearch.Net;
+﻿using Elasticsearch.Net;
 using ElasticUp.Elastic;
 using Nest;
+using static ElasticUp.Operation.Validations.IndexValidations;
+using static ElasticUp.Operation.Validations.StringValidations;
 
 namespace ElasticUp.Operation.Reindex
 {
@@ -36,15 +37,21 @@ namespace ElasticUp.Operation.Reindex
             return this;
         }
 
+        public override void Validate(IElasticClient elasticClient)
+        {
+            StringValidationsFor<ReindexTypeOperation>()
+                .IsNotBlank(FromIndexName, RequiredMessage("FromIndexName"))
+                .IsNotBlank(ToIndexName, RequiredMessage("ToIndexName"))
+                .IsNotBlank(TypeName, RequiredMessage("TypeName"));
+
+            IndexValidationsFor<ReindexTypeOperation>(elasticClient)
+                .IndexExists(FromIndexName)
+                .IndexExists(ToIndexName);
+        }
+
         public override void Execute(IElasticClient elasticClient)
         {
-            if (string.IsNullOrWhiteSpace(FromIndexName)) throw new ElasticUpException($"ReindexTypeOperation: Invalid fromIndexName {FromIndexName}");
-            if (string.IsNullOrWhiteSpace(ToIndexName)) throw new ElasticUpException($"ReindexTypeOperation: Invalid toIndexName {ToIndexName}");
-            if (string.IsNullOrWhiteSpace(TypeName)) throw new ElasticUpException($"ReindexTypeOperation: Invalid type {TypeName}");
-            if (!elasticClient.IndexExists(FromIndexName).Exists) throw new ElasticUpException($"ReindexTypeOperation: Invalid fromIndex {FromIndexName} does not exist.");
-            if (!elasticClient.IndexExists(ToIndexName).Exists) throw new ElasticUpException($"ReindexTypeOperation: Invalid toIndex {ToIndexName} does not exist."); 
-
-            var response = elasticClient.ReindexOnServer(descriptor =>
+            elasticClient.ReindexOnServer(descriptor =>
             {
                 descriptor
                     .Source(sourceDescriptor => sourceDescriptor

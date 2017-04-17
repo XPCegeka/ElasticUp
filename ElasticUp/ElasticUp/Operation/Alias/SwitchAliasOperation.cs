@@ -27,14 +27,17 @@ namespace ElasticUp.Operation.Alias
             return this;
         }
 
-        public override void Execute(IElasticClient elasticClient)
+        public override void Validate(IElasticClient elasticClient)
         {
             if (string.IsNullOrWhiteSpace(Alias)) throw new ElasticUpException($"SwitchAliasOperation: Invalid alias {Alias}");
             if (string.IsNullOrWhiteSpace(FromIndexName)) throw new ElasticUpException($"SwitchAliasOperation: Invalid fromIndexName {FromIndexName}");
             if (string.IsNullOrWhiteSpace(ToIndexName)) throw new ElasticUpException($"SwitchAliasOperation: Invalid toIndexName {ToIndexName}");
             if (!elasticClient.IndexExists(FromIndexName).Exists) throw new ElasticUpException($"SwitchAliasOperation: fromIndex {FromIndexName} does not exist.");
             if (!elasticClient.IndexExists(ToIndexName).Exists) throw new ElasticUpException($"SwitchAliasOperation: toIndex {ToIndexName} does not exist.");
-            
+        }
+
+        public override void Execute(IElasticClient elasticClient)
+        {
             new AliasHelper(elasticClient).SwitchAlias(Alias, FromIndexName, ToIndexName);
         }
     }

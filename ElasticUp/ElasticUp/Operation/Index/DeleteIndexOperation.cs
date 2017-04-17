@@ -12,11 +12,14 @@ namespace ElasticUp.Operation.Index
             IndexName = indexName?.ToLowerInvariant();
         }
 
-        public override void Execute(IElasticClient elasticClient)
+        public override void Validate(IElasticClient elasticClient)
         {
             if (string.IsNullOrWhiteSpace(IndexName)) throw new ElasticUpException($"DeleteIndexOperation: Invalid indexName {IndexName}");
             if (!elasticClient.IndexExists(IndexName).Exists) throw new ElasticUpException($"DeleteIndexOperation: index {IndexName} does not exist.");
+        }
 
+        public override void Execute(IElasticClient elasticClient)
+        {
             elasticClient.DeleteIndex(IndexName);
         }
     }

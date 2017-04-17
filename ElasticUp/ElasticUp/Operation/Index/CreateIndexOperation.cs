@@ -13,7 +13,6 @@ namespace ElasticUp.Operation.Index
         protected Func<IndexSettingsDescriptor, IPromise<IIndexSettings>> SettingSelector;
         protected CreateIndexDescriptor CreateIndexDescriptor;
 
-
         public CreateIndexOperation(string indexName)
         {
             IndexName = indexName?.ToLowerInvariant();
@@ -37,13 +36,16 @@ namespace ElasticUp.Operation.Index
             return this;
         }
 
-        public override void Execute(IElasticClient elasticClient)
+        public override void Validate(IElasticClient elasticClient)
         {
             if (string.IsNullOrWhiteSpace(IndexName)) throw new ElasticUpException($"CreateIndexOperation: Invalid indexName {IndexName}");
             if (MappingSelector == null) throw new ElasticUpException($"CreateIndexOperation: Invalid mapping (required)");
             if (!string.IsNullOrEmpty(Alias) && string.IsNullOrWhiteSpace(Alias)) throw new ElasticUpException($"CreateIndexOperation: Invalid alias {Alias}");
-            if (elasticClient.IndexExists(IndexName).Exists) throw new ElasticUpException($"CreateIndexOperation: index {IndexName} already exists.");   
-            
+            if (elasticClient.IndexExists(IndexName).Exists) throw new ElasticUpException($"CreateIndexOperation: index {IndexName} already exists.");
+        }
+
+        public override void Execute(IElasticClient elasticClient)
+        {
             var descriptor = new CreateIndexDescriptor(IndexName);
             
             descriptor.Mappings(MappingSelector);
