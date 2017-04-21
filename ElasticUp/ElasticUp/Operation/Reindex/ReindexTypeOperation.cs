@@ -59,7 +59,8 @@ namespace ElasticUp.Operation.Reindex
                     .Destination(destinationDescriptor => destinationDescriptor
                         .VersionType(VersionType)
                         .Index(ToIndexName))
-                    .WaitForCompletion();
+                    .WaitForCompletion()
+                    .Refresh();
 
                 if (!string.IsNullOrWhiteSpace(Script))
                     descriptor.Script(scriptDescriptor => scriptDescriptor.Inline(Script));

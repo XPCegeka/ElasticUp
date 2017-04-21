@@ -184,20 +184,34 @@ namespace ElasticUp.Tests.Operation.Reindex
             var response = ElasticClient.UpdateIndexSettings(TestIndex.NextIndexNameWithVersion(), s => s.IndexSettings(p => p.RefreshInterval(new Time(-1))));
 
             // WHEN
-            var timer = new Stopwatch();
-            timer.Start();
-            new ReindexTypeOperation("sampleobject")
-                    .FromIndex(TestIndex.IndexNameWithVersion())
-                    .ToIndex(TestIndex.NextIndexNameWithVersion())
-                    .Execute(ElasticClient);
-            timer.Stop();
-
-            Console.WriteLine($"Took {TimeSpan.FromMilliseconds(timer.ElapsedMilliseconds).TotalSeconds}");
-
+            using(new ElasticUpTimer("TomsRefreshIntervalExperimentWithReindex")) { 
+                new ReindexTypeOperation("sampleobject")
+                        .FromIndex(TestIndex.IndexNameWithVersion())
+                        .ToIndex(TestIndex.NextIndexNameWithVersion())
+                        .Execute(ElasticClient);
+            }
+            
             // THEN
             ElasticClient.Refresh(Indices.All);
             var countResponse = ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion()));
             countResponse.Count.Should().Be(expectedDocumentCount);
         }
+
+        [Test]
+        public void WaitForCompletionDoesNotWaitAnymoreSinceNest_2_4_7_AddRefreshInReindexOperation()
+        {
+            ElasticClient.IndexMany(new[] { new SampleDocument(), new SampleDocument() }, TestIndex.IndexNameWithVersion());
+            ElasticClient.Refresh(Indices.All);
+
+            new ReindexTypeOperation("sampledocument")
+                .FromIndex(TestIndex.IndexNameWithVersion())
+                .ToIndex(TestIndex.NextIndexNameWithVersion())
+                .Execute(ElasticClient);
+
+            // ElasticClient.Refresh(Indices.All);
+            var countResponse = ElasticClient.Count<SampleDocument>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion()));
+            countResponse.Count.Should().Be(2);
+        }
+
     }
 }

@@ -36,8 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Elasticsearch.Net, Version=2.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
-      <HintPath>..\packages\Elasticsearch.Net.2.4.6\lib\net45\Elasticsearch.Net.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\Elasticsearch.Net.2.4.7\lib\net45\Elasticsearch.Net.dll</HintPath>
     </Reference>
     <Reference Include="FluentAssertions, Version=4.15.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.4.15.0\lib\net45\FluentAssertions.dll</HintPath>
@@ -49,8 +48,7 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Nest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
-      <HintPath>..\packages\NEST.2.4.6\lib\net45\Nest.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\NEST.2.4.7\lib\net45\Nest.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>

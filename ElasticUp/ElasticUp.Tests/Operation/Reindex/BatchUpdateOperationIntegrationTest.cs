@@ -229,8 +229,16 @@ namespace ElasticUp.Tests.Operation.Reindex
 
             // VERIFY
             ElasticClient.Refresh(Indices.All);
-            Assert.Throws<ElasticsearchClientException>(() => ElasticClient.Get<SampleObjectWithId>("TestId-0", desc => desc.Index(TestIndex.NextIndexNameWithVersion())));
-            ElasticClient.Get<SampleObjectWithId>("TestId-1", desc => desc.Index(TestIndex.NextIndexNameWithVersion())).Should().NotBeNull();
+
+            var response0 = ElasticClient.Get<SampleObjectWithId>("TestId-0", desc => desc.Index(TestIndex.NextIndexNameWithVersion()));
+            response0.IsValid.Should().BeTrue();
+            response0.Found.Should().BeFalse();
+            response0.Source.Should().BeNull();
+
+            var response1 = ElasticClient.Get<SampleObjectWithId>("TestId-1", desc => desc.Index(TestIndex.NextIndexNameWithVersion()));
+            response1.IsValid.Should().BeTrue();
+            response1.Found.Should().BeTrue();
+            response1.Source.Should().NotBeNull();
         }
 
         [Test]
