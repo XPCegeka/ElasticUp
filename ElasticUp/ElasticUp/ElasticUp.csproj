@@ -44,15 +44,16 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helper\IndexHelper.cs" />
     <Compile Include="Util\ElasticUpException.cs" />
     <Compile Include="Util\ElasticUpTimer.cs" />
-    <Compile Include="Extension\ReadOnlyIndexContext.cs" />
+    <Compile Include="Util\ReadOnlyIndexContext.cs" />
     <Compile Include="Extension\TimeSpanExtensions.cs" />
     <Compile Include="History\MigrationHistory.cs" />
     <Compile Include="Migration\AbstractElasticUpMigration.cs" />
     <Compile Include="Migration\ElasticUpCustomMigration.cs" />
     <Compile Include="Migration\ElasticUpVersionedIndexMigration.cs" />
-    <Compile Include="Alias\AliasHelper.cs" />
+    <Compile Include="Helper\AliasHelper.cs" />
     <Compile Include="Operation\Delete\DeleteByTypeOperation.cs" />
     <Compile Include="Operation\Mapping\CopyTypeMappingOperation.cs" />
     <Compile Include="Operation\Mapping\PutTypeMappingOperation.cs" />

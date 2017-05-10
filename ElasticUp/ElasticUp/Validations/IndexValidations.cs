@@ -1,4 +1,5 @@
 ﻿using System;
+using ElasticUp.Helper;
 using ElasticUp.Util;
 using Nest;
 
@@ -7,14 +8,16 @@ namespace ElasticUp.Validations
     public class IndexValidations
     {
         private readonly Type _type;
-        private readonly IElasticClient _elasticClient;
+        private readonly IndexHelper _indexHelper;
+        private readonly AliasHelper _aliasHelper;
 
         private string ExceptionMessage(string message) => $"{_type.Name}: {message}";
 
         private IndexValidations(IElasticClient elasticClient, Type type)
         {
             _type = type;
-            _elasticClient = elasticClient;
+            _indexHelper = new IndexHelper(elasticClient);
+            _aliasHelper = new AliasHelper(elasticClient);
         }
 
         public static IndexValidations IndexValidationsFor<T>(IElasticClient elasticClient) where T : class
@@ -24,51 +27,47 @@ namespace ElasticUp.Validations
 
         public IndexValidations IndexExists(string index)
         {
-            if (!_elasticClient.IndexExists(index).Exists) throw new ElasticUpException(ExceptionMessage($"Index '{index}' does not exist"));
+            if (_indexHelper.IndexDoesNotExist(index)) throw new ElasticUpException(ExceptionMessage($"Index '{index}' does not exist"));
             return this;
         }
 
         public IndexValidations IndexDoesNotExists(string index)
         {
-            if (_elasticClient.IndexExists(index).Exists) throw new ElasticUpException(ExceptionMessage($"Index '{index}' already exists"));
+            if (_indexHelper.IndexExists(index)) throw new ElasticUpException(ExceptionMessage($"Index '{index}' already exists"));
             return this;
         }
 
         public IndexValidations IndexExists(VersionedIndexName versionedIndexName)
         {
-            if (!_elasticClient.IndexExists(versionedIndexName.IndexNameWithVersion()).Exists) throw new ElasticUpException(ExceptionMessage($"Index '{versionedIndexName.IndexNameWithVersion()}' does not exist"));
-            return this;
+            return IndexExists(versionedIndexName.IndexNameWithVersion());
         }
 
         public IndexValidations IndexDoesNotExists(VersionedIndexName versionedIndexName)
         {
-            if (_elasticClient.IndexExists(versionedIndexName.IndexNameWithVersion()).Exists) throw new ElasticUpException(ExceptionMessage($"Index '{versionedIndexName.IndexNameWithVersion()}' already exist"));
-            return this;
+            return IndexDoesNotExists(versionedIndexName.IndexNameWithVersion());
         }
 
         public IndexValidations IndexExistsWithAlias(VersionedIndexName versionedIndexName)
         {
-            IndexExistsWithAlias(versionedIndexName.IndexNameWithVersion(), versionedIndexName.AliasName);
-            return this;
+            return IndexExistsWithAlias(versionedIndexName.IndexNameWithVersion(), versionedIndexName.AliasName);
         }
 
         public IndexValidations IndexExistsWithAlias(string index, string alias)
         {
-            if (!_elasticClient.IndexExists(index).Exists) throw new ElasticUpException(ExceptionMessage($"Index '{index}' does not exist"));
-            if (!_elasticClient.AliasExists(r => r.Index(index).Name(alias)).Exists) throw new ElasticUpException(ExceptionMessage($"Alias '{alias}' does not exist on index '{index}'"));
+            if (_indexHelper.IndexDoesNotExist(index)) throw new ElasticUpException(ExceptionMessage($"Index '{index}' does not exist"));
+            if (_aliasHelper.AliasDoesNotExistOnIndex(alias, index)) throw new ElasticUpException(ExceptionMessage($"Alias '{alias}' does not exist on index '{index}'"));
             return this;
         }
 
         public IndexValidations IndexExistsWithoutAlias(VersionedIndexName versionedIndexName)
         {
-            IndexExistsWithoutAlias(versionedIndexName.IndexNameWithVersion(), versionedIndexName.AliasName);
-            return this;
+            return IndexExistsWithoutAlias(versionedIndexName.IndexNameWithVersion(), versionedIndexName.AliasName);
         }
 
         public IndexValidations IndexExistsWithoutAlias(string index, string alias)
         {
-            if (!_elasticClient.IndexExists(index).Exists) throw new ElasticUpException(ExceptionMessage($"Index '{index}' does not exist"));
-            if (_elasticClient.AliasExists(r => r.Index(index).Name(alias)).Exists) throw new ElasticUpException(ExceptionMessage($"Alias '{alias}' should not exist on index '{index}'"));
+            if (_indexHelper.IndexDoesNotExist(index)) throw new ElasticUpException(ExceptionMessage($"Index '{index}' does not exist"));
+            if (_aliasHelper.AliasExistsOnIndex(alias, index)) throw new ElasticUpException(ExceptionMessage($"Alias '{alias}' does not exist on index '{index}'"));
             return this;
         }
     }

@@ -1,3 +1,4 @@
+using ElasticUp.Helper;
 using ElasticUp.Operation.Alias;
 using ElasticUp.Util;
 using FluentAssertions;
@@ -11,13 +12,15 @@ namespace ElasticUp.Tests.Operation.Alias
         [Test]
         public void RemoveAlias_RemovesAliasOnCorrectIndex()
         {
-            ElasticClient.CatAliases(cat => cat.Name(TestIndex.AliasName)).Records.Should().HaveCount(1);
+            new AliasHelper(ElasticClient).AliasExistsOnIndex(TestIndex).Should().BeTrue();
 
+            //WHEN
             new RemoveAliasOperation(TestIndex.AliasName)
                 .FromIndex(TestIndex.IndexNameWithVersion())
                 .Execute(ElasticClient);
 
-            ElasticClient.CatAliases(cat => cat.Name(TestIndex.AliasName)).Records.Should().HaveCount(0);
+            //THEN
+            new AliasHelper(ElasticClient).AliasDoesNotExistOnIndex(TestIndex).Should().BeTrue();
         }
 
         [Test]

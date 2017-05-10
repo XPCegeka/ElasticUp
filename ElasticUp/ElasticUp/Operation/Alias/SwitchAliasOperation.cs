@@ -1,6 +1,7 @@
-﻿using ElasticUp.Alias;
-using ElasticUp.Util;
+﻿using ElasticUp.Helper;
 using Nest;
+using static ElasticUp.Validations.IndexValidations;
+using static ElasticUp.Validations.StringValidations;
 
 namespace ElasticUp.Operation.Alias
 {
@@ -29,11 +30,14 @@ namespace ElasticUp.Operation.Alias
 
         public override void Validate(IElasticClient elasticClient)
         {
-            if (string.IsNullOrWhiteSpace(Alias)) throw new ElasticUpException($"SwitchAliasOperation: Invalid alias {Alias}");
-            if (string.IsNullOrWhiteSpace(FromIndexName)) throw new ElasticUpException($"SwitchAliasOperation: Invalid fromIndexName {FromIndexName}");
-            if (string.IsNullOrWhiteSpace(ToIndexName)) throw new ElasticUpException($"SwitchAliasOperation: Invalid toIndexName {ToIndexName}");
-            if (!elasticClient.IndexExists(FromIndexName).Exists) throw new ElasticUpException($"SwitchAliasOperation: fromIndex {FromIndexName} does not exist.");
-            if (!elasticClient.IndexExists(ToIndexName).Exists) throw new ElasticUpException($"SwitchAliasOperation: toIndex {ToIndexName} does not exist.");
+            StringValidationsFor<SwitchAliasOperation>()
+                .IsNotBlank(Alias, RequiredMessage("Alias"))
+                .IsNotBlank(FromIndexName, RequiredMessage("FromIndexName"))
+                .IsNotBlank(ToIndexName, RequiredMessage("ToIndexName"));
+
+            IndexValidationsFor<SwitchAliasOperation>(elasticClient)
+                .IndexExists(FromIndexName)
+                .IndexExists(ToIndexName);
         }
 
         public override void Execute(IElasticClient elasticClient)

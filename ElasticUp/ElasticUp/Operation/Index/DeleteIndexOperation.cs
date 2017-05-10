@@ -1,5 +1,6 @@
-﻿using ElasticUp.Util;
-using Nest;
+﻿using Nest;
+using static ElasticUp.Validations.IndexValidations;
+using static ElasticUp.Validations.StringValidations;
 
 namespace ElasticUp.Operation.Index
 {
@@ -14,8 +15,11 @@ namespace ElasticUp.Operation.Index
 
         public override void Validate(IElasticClient elasticClient)
         {
-            if (string.IsNullOrWhiteSpace(IndexName)) throw new ElasticUpException($"DeleteIndexOperation: Invalid indexName {IndexName}");
-            if (!elasticClient.IndexExists(IndexName).Exists) throw new ElasticUpException($"DeleteIndexOperation: index {IndexName} does not exist.");
+            StringValidationsFor<DeleteIndexOperation>()
+                .IsNotBlank(IndexName, RequiredMessage("IndexName"));
+
+            IndexValidationsFor<DeleteIndexOperation>(elasticClient)
+                .IndexExists(IndexName);
         }
 
         public override void Execute(IElasticClient elasticClient)

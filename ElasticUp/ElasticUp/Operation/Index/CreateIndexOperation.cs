@@ -1,6 +1,7 @@
 ﻿using System;
-using ElasticUp.Util;
 using Nest;
+using static ElasticUp.Validations.IndexValidations;
+using static ElasticUp.Validations.StringValidations;
 
 namespace ElasticUp.Operation.Index
 {
@@ -38,10 +39,12 @@ namespace ElasticUp.Operation.Index
 
         public override void Validate(IElasticClient elasticClient)
         {
-            if (string.IsNullOrWhiteSpace(IndexName)) throw new ElasticUpException($"CreateIndexOperation: Invalid indexName {IndexName}");
-            if (MappingSelector == null) throw new ElasticUpException($"CreateIndexOperation: Invalid mapping (required)");
-            if (!string.IsNullOrEmpty(Alias) && string.IsNullOrWhiteSpace(Alias)) throw new ElasticUpException($"CreateIndexOperation: Invalid alias {Alias}");
-            if (elasticClient.IndexExists(IndexName).Exists) throw new ElasticUpException($"CreateIndexOperation: index {IndexName} already exists.");
+            StringValidationsFor<CreateIndexOperation>()
+                .IsNotBlank(Alias, RequiredMessage("Alias"))
+                .IsNotBlank(IndexName, RequiredMessage("IndexName"));
+
+            IndexValidationsFor<CreateIndexOperation>(elasticClient)
+                .IndexExists(IndexName);
         }
 
         public override void Execute(IElasticClient elasticClient)

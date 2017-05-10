@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+using ElasticUp.Helper;
 using ElasticUp.Operation.Index;
 using ElasticUp.Util;
 using FluentAssertions;
-using Nest;
 using NUnit.Framework;
 
 namespace ElasticUp.Tests.Operation.Index
@@ -18,11 +14,11 @@ namespace ElasticUp.Tests.Operation.Index
         {
             var customIndexName = TestIndex.IndexNameWithVersion() + "-custom";
             ElasticClient.CreateIndex(customIndexName);
-            ElasticClient.IndexExists(customIndexName).Exists.Should().BeTrue();
+            new IndexHelper(ElasticClient).IndexExists(customIndexName).Should().BeTrue();
 
             new DeleteIndexOperation(customIndexName).Execute(ElasticClient);
-            
-            ElasticClient.IndexExists(customIndexName).Exists.Should().BeFalse();
+
+            new IndexHelper(ElasticClient).IndexDoesNotExist(customIndexName).Should().BeTrue();
         }
 
         [Test]

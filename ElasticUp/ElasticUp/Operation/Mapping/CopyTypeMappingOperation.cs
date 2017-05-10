@@ -1,5 +1,6 @@
-﻿using ElasticUp.Util;
-using Nest;
+﻿using Nest;
+using static ElasticUp.Validations.IndexValidations;
+using static ElasticUp.Validations.StringValidations;
 
 namespace ElasticUp.Operation.Mapping
 {
@@ -28,11 +29,14 @@ namespace ElasticUp.Operation.Mapping
 
         public override void Validate(IElasticClient elasticClient)
         {
-            if (string.IsNullOrWhiteSpace(Type)) throw new ElasticUpException($"CopyMappingOperation: Invalid Type {Type}");
-            if (string.IsNullOrWhiteSpace(FromIndexName)) throw new ElasticUpException($"CopyMappingOperation: Invalid indexName {FromIndexName}");
-            if (string.IsNullOrWhiteSpace(ToIndexName)) throw new ElasticUpException($"CopyMappingOperation: Invalid indexName {ToIndexName}");
-            if (!elasticClient.IndexExists(FromIndexName).Exists) throw new ElasticUpException($"CopyMappingOperation: fromIndex {FromIndexName} does not exist.");
-            if (!elasticClient.IndexExists(ToIndexName).Exists) throw new ElasticUpException($"CopyMappingOperation: toIndex {ToIndexName} does not exist.");
+            StringValidationsFor<CopyTypeMappingOperation>()
+                .IsNotBlank(Type, RequiredMessage("Type"))
+                .IsNotBlank(FromIndexName, RequiredMessage("FromIndexName"))
+                .IsNotBlank(ToIndexName, RequiredMessage("ToIndexName"));
+
+            IndexValidationsFor<CopyTypeMappingOperation>(elasticClient)
+                .IndexExists(FromIndexName)
+                .IndexExists(ToIndexName);
         }
 
         public override void Execute(IElasticClient elasticClient)

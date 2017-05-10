@@ -1,4 +1,3 @@
-using System;
 using ElasticUp.History;
 using ElasticUp.Tests.Sample;
 using ElasticUp.Util;

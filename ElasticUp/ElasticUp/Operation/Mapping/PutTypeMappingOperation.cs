@@ -1,6 +1,7 @@
 ﻿using Elasticsearch.Net;
-using ElasticUp.Util;
 using Nest;
+using static ElasticUp.Validations.IndexValidations;
+using static ElasticUp.Validations.StringValidations;
 
 namespace ElasticUp.Operation.Mapping
 {
@@ -29,9 +30,13 @@ namespace ElasticUp.Operation.Mapping
 
         public override void Validate(IElasticClient elasticClient)
         {
-            if (string.IsNullOrWhiteSpace(IndexName)) throw new ElasticUpException($"PutTypeMappingOperation: Invalid indexName {IndexName}");
-            if (string.IsNullOrWhiteSpace(Type)) throw new ElasticUpException($"PutTypeMappingOperation: Invalid type {Type}");
-            if (string.IsNullOrWhiteSpace(JsonMappingAsString)) throw new ElasticUpException($"PutTypeMappingOperation: Invalid json mapping {JsonMappingAsString}");
+            StringValidationsFor<PutTypeMappingOperation>()
+                .IsNotBlank(Type, RequiredMessage("Type"))
+                .IsNotBlank(IndexName, RequiredMessage("IndexName"))
+                .IsNotBlank(JsonMappingAsString, RequiredMessage("JsonMappingAsString"));
+
+            IndexValidationsFor<PutTypeMappingOperation>(elasticClient)
+                .IndexExists(IndexName);
         }
 
         public override void Execute(IElasticClient elasticClient)

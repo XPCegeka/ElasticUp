@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using ElasticUp.Alias;
+using ElasticUp.Helper;
 using ElasticUp.History;
 using ElasticUp.Tests.Sample;
 using ElasticUp.Util;

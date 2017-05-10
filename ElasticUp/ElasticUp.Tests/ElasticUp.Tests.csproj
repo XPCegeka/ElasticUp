@@ -80,6 +80,7 @@
     <Compile Include="ElasticUpTestConfig.cs" />
     <Compile Include="Extension\ReadOnlyIndexContextTest.cs" />
     <Compile Include="Extension\ElasticClientExtensionsTest.cs" />
+    <Compile Include="Helper\IndexHelperIntegrationTest.cs" />
     <Compile Include="History\MigrationHistoryHelperTest.cs" />
     <Compile Include="Infrastructure\ResourceUtilities.cs" />
     <Compile Include="Operation\Alias\SwitchAliasOperationIntegrationTest.cs" />
@@ -102,7 +103,7 @@
     <Compile Include="Sample\SampleVersionedIndexMigrationWithReindexTypeOperation.cs" />
     <Compile Include="Sample\SampleDocument.cs" />
     <Compile Include="History\MigrationHistoryHelperIntegrationTest.cs" />
-    <Compile Include="Alias\AliasHelperIntegrationTest.cs" />
+    <Compile Include="Helper\AliasHelperIntegrationTest.cs" />
     <Compile Include="Sample\SampleEmptyOperation.cs" />
     <Compile Include="ElasticUpFullStackTests\ElasticUpIntegrationTest.cs" />
     <Compile Include="Sample\SampleObject.cs" />

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using ElasticUp.Alias;
 using ElasticUp.Extension;
+using ElasticUp.Helper;
 using ElasticUp.History;
 using ElasticUp.Operation;
 using Nest;

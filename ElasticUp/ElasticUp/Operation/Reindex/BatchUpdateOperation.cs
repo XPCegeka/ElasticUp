@@ -36,7 +36,6 @@ namespace ElasticUp.Operation.Reindex
 
         public override void Execute(IElasticClient elasticClient)
         {
-            //TODO reset Threadpool after processing?
             if (_arguments.DegreeOfParallellism > 1) ThreadPool.SetMaxThreads(_arguments.DegreeOfParallellism,_arguments.DegreeOfParallellism);
 
             var searchResponse = Search(elasticClient);

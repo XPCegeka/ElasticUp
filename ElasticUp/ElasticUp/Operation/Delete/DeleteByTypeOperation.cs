@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using ElasticUp.Util;
 using Nest;
+using static ElasticUp.Validations.IndexValidations;
+using static ElasticUp.Validations.StringValidations;
 
 namespace ElasticUp.Operation.Delete
 {
@@ -48,8 +50,12 @@ namespace ElasticUp.Operation.Delete
 
         public override void Validate(IElasticClient elasticClient)
         {
-            if (string.IsNullOrEmpty(IndexName)) throw new ElasticUpException($"Could not execute {nameof(DeleteByTypeOperation)}", new ArgumentNullException(nameof(IndexName)));
-            if (string.IsNullOrEmpty(TypeName)) throw new ElasticUpException($"Could not execute {nameof(DeleteByTypeOperation)}", new ArgumentNullException(nameof(TypeName)));
+            StringValidationsFor<DeleteByTypeOperation>()
+                .IsNotBlank(IndexName, RequiredMessage("IndexName"))
+                .IsNotBlank(TypeName, RequiredMessage("TypeName"));
+
+            IndexValidationsFor<DeleteByTypeOperation>(elasticClient)
+                .IndexExists(IndexName);
         }
 
         public override void Execute(IElasticClient elasticClient)

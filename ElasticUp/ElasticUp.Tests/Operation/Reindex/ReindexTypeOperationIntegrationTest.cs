@@ -1,8 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using Elasticsearch.Net;
 using ElasticUp.Operation.Mapping;
 using ElasticUp.Operation.Reindex;
 using ElasticUp.Tests.Infrastructure;
@@ -11,7 +9,6 @@ using ElasticUp.Tests.Sample.IntValue;
 using ElasticUp.Util;
 using FluentAssertions;
 using Nest;
-using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace ElasticUp.Tests.Operation.Reindex

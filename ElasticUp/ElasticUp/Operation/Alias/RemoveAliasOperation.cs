@@ -1,6 +1,7 @@
-﻿using ElasticUp.Alias;
-using ElasticUp.Util;
+﻿using ElasticUp.Helper;
 using Nest;
+using static ElasticUp.Validations.IndexValidations;
+using static ElasticUp.Validations.StringValidations;
 
 namespace ElasticUp.Operation.Alias
 {
@@ -22,9 +23,12 @@ namespace ElasticUp.Operation.Alias
 
         public override void Validate(IElasticClient elasticClient)
         {
-            if (string.IsNullOrWhiteSpace(Alias)) throw new ElasticUpException($"RemoveAliasOperation: Invalid alias {Alias}");
-            if (string.IsNullOrWhiteSpace(IndexName)) throw new ElasticUpException($"RemoveAliasOperation: Invalid indexName {IndexName}");
-            if (!elasticClient.IndexExists(IndexName).Exists) throw new ElasticUpException($"RemoveAliasOperation: index {IndexName} does not exist.");
+            StringValidationsFor<RemoveAliasOperation>()
+                .IsNotBlank(Alias, RequiredMessage("Alias"))
+                .IsNotBlank(IndexName, RequiredMessage("IndexName"));
+
+            IndexValidationsFor<RemoveAliasOperation>(elasticClient)
+                .IndexExists(IndexName);
         }
 
         public override void Execute(IElasticClient elasticClient)

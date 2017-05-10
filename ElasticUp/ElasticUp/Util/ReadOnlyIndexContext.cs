@@ -1,8 +1,8 @@
 using System;
-using ElasticUp.Util;
+using ElasticUp.Extension;
 using Nest;
 
-namespace ElasticUp.Extension
+namespace ElasticUp.Util
 {
     public class ReadOnlyIndexContext : IDisposable
     {

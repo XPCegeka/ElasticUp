@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ElasticUp.Alias;
+using ElasticUp.Helper;
 using ElasticUp.History;
 using ElasticUp.Migration;
 using ElasticUp.Util;
