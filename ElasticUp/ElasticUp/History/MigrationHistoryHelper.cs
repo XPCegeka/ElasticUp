@@ -1,6 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
+using ElasticUp.Helper;
 using ElasticUp.Migration;
+using ElasticUp.Operation.Index;
 using ElasticUp.Operation.Reindex;
 using ElasticUp.Util;
 using Nest;
@@ -11,27 +12,39 @@ namespace ElasticUp.History
 {
     public class MigrationHistoryHelper
     {
-        private readonly IElasticClient _elasticClient;
         public readonly string MigrationHistoryIndexAlias;
+
+        private readonly IElasticClient _elasticClient;
+        private readonly IndexHelper _indexHelper;
 
         public MigrationHistoryHelper(IElasticClient elasticClient, string migrationHistoryIndexAlias)
         {
+            StringValidationsFor<MigrationHistoryHelper>()
+                .IsNotBlank(migrationHistoryIndexAlias, RequiredMessage(nameof(MigrationHistoryIndexAlias)));
+
             _elasticClient = elasticClient;
-            MigrationHistoryIndexAlias = migrationHistoryIndexAlias;
+            _indexHelper = new IndexHelper(_elasticClient);
+            MigrationHistoryIndexAlias = migrationHistoryIndexAlias.ToLowerInvariant();
         }
 
         public void InitMigrationHistory()
         {
-            var catAliasesRecords = _elasticClient.CatAliases(selector => selector.Name(MigrationHistoryIndexAlias)).Records;
+            var existingAliases = _elasticClient.CatAliases(selector => selector.Name(MigrationHistoryIndexAlias)).Records;
 
-            if (!catAliasesRecords.Any())
+            if (!existingAliases.Any())
             {
-                var migrationHistoryIndexName = new VersionedIndexName(MigrationHistoryIndexAlias, 0).IndexNameWithVersion();
+                var migrationHistoryIndexName = new VersionedIndexName(MigrationHistoryIndexAlias, 0);
 
-                IndexValidationsFor<MigrationHistoryHelper>(_elasticClient).IndexDoesNotExists(migrationHistoryIndexName);
+                var createIndexOperation = new CreateIndexOperation(migrationHistoryIndexName.IndexNameWithVersion())
+                                                    .WithAlias(migrationHistoryIndexName.AliasName)
+                                                    .WithMapping(ElasticUpMigrationHistoryConfig.Mapping);
+                                                    //TODO specific settings?
 
-                _elasticClient.CreateIndex(migrationHistoryIndexName);
-                _elasticClient.PutAlias(migrationHistoryIndexName, MigrationHistoryIndexAlias);
+                createIndexOperation.Validate(_elasticClient);
+                createIndexOperation.Execute(_elasticClient);
+
+                IndexValidationsFor<MigrationHistoryHelper>(_elasticClient)
+                    .IndexExistsWithAlias(migrationHistoryIndexName);
             }
         }
 
@@ -50,18 +63,13 @@ namespace ElasticUp.History
             AddMigrationToHistory(migration?.ToString());
         }
 
-        public void AddMigrationToHistory(AbstractElasticUpMigration migration, Exception exception)
-        {
-            AddMigrationToHistory(migration?.ToString(), exception);
-        }
-
-        private void AddMigrationToHistory(string migrationName, Exception exception = null)
+        private void AddMigrationToHistory(string migrationName)
         {
             StringValidationsFor<MigrationHistoryHelper>()
                 .IsNotBlank(migrationName, RequiredMessage(nameof(migrationName)))
                 .IsNotBlank(MigrationHistoryIndexAlias, RequiredMessage(nameof(MigrationHistoryIndexAlias)));
             
-            var history = new ElasticUpMigrationHistory(migrationName, exception);
+            var history = new ElasticUpMigrationHistory { ElasticUpMigrationName = migrationName };
 
             _elasticClient.Index(history, descriptor => descriptor.Index(MigrationHistoryIndexAlias));
         }
@@ -74,10 +82,9 @@ namespace ElasticUp.History
         private bool HasMigrationAlreadyBeenApplied(string migrationName)
         {
             StringValidationsFor<MigrationHistoryHelper>()
-                .IsNotBlank(migrationName, RequiredMessage(nameof(migrationName)))
-                .IsNotBlank(MigrationHistoryIndexAlias, RequiredMessage(nameof(MigrationHistoryIndexAlias)));
-            
-            if (!_elasticClient.IndexExists(MigrationHistoryIndexAlias).Exists) return false;
+                .IsNotBlank(migrationName, RequiredMessage(nameof(migrationName)));
+
+            if (_indexHelper.IndexDoesNotExist(MigrationHistoryIndexAlias)) return false;
 
             var searchResponse = _elasticClient.Search<ElasticUpMigrationHistory>(sd =>
                 sd.Index(MigrationHistoryIndexAlias)
@@ -85,7 +92,7 @@ namespace ElasticUp.History
                   .Query(q => q.Term(f => f.ElasticUpMigrationName, migrationName)));
             
             var foundMigration = searchResponse.Documents.SingleOrDefault(); //count should be 0 or 1 - but search to prevent 404
-            return foundMigration != null && foundMigration.HasBeenAppliedSuccessfully;
+            return foundMigration != null;
         }
     }
 }

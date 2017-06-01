@@ -44,7 +44,7 @@ namespace ElasticUp.Operation.Index
                 .IsNotBlank(IndexName, RequiredMessage("IndexName"));
 
             IndexValidationsFor<CreateIndexOperation>(elasticClient)
-                .IndexExists(IndexName);
+                .IndexDoesNotExists(IndexName);
         }
 
         public override void Execute(IElasticClient elasticClient)

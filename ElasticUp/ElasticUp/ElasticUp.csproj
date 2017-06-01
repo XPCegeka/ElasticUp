@@ -45,11 +45,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helper\IndexHelper.cs" />
+    <Compile Include="History\ElasticUpMigrationHistoryConfig.cs" />
     <Compile Include="Util\ElasticUpException.cs" />
     <Compile Include="Util\ElasticUpTimer.cs" />
     <Compile Include="Util\ReadOnlyIndexContext.cs" />
     <Compile Include="Extension\TimeSpanExtensions.cs" />
-    <Compile Include="History\MigrationHistory.cs" />
+    <Compile Include="History\ElasticUpMigrationHistory.cs" />
     <Compile Include="Migration\AbstractElasticUpMigration.cs" />
     <Compile Include="Migration\ElasticUpCustomMigration.cs" />
     <Compile Include="Migration\ElasticUpVersionedIndexMigration.cs" />

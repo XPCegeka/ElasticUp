@@ -1,5 +1,4 @@
 ﻿using Elasticsearch.Net;
-using ElasticUp.Helper;
 using ElasticUp.Tests.Sample;
 using ElasticUp.Util;
 using FluentAssertions;

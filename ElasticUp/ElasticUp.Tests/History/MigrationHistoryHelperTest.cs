@@ -38,13 +38,6 @@ namespace ElasticUp.Tests.History
         }
 
         [Test]
-        public void AddMigrationHistory_WithException_ThrowsWithInvalidParameters()
-        {
-            Assert.Throws<ElasticUpException>(() => _migrationHistoryHelper.AddMigrationToHistory(null, null));
-            Assert.Throws<ElasticUpException>(() => new MigrationHistoryHelper(_elasticClient, null).AddMigrationToHistory(new SampleEmptyVersionedIndexMigration("index")));
-        }
-
-        [Test]
         public void HasMigrationAlreadyBeenApplied_ThrowsWithInvalidParameters()
         {
             Assert.Throws<ElasticUpException>(() => _migrationHistoryHelper.HasMigrationAlreadyBeenApplied(null));
