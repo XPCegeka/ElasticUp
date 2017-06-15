@@ -68,7 +68,7 @@ namespace ElasticUp.Operation.Reindex
             
             foreach (var transformedDocument in transformedDocuments)
             {
-                OnDocumentProcessed?.Invoke(transformedDocument.TransformedHit); //TODO Pass transformedDocument here?
+                OnDocumentProcessed?.Invoke(transformedDocument.TransformedHit);
             }
         }
 

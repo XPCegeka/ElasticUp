@@ -20,7 +20,7 @@ namespace ElasticUp.Migration
         {
             var indicesForAlias = ElasticClient.GetIndicesPointingToAlias(Alias);
             if (indicesForAlias == null || indicesForAlias.Count > 1)
-                throw new NotImplementedException("Error: Not supporting multiple ElasticSearch indices with the same alias yet!");
+                throw new NotSupportedException("Error: Not supporting multiple indices with the same alias!");
 
             var versionedIndexName = VersionedIndexName.CreateFromIndexName(indicesForAlias[0]);
 

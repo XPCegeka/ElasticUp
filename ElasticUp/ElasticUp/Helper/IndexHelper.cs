@@ -34,7 +34,6 @@ namespace ElasticUp.Helper
             return IndexDoesNotExist(versionedIndexName.IndexNameWithVersion());
         }
 
-        //TODO write tests for these methods
         public bool IndexExistsWithAlias(VersionedIndexName versionedIndexName)
         {
             return IndexExistsWithAlias(versionedIndexName.IndexNameWithVersion(), versionedIndexName.AliasName);
