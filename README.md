@@ -3,35 +3,31 @@
 Easy ElasticSearch data migrations for continuous integration and deployment! Inspired by tools like DbUp for Sql.
 
 ## Why ElasticUp
-When developing new features it is possible your datamodel changes. This may require an update of your existing data in ElasticSearch. Or maybe you just want to migrate your data to another index. We wanted a tool similar to [DbUp](https://dbup.github.io/) for sql, that we could use in our [TeamCity] (https://www.jetbrains.com/teamcity) build, and when deploying new software versions with [Octopus Deploy](http://github.com). 
+When developing new features it is possible your datamodel changes. This may require an update of your existing data in ElasticSearch. Or maybe you just want to reindex your data while doing some transformations. We wanted a tool similar to [DbUp](https://dbup.github.io/) for sql, that we could use in our [TeamCity] (https://www.jetbrains.com/teamcity) build and while deploying new software versions with [Octopus Deploy](http://github.com). 
 
 Our requirements for ElasticUp are:
-- automate the migration and updates of data in your ElasticSearch
+- automate the migration and transformation of data in your ElasticSearch
 - track history of executed migrations so they run once and only once
 - offer sensible base classes and helpers to implement your own migrations
-- make it possible to create a console application that uses ElasticUp, so you can create your own migration console application from TeamCity, Octopus Deploy, Visual Studio, ....
+- make it possible to create a console application that uses ElasticUp, so you can create your own migration console application and run it from TeamCity, Octopus Deploy, Visual Studio, ....
 
 
 ## The concept
 
-The default way of using ElasticUp is by using version numbers in your index names.
-Imagine your index **my-index-v0** with alias **my-index** (your application should always use **my-index**).
-When executing an ElasticUp migration, it will 
-- migrate your data from **my-index-v0** to **my-index-v1** 
-- move the alias from **my-index-v0** to **my-index-v1**
+The preferred way of using ElasticUp is by using version numbers in your index names. T
 
-When deploying a new version of your application with Octopus Deploy, you can first run your ElasticUpConsoleApplication before actually deploying the new version of your application. If your application uses the alias **my-index** it will automatically use the migrated index because ElasticUp moves the alias from the old to the new index. Smooth!
+Imagine an index **my-index-v0** with alias **my-index** (your application should always talk to the alias **my-index**).
 
-
-The index **my-index-v0** is not automatically removed.
-The advantage is that if something goes wrong, you can always put the alias back on **my-index-v0** and continue working.
-
-In some cases you will want to override the default behavior or do something completely different. ElasticUp offers a CustomElasticUpMigration so you can implement any behavior you want. (see more below).
+A possible scenario could be: I want to rename the field "abc" to "someUsefulName". Using ElasticUp you would create a Migration containing 3 operations:
+- CreateIndexOperation: create **my-index-v1**
+- BatchUpdateOperation: reindex and transform your data from **my-index-v0** to **my-index-v1** 
+- SwitchAliasOperation: move the alias **my-index** from **my-index-v0** to **my-index-v1**
+(- DeleteIndexOperation: you can delete the old index **my-index-v0** if you want to)
 
 
 ## Keeping track of the migrations
 
-ElasticUp keeps track of which migrations already ran in a separate index. By default it will use an index with aliasname 'elasticupmigrationhistory'. If the index does not exist yet it will create an index 'elasticupmigrationhistory-v0' with aliasname 'elasticupmigrationhistory'. You can define a different index to keep your history but we strongly recommend you use the same concept of having an indexname with a version with an alias on it.
+ElasticUp keeps track of which migrations already ran in a separate index. By default it will use an index 'elasticupmigrationhistory-v0' with aliasname 'elasticupmigrationhistory'. If the index does not exist yet it will create it first. You can pass your own migrationhistory alias name to ElasticUp if you want the index to have a different name.
 
 When running ElasticUp it will check the elasticupmigrationhistory index to find out which migrations already ran. It will then run the migrations that didn't run yet in the order you provided. 
 
