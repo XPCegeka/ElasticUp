@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using ElasticUp.Operation.Index;
+using ElasticUp.Operation.Mapping;
 using ElasticUp.Operation.Reindex;
 using ElasticUp.Tests.Sample;
+using ElasticUp.Tests.Sample.IntValue;
 using ElasticUp.Util;
 using FluentAssertions;
+using FluentAssertions.Formatting;
 using Nest;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -45,7 +49,9 @@ namespace ElasticUp.Tests.Operation.Reindex
             // VERIFY BATCH UPDATE
             processedDocumentCount.Should().Be(expectedDocumentCount);
             ElasticClient.Refresh(Indices.All);
-            ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion())).Count.Should().Be(expectedDocumentCount);
+            ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextIndexNameWithVersion()))
+                .Count.Should()
+                .Be(expectedDocumentCount);
 
 
             //WHEN BATCHUPDATE WITH PARALLEL
@@ -54,35 +60,55 @@ namespace ElasticUp.Tests.Operation.Reindex
             using (timerWithParallel)
             {
                 new BatchUpdateOperation<SampleObject, SampleObject>(descriptor => descriptor
-                        .FromIndex(TestIndex.NextVersion().IndexNameWithVersion())
-                        .ToIndex(TestIndex.NextVersion().NextIndexNameWithVersion())
-                        .DegreeOfParallellism(5)
-                        .Transformation(doc =>
-                        {
-                            processedDocumentCount++;
-                            return doc;
-                        })
+                    .FromIndex(TestIndex.NextVersion().IndexNameWithVersion())
+                    .ToIndex(TestIndex.NextVersion().NextIndexNameWithVersion())
+                    .DegreeOfParallellism(5)
+                    .Transformation(doc =>
+                    {
+                        processedDocumentCount++;
+                        return doc;
+                    })
                 ).Execute(ElasticClient);
             }
 
             //VERIFY
             processedDocumentCount.Should().Be(expectedDocumentCount);
             ElasticClient.Refresh(Indices.All);
-            ElasticClient.Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextVersion().NextIndexNameWithVersion())).Count.Should().Be(expectedDocumentCount);
+            ElasticClient
+                .Count<SampleObject>(descriptor => descriptor.Index(TestIndex.NextVersion().NextIndexNameWithVersion()))
+                .Count.Should()
+                .Be(expectedDocumentCount);
 
             //VERIFY parallel was faster
-            timerWithoutParallel.GetElapsedMilliseconds().Should().BeGreaterThan(timerWithParallel.GetElapsedMilliseconds());
+            timerWithoutParallel.GetElapsedMilliseconds()
+                .Should()
+                .BeGreaterThan(timerWithParallel.GetElapsedMilliseconds());
         }
 
         [Test]
         public void OperationValidatesThatFromAndToIndexAreDefinedAndExistInElasticSearch()
         {
-            Assert.Throws<ElasticUpException>(() => new BatchUpdateOperation<SampleObject,SampleObject>(s => s.FromIndex(null).ToIndex(TestIndex.NextIndexNameWithVersion())).Validate(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new BatchUpdateOperation<SampleObject,SampleObject>(s => s.FromIndex(" ").ToIndex(TestIndex.NextIndexNameWithVersion())).Validate(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new BatchUpdateOperation<SampleObject,SampleObject>(s => s.FromIndex(TestIndex.IndexNameWithVersion()).ToIndex(null)).Validate(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new BatchUpdateOperation<SampleObject,SampleObject>(s => s.FromIndex(TestIndex.IndexNameWithVersion()).ToIndex("")).Validate(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new BatchUpdateOperation<SampleObject,SampleObject>(s => s.FromIndex("does not exist").ToIndex(TestIndex.NextIndexNameWithVersion())).Validate(ElasticClient));
-            Assert.Throws<ElasticUpException>(() => new BatchUpdateOperation<SampleObject,SampleObject>(s => s.FromIndex(TestIndex.IndexNameWithVersion()).ToIndex("does not exist")).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(
+                () => new BatchUpdateOperation<SampleObject, SampleObject>(s => s.FromIndex(null)
+                    .ToIndex(TestIndex.NextIndexNameWithVersion())).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(
+                () => new BatchUpdateOperation<SampleObject, SampleObject>(s => s.FromIndex(" ")
+                    .ToIndex(TestIndex.NextIndexNameWithVersion())).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(
+                () => new BatchUpdateOperation<SampleObject, SampleObject>(s => s
+                    .FromIndex(TestIndex.IndexNameWithVersion())
+                    .ToIndex(null)).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(
+                () => new BatchUpdateOperation<SampleObject, SampleObject>(s => s
+                    .FromIndex(TestIndex.IndexNameWithVersion())
+                    .ToIndex("")).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(
+                () => new BatchUpdateOperation<SampleObject, SampleObject>(s => s.FromIndex("does not exist")
+                    .ToIndex(TestIndex.NextIndexNameWithVersion())).Validate(ElasticClient));
+            Assert.Throws<ElasticUpException>(
+                () => new BatchUpdateOperation<SampleObject, SampleObject>(s => s
+                    .FromIndex(TestIndex.IndexNameWithVersion())
+                    .ToIndex("does not exist")).Validate(ElasticClient));
         }
 
         [Test]
@@ -95,7 +121,7 @@ namespace ElasticUp.Tests.Operation.Reindex
             // TEST
             var processedRecordCount = 0;
 
-            var operation = new BatchUpdateOperation<JObject,JObject>(descriptor => descriptor
+            var operation = new BatchUpdateOperation<JObject, JObject>(descriptor => descriptor
                 .BatchSize(50)
                 .FromIndex(TestIndex.IndexNameWithVersion())
                 .ToIndex(TestIndex.NextIndexNameWithVersion())
@@ -117,8 +143,10 @@ namespace ElasticUp.Tests.Operation.Reindex
             processedRecordCount.Should().Be(expectedDocumentCount);
 
             ElasticClient.Count<SampleObject>(descriptor => descriptor
-                .Index(TestIndex.NextIndexNameWithVersion())
-                .Query(q => q.Term(t => t.Number, 666))).Count.Should().Be(expectedDocumentCount);
+                    .Index(TestIndex.NextIndexNameWithVersion())
+                    .Query(q => q.Term(t => t.Number, 666)))
+                .Count.Should()
+                .Be(expectedDocumentCount);
         }
 
         [Test]
@@ -132,7 +160,7 @@ namespace ElasticUp.Tests.Operation.Reindex
             ElasticClient.Refresh(Indices.All);
 
             // TEST
-            var operation = new BatchUpdateOperation<JObject,JObject>(descriptor => descriptor
+            var operation = new BatchUpdateOperation<JObject, JObject>(descriptor => descriptor
                 .FromIndex(TestIndex.IndexNameWithVersion())
                 .ToIndex(TestIndex.NextIndexNameWithVersion())
                 .FromType<SampleObjectWithId>()
@@ -144,34 +172,84 @@ namespace ElasticUp.Tests.Operation.Reindex
 
             // VERIFY
             ElasticClient.Refresh(Indices.All);
-            ElasticClient.Get<SampleObjectWithId>("TestId-0", desc => desc.Index(TestIndex.NextIndexNameWithVersion())).Should().NotBeNull();
-            ElasticClient.Get<SampleObjectWithId>("TestId-1", desc => desc.Index(TestIndex.NextIndexNameWithVersion())).Should().NotBeNull();
+            ElasticClient.Get<SampleObjectWithId>("TestId-0", desc => desc.Index(TestIndex.NextIndexNameWithVersion()))
+                .Should()
+                .NotBeNull();
+            ElasticClient.Get<SampleObjectWithId>("TestId-1", desc => desc.Index(TestIndex.NextIndexNameWithVersion()))
+                .Should()
+                .NotBeNull();
         }
 
         [Test]
         public void TransformAsJObjects_ObjectsAreTransformedAndIndexedInNewIndex_AndKeepTheirVersion()
         {
             // GIVEN
-            var sampleObject1V1 = new SampleObjectWithId {Id = new ObjectId {Type = "TestId", Sequence = 1}, Number = 1};
-            var sampleObject1V2 = new SampleObjectWithId {Id = new ObjectId {Type = "TestId", Sequence = 1}, Number = 2};
-            var sampleObject1V3 = new SampleObjectWithId {Id = new ObjectId {Type = "TestId", Sequence = 1}, Number = 3};
+            var sampleObject1V1 = new SampleObjectWithId
+            {
+                Id = new ObjectId {Type = "TestId", Sequence = 1},
+                Number = 1
+            };
+            var sampleObject1V2 = new SampleObjectWithId
+            {
+                Id = new ObjectId {Type = "TestId", Sequence = 1},
+                Number = 2
+            };
+            var sampleObject1V3 = new SampleObjectWithId
+            {
+                Id = new ObjectId {Type = "TestId", Sequence = 1},
+                Number = 3
+            };
 
-            var sampleObject2V1 = new SampleObjectWithId { Id = new ObjectId { Type = "TestId", Sequence = 2 }, Number = 1 };
-            var sampleObject2V2 = new SampleObjectWithId { Id = new ObjectId { Type = "TestId", Sequence = 2 }, Number = 2 };
+            var sampleObject2V1 = new SampleObjectWithId
+            {
+                Id = new ObjectId {Type = "TestId", Sequence = 2},
+                Number = 1
+            };
+            var sampleObject2V2 = new SampleObjectWithId
+            {
+                Id = new ObjectId {Type = "TestId", Sequence = 2},
+                Number = 2
+            };
 
-            var sampleObject3V1 = new SampleObjectWithId { Id = new ObjectId { Type = "TestId", Sequence = 3 }, Number = 1 };
+            var sampleObject3V1 = new SampleObjectWithId
+            {
+                Id = new ObjectId {Type = "TestId", Sequence = 3},
+                Number = 1
+            };
 
-            var sampleObject4V1 = new SampleObjectWithId { Id = new ObjectId { Type = "TestId", Sequence = 4 }, Number = 1 };
-            var sampleObject4V2 = new SampleObjectWithId { Id = new ObjectId { Type = "TestId", Sequence = 4 }, Number = 2 };
-            var sampleObject4V3 = new SampleObjectWithId { Id = new ObjectId { Type = "TestId", Sequence = 4 }, Number = 3 };
-            var sampleObject4V4 = new SampleObjectWithId { Id = new ObjectId { Type = "TestId", Sequence = 4 }, Number = 4 };
+            var sampleObject4V1 = new SampleObjectWithId
+            {
+                Id = new ObjectId {Type = "TestId", Sequence = 4},
+                Number = 1
+            };
+            var sampleObject4V2 = new SampleObjectWithId
+            {
+                Id = new ObjectId {Type = "TestId", Sequence = 4},
+                Number = 2
+            };
+            var sampleObject4V3 = new SampleObjectWithId
+            {
+                Id = new ObjectId {Type = "TestId", Sequence = 4},
+                Number = 3
+            };
+            var sampleObject4V4 = new SampleObjectWithId
+            {
+                Id = new ObjectId {Type = "TestId", Sequence = 4},
+                Number = 4
+            };
 
             ElasticClient.IndexMany(new List<SampleObjectWithId>
             {
-                sampleObject1V1, sampleObject1V2, sampleObject1V3,
-                sampleObject2V1, sampleObject2V2,
+                sampleObject1V1,
+                sampleObject1V2,
+                sampleObject1V3,
+                sampleObject2V1,
+                sampleObject2V2,
                 sampleObject3V1,
-                sampleObject4V1, sampleObject4V2, sampleObject4V3, sampleObject4V4
+                sampleObject4V1,
+                sampleObject4V2,
+                sampleObject4V3,
+                sampleObject4V4
             }, TestIndex.IndexNameWithVersion());
             ElasticClient.Refresh(Indices.All);
 
@@ -188,16 +266,24 @@ namespace ElasticUp.Tests.Operation.Reindex
             // VERIFY
             ElasticClient.Refresh(Indices.All);
 
-            var sampleObject1Version = ElasticClient.Get<SampleObjectWithId>($"TestId-1", desc => desc.Index(TestIndex.NextIndexNameWithVersion())).Version;
+            var sampleObject1Version = ElasticClient
+                .Get<SampleObjectWithId>($"TestId-1", desc => desc.Index(TestIndex.NextIndexNameWithVersion()))
+                .Version;
             sampleObject1Version.Should().Be(3);
 
-            var sampleObject2Version = ElasticClient.Get<SampleObjectWithId>($"TestId-2", desc => desc.Index(TestIndex.NextIndexNameWithVersion())).Version;
+            var sampleObject2Version = ElasticClient
+                .Get<SampleObjectWithId>($"TestId-2", desc => desc.Index(TestIndex.NextIndexNameWithVersion()))
+                .Version;
             sampleObject2Version.Should().Be(2);
 
-            var sampleObject3Version = ElasticClient.Get<SampleObjectWithId>($"TestId-3", desc => desc.Index(TestIndex.NextIndexNameWithVersion())).Version;
+            var sampleObject3Version = ElasticClient
+                .Get<SampleObjectWithId>($"TestId-3", desc => desc.Index(TestIndex.NextIndexNameWithVersion()))
+                .Version;
             sampleObject3Version.Should().Be(1);
 
-            var sampleObject4Version = ElasticClient.Get<SampleObjectWithId>($"TestId-4", desc => desc.Index(TestIndex.NextIndexNameWithVersion())).Version;
+            var sampleObject4Version = ElasticClient
+                .Get<SampleObjectWithId>($"TestId-4", desc => desc.Index(TestIndex.NextIndexNameWithVersion()))
+                .Version;
             sampleObject4Version.Should().Be(4);
         }
 
@@ -212,7 +298,7 @@ namespace ElasticUp.Tests.Operation.Reindex
             ElasticClient.Refresh(Indices.All);
 
             // TEST
-            var operation = new BatchUpdateOperation<JObject,JObject>(descriptor => descriptor
+            var operation = new BatchUpdateOperation<JObject, JObject>(descriptor => descriptor
                 .FromIndex(TestIndex.IndexNameWithVersion())
                 .ToIndex(TestIndex.NextIndexNameWithVersion())
                 .FromType<SampleObjectWithId>()
@@ -229,12 +315,16 @@ namespace ElasticUp.Tests.Operation.Reindex
             // VERIFY
             ElasticClient.Refresh(Indices.All);
 
-            var response0 = ElasticClient.Get<SampleObjectWithId>("TestId-0", desc => desc.Index(TestIndex.NextIndexNameWithVersion()));
+            var response0 =
+                ElasticClient.Get<SampleObjectWithId>("TestId-0",
+                    desc => desc.Index(TestIndex.NextIndexNameWithVersion()));
             response0.IsValid.Should().BeTrue();
             response0.Found.Should().BeFalse();
             response0.Source.Should().BeNull();
 
-            var response1 = ElasticClient.Get<SampleObjectWithId>("TestId-1", desc => desc.Index(TestIndex.NextIndexNameWithVersion()));
+            var response1 =
+                ElasticClient.Get<SampleObjectWithId>("TestId-1",
+                    desc => desc.Index(TestIndex.NextIndexNameWithVersion()));
             response1.IsValid.Should().BeTrue();
             response1.Found.Should().BeTrue();
             response1.Source.Should().NotBeNull();
@@ -249,7 +339,7 @@ namespace ElasticUp.Tests.Operation.Reindex
 
             // TEST
             var processedDocuments = new List<SampleObject>();
-            var operation = new BatchUpdateOperation<SampleObject, SampleObject>( s => s
+            var operation = new BatchUpdateOperation<SampleObject, SampleObject>(s => s
                 .FromIndex(TestIndex.IndexNameWithVersion())
                 .ToIndex(TestIndex.NextIndexNameWithVersion())
                 .OnDocumentProcessed(doc =>
@@ -261,6 +351,38 @@ namespace ElasticUp.Tests.Operation.Reindex
 
             // VERIFY
             processedDocuments.Count.Should().Be(expectedDocumentCount);
+        }
+
+        [Test]
+        public void BulkIndexShouldThrowExceptionIfItPartiallyFailed_ForExampleInCaseOfAMappingFailure_TryingToPutAStringIntoAnIntField()
+        {
+            var objectWithStringField1 = new Sample.StringValue.SampleDocumentWithValue {Id = "2", Value = "Two"};
+            var objectWithStringField2 = new Sample.StringValue.SampleDocumentWithValue {Id = "3", Value = "3"};
+
+            new DeleteIndexOperation(TestIndex.IndexNameWithVersion()).Execute(ElasticClient);
+            new DeleteIndexOperation(TestIndex.NextIndexNameWithVersion()).Execute(ElasticClient);
+
+            new CreateIndexOperation(TestIndex.IndexNameWithVersion())
+                    .WithMapping(selector => selector.Map<Sample.StringValue.SampleDocumentWithValue>(m => m.AutoMap()))
+                    .Execute(ElasticClient);
+
+            new CreateIndexOperation(TestIndex.NextIndexNameWithVersion())
+                .WithMapping(selector => selector.Map<Sample.IntValue.SampleDocumentWithValue>(m => m.AutoMap()))
+                .Execute(ElasticClient);
+
+            ElasticClient.Index(objectWithStringField1, idx => idx.Index(TestIndex.IndexNameWithVersion()));
+            ElasticClient.Index(objectWithStringField2, idx => idx.Index(TestIndex.NextIndexNameWithVersion()));
+
+            ElasticClient.Refresh(Indices.All);
+
+            Assert.Throws<AggregateException>(() =>
+                new BatchUpdateOperation<JObject, JObject>(
+                    selector => selector
+                        .FromIndex(TestIndex.IndexNameWithVersion())
+                        .ToIndex(TestIndex.NextIndexNameWithVersion())
+                        .Type<Sample.StringValue.SampleDocumentWithValue>()
+                        .Transformation(model => model))
+                        .Execute(ElasticClient));
         }
     }
 }

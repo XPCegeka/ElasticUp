@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
+using ElasticUp.Util;
 using Nest;
 using static ElasticUp.Validations.IndexValidations;
 using static ElasticUp.Validations.StringValidations;
@@ -105,7 +106,9 @@ namespace ElasticUp.Operation.Reindex
                 }
             }
 
-            elasticClient.Bulk(bulkDescriptor);
+
+            var bulkResponse = elasticClient.Bulk(bulkDescriptor);
+            if (!bulkResponse.IsValid) throw new ElasticUpException("BatchUpdateOperation: failed to bulkIndex models:" + bulkResponse.DebugInformation);
         }
 
         protected IEnumerable<TransformedDocument<TTransformFromType, TTransformToType>> TransformDocuments(IEnumerable<IHit<TTransformFromType>> hits)
