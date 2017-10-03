@@ -1,7 +1,11 @@
 using System;
 using System.Linq;
+using System.Threading;
 using ElasticUp.History;
+using ElasticUp.Migration;
+using ElasticUp.Operation.Reindex;
 using ElasticUp.Tests.Sample;
+using ElasticUp.Util;
 using FluentAssertions;
 using Nest;
 using NUnit.Framework;
@@ -68,6 +72,28 @@ namespace ElasticUp.Tests.ElasticUpFullStackTests
         }
 
         [Test]
+        public void ElasticUp_FullStackTest_FromAndToIndexIdentical_Exception()
+        {
+            ElasticClient.Index(new SampleDocument { Id = "1", Name = "Jabba/The/Hut" }, id => id.Index(TestIndex.AliasName));
+            ElasticClient.Refresh(Indices.All);
+
+            // Run migration: reindex and update document
+            try
+            {
+                new ElasticUp(ElasticClient)
+                    .WithMigrationHistoryIndexAliasName(MigrationHistoryTestIndex.AliasName)
+                    .Migration(new MigrationToIdenticalIndex(TestIndex))
+                    .Run();
+
+                throw new AssertionException("The above code should throw an error");
+            }
+            catch (Exception e)
+            {
+                //all is well here on the dark side
+            }
+        }
+
+        [Test]
         public void WhenAddingAMigration_MakeSureAllMigrationNamesAreUnique()
         {
             Assert.Throws<ArgumentException>(() =>
@@ -77,5 +103,30 @@ namespace ElasticUp.Tests.ElasticUpFullStackTests
         }
 
 
+    }
+
+    class MigrationToIdenticalIndex : ElasticUpCustomMigration
+    {
+        private readonly VersionedIndexName _testIndex;
+
+        public MigrationToIdenticalIndex(VersionedIndexName testIndex)
+        {
+            _testIndex = testIndex;
+        }
+
+        protected override void DefineOperations()
+        {
+            Operations.Add(new BatchUpdateOperation<SampleDocument, SampleDocument>(descriptor => descriptor
+                .FromIndex(_testIndex.IndexNameWithVersion())
+                .ToIndex(_testIndex.IndexNameWithVersion())
+                .FromType<SampleDocument>()
+                .ToType<SampleDocument>()
+                .Transformation(model =>
+                {
+                    model.Name = model.Name + " from Star Wars";
+                    return model;
+                })
+                .SearchDescriptor(sd => sd.MatchAll())));
+        }
     }
 }

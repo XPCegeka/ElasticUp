@@ -11,6 +11,7 @@ using FluentAssertions;
 using FluentAssertions.Formatting;
 using Nest;
 using Newtonsoft.Json.Linq;
+using NSubstitute.Routing.Handlers;
 using NUnit.Framework;
 
 namespace ElasticUp.Tests.Operation.Reindex
@@ -383,6 +384,44 @@ namespace ElasticUp.Tests.Operation.Reindex
                         .Type<Sample.StringValue.SampleDocumentWithValue>()
                         .Transformation(model => model))
                         .Execute(ElasticClient));
+        }
+
+        [Test]
+        public void TransformToSameIndex()
+        {
+            // GIVEN
+            var sampleObject1V1 = new SampleObjectWithId
+            {
+                Id = new ObjectId { Type = "TestId", Sequence = 1 },
+                Number = 1
+            };
+
+            ElasticClient.IndexMany(new List<SampleObjectWithId>
+            {
+                sampleObject1V1
+            }, TestIndex.IndexNameWithVersion());
+            ElasticClient.Refresh(Indices.All);
+
+            // TEST
+            var operation = new BatchUpdateOperation<SampleObjectWithId, SampleObjectWithId>(descriptor => descriptor
+                .UsingSameIndexAndIncrementingVersion(TestIndex.IndexNameWithVersion())
+                .FromType<SampleObjectWithId>()
+                .ToType<SampleObjectWithId>()
+                .Transformation(model =>
+                {
+                    model.Number = model.Number + 5;
+                    return model;
+                })
+                .SearchDescriptor(sd => sd.MatchAll()));
+
+            operation.Execute(ElasticClient);
+
+            // VERIFY
+            ElasticClient.Refresh(Indices.All);
+
+            var sampleObject1 = ElasticClient
+                .Get<SampleObjectWithId>($"TestId-1", desc => desc.Index(TestIndex.IndexNameWithVersion()));
+            sampleObject1.Source.Number.Should().Be(6);
         }
     }
 }

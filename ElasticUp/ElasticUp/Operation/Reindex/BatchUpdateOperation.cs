@@ -86,13 +86,18 @@ namespace ElasticUp.Operation.Reindex
 
                 if (document.Hit.Version.HasValue)
                 {
+                    var version = document.Hit.Version;
+                    if (_arguments.IncrementVersionInSameIndex)
+                    {
+                        version++;
+                    }
                     bulkDescriptor.Index<object>(
                         descr => descr
                             .Index(_arguments.ToIndexName)
                             .Id(document.Hit.Id)
                             .Type(_arguments.ToTypeName)
                             .VersionType(VersionType.External)
-                            .Version(document.Hit.Version)
+                            .Version(version)
                             .Document(document.TransformedHit));
                 }
                 else

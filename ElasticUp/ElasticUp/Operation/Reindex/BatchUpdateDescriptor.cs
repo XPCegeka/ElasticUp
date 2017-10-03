@@ -16,6 +16,7 @@ namespace ElasticUp.Operation.Reindex
         public string FromTypeName { get; set; }
         public string ToIndexName { get; set; }
         public string ToTypeName { get; set; }
+        public bool IncrementVersionInSameIndex { get; set; }
 
         public Func<SearchDescriptor<TTransformFrom>, ISearchRequest> SearchDescriptor { get; set; } = s => s;
         public Func<TTransformFrom, TTransformTo> Transformation { get; set; } = t => t as TTransformTo;
@@ -32,6 +33,14 @@ namespace ElasticUp.Operation.Reindex
             BatchUpdateArguments = new BatchUpdateArguments<TTransformFrom, TTransformTo>();
             FromType<TTransformFrom>();
             ToType<TTransformTo>();
+        }
+
+        public BatchUpdateDescriptor<TTransformFrom, TTransformTo> UsingSameIndexAndIncrementingVersion(string indexName)
+        {
+            BatchUpdateArguments.FromIndexName = indexName?.ToLowerInvariant();
+            BatchUpdateArguments.ToIndexName = indexName?.ToLowerInvariant();
+            BatchUpdateArguments.IncrementVersionInSameIndex = true;
+            return this;
         }
 
         public BatchUpdateDescriptor<TTransformFrom, TTransformTo> FromIndex(string fromIndexName)
