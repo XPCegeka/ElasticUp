@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helper\IndexHelper.cs" />
+    <Compile Include="Helper\IndexSettingsForBulkHelper.cs" />
     <Compile Include="History\ElasticUpMigrationHistoryConfig.cs" />
     <Compile Include="Util\ElasticUpException.cs" />
     <Compile Include="Util\ElasticUpTimer.cs" />

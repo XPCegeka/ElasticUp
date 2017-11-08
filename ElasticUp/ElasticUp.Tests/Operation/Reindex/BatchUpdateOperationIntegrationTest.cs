@@ -21,7 +21,7 @@ namespace ElasticUp.Tests.Operation.Reindex
         {
             CreateIndex(TestIndex.NextVersion().NextIndexNameWithVersion());
 
-            const int expectedDocumentCount = 1000;
+            const int expectedDocumentCount = 11000;
             BulkIndexSampleObjects(expectedDocumentCount, expectedDocumentCount);
             Thread.Sleep(TimeSpan.FromSeconds(5)); //wait for elastic to do it's thing
 
@@ -38,7 +38,7 @@ namespace ElasticUp.Tests.Operation.Reindex
                     .DegreeOfParallellism(1)
                     .Transformation(doc =>
                     {
-                        processedDocumentCount++;
+                        Interlocked.Increment(ref processedDocumentCount);
                         return doc;
                     })).Execute(ElasticClient);
             }
@@ -53,7 +53,7 @@ namespace ElasticUp.Tests.Operation.Reindex
 
             //WHEN BATCHUPDATE WITH PARALLEL
             processedDocumentCount = 0;
-            var timerWithParallel = new ElasticUpTimer("WithoutParallellism");
+            var timerWithParallel = new ElasticUpTimer("WithParallellism");
             using (timerWithParallel)
             {
                 new BatchUpdateOperation<SampleObject, SampleObject>(descriptor => descriptor
@@ -62,7 +62,7 @@ namespace ElasticUp.Tests.Operation.Reindex
                     .DegreeOfParallellism(5)
                     .Transformation(doc =>
                     {
-                        processedDocumentCount++;
+                        Interlocked.Increment(ref processedDocumentCount);
                         return doc;
                     })
                 ).Execute(ElasticClient);
@@ -128,7 +128,7 @@ namespace ElasticUp.Tests.Operation.Reindex
                 .Transformation(doc =>
                 {
                     doc["number"] = 666;
-                    processedRecordCount++;
+                    Interlocked.Increment(ref processedRecordCount);
                     return doc;
                 }));
 

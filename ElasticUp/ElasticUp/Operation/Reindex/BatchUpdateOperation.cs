@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 using Elasticsearch.Net;
+using ElasticUp.Helper;
 using ElasticUp.Util;
 using Nest;
 using static ElasticUp.Validations.IndexValidations;
@@ -35,35 +37,61 @@ namespace ElasticUp.Operation.Reindex
                 .IndexExists(_arguments.ToIndexName);
         }
 
-        public async Task Search(IElasticClient elasticClient, BufferBlock<IEnumerable<IHit<TTransformFromType>>> bufferQueue)
-        {
-            var searchResponse = Search(elasticClient);
-            if (!searchResponse.Documents.Any()) { bufferQueue.Complete(); return; }
-
-            do
-            {
-                await bufferQueue.SendAsync(searchResponse.Hits);
-                searchResponse = elasticClient.Scroll<TTransformFromType>(_arguments.ScrollTimeout, searchResponse.ScrollId);
-            }
-            while (searchResponse.Documents.Any());
-            bufferQueue.Complete();
-        }
-
         public override void Execute(IElasticClient elasticClient)
         {
-            var buffer = new BufferBlock<IEnumerable<IHit<TTransformFromType>>>(new DataflowBlockOptions { BoundedCapacity = _arguments.DegreeOfBatchParallellism * 2 });
+            using (new IndexSettingsForBulkHelper(elasticClient, _arguments.ToIndexName))
+            {
+                var cancellationToken = new CancellationTokenSource();
+                var collectionQueue = new BlockingCollection<ISearchResponse<TTransformFromType>>(new ConcurrentQueue<ISearchResponse<TTransformFromType>>(), 10);
+                
+                var tasks = new List<Task>();
 
-            var consumer = new ActionBlock<IEnumerable<IHit<TTransformFromType>>>(
-                                        hits => ProcessHits(elasticClient, hits),
-                                        new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _arguments.DegreeOfBatchParallellism });
-            
-            buffer.LinkTo(consumer, new DataflowLinkOptions { PropagateCompletion = true });
+                var producer = new TaskProducer<TTransformFromType, TTransformToType>(collectionQueue, elasticClient, _arguments, cancellationToken);
+                var producerTask = Task.Run(() => producer.ProduceTasks());
+                tasks.Add(producerTask);
 
-            var producer = Search(elasticClient, buffer);
+                for (var i = 0; i < _arguments.DegreeOfParallellism; i++)
+                {
+                    var consumer = new TaskConsumer<TTransformFromType, TTransformToType>(collectionQueue, elasticClient, _arguments, cancellationToken);
+                    var consumerTask = Task.Run(() => consumer.ConsumeTasks());
+                    tasks.Add(consumerTask);
+                }
+                
+                Task.WaitAll(tasks.ToArray());
+            }
+        }
+    }
 
-            // Wait for everything to complete.
-            Task.WaitAll(producer);
-            consumer.Completion.Wait();
+    public class TaskProducer<TTransformFromType, TTransformToType>
+        where TTransformFromType : class
+        where TTransformToType : class
+    {
+        private readonly IElasticClient _elasticClient;
+        private readonly BlockingCollection<ISearchResponse<TTransformFromType>> _taskQueue;
+        private readonly BatchUpdateArguments<TTransformFromType, TTransformToType> _arguments;
+        private readonly CancellationTokenSource _cts;
+
+        public TaskProducer(BlockingCollection<ISearchResponse<TTransformFromType>> taskQueue, IElasticClient elasticClient,  BatchUpdateArguments<TTransformFromType, TTransformToType> arguments, CancellationTokenSource cts)
+        {
+            _elasticClient = elasticClient;
+            _arguments = arguments;
+            _cts = cts;
+            _taskQueue = taskQueue;
+        }
+
+        public void ProduceTasks()
+        {
+            var searchResponse = Search(_elasticClient);
+            if (!searchResponse.Documents.Any()) return;
+            Console.WriteLine($"Need to process {searchResponse.Total} items");
+
+            while (searchResponse.Documents.Any() && !_cts.IsCancellationRequested)
+            {
+                _taskQueue.TryAdd(searchResponse, Int32.MaxValue);
+                Console.WriteLine($"Added {searchResponse.Hits.Count()} items");
+                searchResponse = _elasticClient.Scroll<TTransformFromType>(_arguments.ScrollTimeout, searchResponse.ScrollId);
+            }
+            _taskQueue.CompleteAdding();
         }
 
         protected ISearchResponse<TTransformFromType> Search(IElasticClient elasticClient)
@@ -76,18 +104,62 @@ namespace ElasticUp.Operation.Reindex
                     .Scroll(_arguments.ScrollTimeout)
                     .Size(_arguments.BatchSize)));
         }
+    }
+
+    public class TaskConsumer<TTransformFromType, TTransformToType>
+        where TTransformFromType : class
+        where TTransformToType : class
+    {
+        private readonly IElasticClient _elasticClient;
+        private BlockingCollection<ISearchResponse<TTransformFromType>> _taskQueue;
+        private readonly BatchUpdateArguments<TTransformFromType, TTransformToType> _arguments;
+        private readonly CancellationTokenSource _cts;
+
+        public TaskConsumer(BlockingCollection<ISearchResponse<TTransformFromType>> taskQueue, IElasticClient elasticClient, BatchUpdateArguments<TTransformFromType, TTransformToType> arguments, CancellationTokenSource cts)
+        {
+            _elasticClient = elasticClient;
+            _arguments = arguments;
+            _cts = cts;
+            _taskQueue = taskQueue;
+        }
+
+        public void ConsumeTasks()
+        {
+
+            while (!_taskQueue.IsCompleted && !_cts.IsCancellationRequested)
+            {
+                ISearchResponse<TTransformFromType> response;
+                bool success = _taskQueue.TryTake(out response, Int32.MaxValue);
+                if (success)
+                {
+                    try
+                    {
+                        ProcessHits(_elasticClient, response.Hits);
+                    }
+                    catch (Exception)
+                    {
+                        _cts.Cancel();
+                        throw;
+                    }
+                }
+            }
+            Console.WriteLine($"All items processed");
+
+        }
 
         protected virtual void ProcessHits(IElasticClient elasticClient, IEnumerable<IHit<TTransformFromType>> hits)
         {
             var transformedDocuments = TransformDocuments(hits).ToList();
-            BulkIndex(elasticClient, transformedDocuments);
 
-            Parallel.ForEach(
-                transformedDocuments, 
-                new ParallelOptions { MaxDegreeOfParallelism = _arguments.DegreeOfTransformationParallellism }, 
-                doc => _arguments.OnDocumentProcessed?.Invoke(doc.TransformedHit));
-            
-            //transformedDocuments.ForEach(doc => _arguments.OnDocumentProcessed?.Invoke(doc.TransformedHit));
+            using (new ElasticUpTimer("Bulkindex timer"))
+            {
+                BulkIndex(elasticClient, transformedDocuments);
+            }
+
+            if (_arguments.OnDocumentProcessed != null)
+            {
+                transformedDocuments.ForEach(doc => _arguments.OnDocumentProcessed?.Invoke(doc.TransformedHit));
+            }
         }
 
         protected void BulkIndex(IElasticClient elasticClient, IEnumerable<TransformedDocument<TTransformFromType, TTransformToType>> transformedDocuments)
@@ -128,7 +200,10 @@ namespace ElasticUp.Operation.Reindex
 
 
             var bulkResponse = elasticClient.Bulk(bulkDescriptor);
-            if (!bulkResponse.IsValid) throw new ElasticUpException("BatchUpdateOperation: failed to bulkIndex models:" + bulkResponse.DebugInformation);
+            if (!bulkResponse.IsValid)
+            {
+                throw new ElasticUpException("BatchUpdateOperation: failed to bulkIndex models:" + bulkResponse.DebugInformation);
+            }
         }
 
         protected IEnumerable<TransformedDocument<TTransformFromType, TTransformToType>> TransformDocuments(IEnumerable<IHit<TTransformFromType>> hits)
