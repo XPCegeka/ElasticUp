@@ -88,7 +88,6 @@ namespace ElasticUp.Operation.Reindex
             while (searchResponse.Documents.Any() && !_cts.IsCancellationRequested)
             {
                 _taskQueue.TryAdd(searchResponse, Int32.MaxValue);
-                Console.WriteLine($"Added {searchResponse.Hits.Count()} items");
                 searchResponse = _elasticClient.Scroll<TTransformFromType>(_arguments.ScrollTimeout, searchResponse.ScrollId);
             }
             _taskQueue.CompleteAdding();
@@ -143,18 +142,16 @@ namespace ElasticUp.Operation.Reindex
                     }
                 }
             }
-            Console.WriteLine($"All items processed");
-
         }
 
         protected virtual void ProcessHits(IElasticClient elasticClient, IEnumerable<IHit<TTransformFromType>> hits)
         {
             var transformedDocuments = TransformDocuments(hits).ToList();
 
-            using (new ElasticUpTimer("Bulkindex timer"))
-            {
+            //using (new ElasticUpTimer($"Bulkindex batch of {_arguments.BatchSize} items in"))
+            //{
                 BulkIndex(elasticClient, transformedDocuments);
-            }
+            //}
 
             if (_arguments.OnDocumentProcessed != null)
             {
