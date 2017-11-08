@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using System.Threading;
 using ElasticUp.Operation.Index;
-using ElasticUp.Operation.Mapping;
 using ElasticUp.Operation.Reindex;
 using ElasticUp.Tests.Sample;
-using ElasticUp.Tests.Sample.IntValue;
 using ElasticUp.Util;
 using FluentAssertions;
-using FluentAssertions.Formatting;
 using Nest;
 using Newtonsoft.Json.Linq;
-using NSubstitute.Routing.Handlers;
 using NUnit.Framework;
 
 namespace ElasticUp.Tests.Operation.Reindex
@@ -345,7 +341,11 @@ namespace ElasticUp.Tests.Operation.Reindex
                 .ToIndex(TestIndex.NextIndexNameWithVersion())
                 .OnDocumentProcessed(doc =>
                 {
-                    processedDocuments.Add(doc);
+                    lock (processedDocuments)
+                    {
+                        processedDocuments.Add(doc);
+                    }
+                    
                 }));
 
             operation.Execute(ElasticClient);

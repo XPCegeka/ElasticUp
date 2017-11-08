@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using Elasticsearch.Net;
 using ElasticUp.Util;
 using Nest;
@@ -35,26 +35,35 @@ namespace ElasticUp.Operation.Reindex
                 .IndexExists(_arguments.ToIndexName);
         }
 
-        public override void Execute(IElasticClient elasticClient)
+        public async Task Search(IElasticClient elasticClient, BufferBlock<IEnumerable<IHit<TTransformFromType>>> bufferQueue)
         {
-            if (_arguments.DegreeOfParallellism > 1) ThreadPool.SetMaxThreads(_arguments.DegreeOfParallellism,_arguments.DegreeOfParallellism);
-
             var searchResponse = Search(elasticClient);
-            if (!searchResponse.Documents.Any()) return;
-
-            var tasks = new List<Task>();
+            if (!searchResponse.Documents.Any()) { bufferQueue.Complete(); return; }
 
             do
             {
-                var hits = searchResponse.Hits;
-
-                if (_arguments.DegreeOfParallellism > 1) { tasks.Add(Task.Run(() => ProcessHits(elasticClient, hits))); }
-                else { ProcessHits(elasticClient, hits); }
+                await bufferQueue.SendAsync(searchResponse.Hits);
                 searchResponse = elasticClient.Scroll<TTransformFromType>(_arguments.ScrollTimeout, searchResponse.ScrollId);
             }
             while (searchResponse.Documents.Any());
+            bufferQueue.Complete();
+        }
 
-            if (tasks.Any()) Task.WaitAll(tasks.ToArray());
+        public override void Execute(IElasticClient elasticClient)
+        {
+            var buffer = new BufferBlock<IEnumerable<IHit<TTransformFromType>>>(new DataflowBlockOptions { BoundedCapacity = _arguments.DegreeOfBatchParallellism * 2 });
+
+            var consumer = new ActionBlock<IEnumerable<IHit<TTransformFromType>>>(
+                                        hits => ProcessHits(elasticClient, hits),
+                                        new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _arguments.DegreeOfBatchParallellism });
+            
+            buffer.LinkTo(consumer, new DataflowLinkOptions { PropagateCompletion = true });
+
+            var producer = Search(elasticClient, buffer);
+
+            // Wait for everything to complete.
+            Task.WaitAll(producer);
+            consumer.Completion.Wait();
         }
 
         protected ISearchResponse<TTransformFromType> Search(IElasticClient elasticClient)
@@ -72,7 +81,13 @@ namespace ElasticUp.Operation.Reindex
         {
             var transformedDocuments = TransformDocuments(hits).ToList();
             BulkIndex(elasticClient, transformedDocuments);
-            transformedDocuments.ForEach(doc => _arguments.OnDocumentProcessed?.Invoke(doc.TransformedHit));
+
+            Parallel.ForEach(
+                transformedDocuments, 
+                new ParallelOptions { MaxDegreeOfParallelism = _arguments.DegreeOfTransformationParallellism }, 
+                doc => _arguments.OnDocumentProcessed?.Invoke(doc.TransformedHit));
+            
+            //transformedDocuments.ForEach(doc => _arguments.OnDocumentProcessed?.Invoke(doc.TransformedHit));
         }
 
         protected void BulkIndex(IElasticClient elasticClient, IEnumerable<TransformedDocument<TTransformFromType, TTransformToType>> transformedDocuments)

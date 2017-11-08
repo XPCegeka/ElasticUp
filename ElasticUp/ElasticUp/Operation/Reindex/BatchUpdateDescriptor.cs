@@ -10,7 +10,8 @@ namespace ElasticUp.Operation.Reindex
         public Time ScrollTimeout => new Time(TimeSpan.FromSeconds(ScrollTimeoutInSeconds));
         public double ScrollTimeoutInSeconds = 360;
         public int BatchSize { get; set; } = 5000;
-        public int DegreeOfParallellism { get; set; } = 5;
+        public int DegreeOfBatchParallellism { get; set; } = 3;
+        public int DegreeOfTransformationParallellism { get; set; } = Environment.ProcessorCount;
 
         public string FromIndexName { get; set; }
         public string FromTypeName { get; set; }
@@ -113,10 +114,17 @@ namespace ElasticUp.Operation.Reindex
             return this;
         }
 
-        public BatchUpdateDescriptor<TTransformFrom, TTransformTo> DegreeOfParallellism(int degreeOfParallellism = 5)
+        public BatchUpdateDescriptor<TTransformFrom, TTransformTo> DegreeOfParallellism(int degreeOfParallellism = 3)
         {
             if (degreeOfParallellism <= 0) throw new ArgumentException($"{nameof(degreeOfParallellism)} cannot be negative or zero");
-            BatchUpdateArguments.DegreeOfParallellism = degreeOfParallellism;
+            BatchUpdateArguments.DegreeOfBatchParallellism = degreeOfParallellism;
+            return this;
+        }
+
+        public BatchUpdateDescriptor<TTransformFrom, TTransformTo> DegreeOfTransformationParallellism(int degreeOfParallellism = 10)
+        {
+            if (degreeOfParallellism <= 0) throw new ArgumentException($"{nameof(degreeOfParallellism)} cannot be negative or zero");
+            BatchUpdateArguments.DegreeOfTransformationParallellism = degreeOfParallellism;
             return this;
         }
 

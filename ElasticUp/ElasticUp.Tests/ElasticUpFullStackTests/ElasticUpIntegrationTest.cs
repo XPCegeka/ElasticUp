@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Threading;
 using ElasticUp.History;
 using ElasticUp.Migration;
 using ElasticUp.Operation.Reindex;
