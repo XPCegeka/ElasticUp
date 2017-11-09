@@ -13,6 +13,18 @@ using static ElasticUp.Validations.StringValidations;
 
 namespace ElasticUp.Operation.Reindex
 {
+
+    /// <summary>
+    /// This operation will 
+    /// - read documents from a given index (using an elasticsearch SearchDescriptor)
+    /// - transform the documents using your function
+    /// - reindex the documents to a given index (using bulk index)
+    /// 
+    /// The transformation and reindexing will happen in multiple threads according to 
+    /// 
+    /// </summary>
+    /// <typeparam name="TTransformFromType"></typeparam>
+    /// <typeparam name="TTransformToType"></typeparam>
     public class BatchUpdateOperation<TTransformFromType, TTransformToType> : AbstractElasticUpOperation
                         where TTransformFromType : class
                         where TTransformToType : class
@@ -39,10 +51,10 @@ namespace ElasticUp.Operation.Reindex
 
         public override void Execute(IElasticClient elasticClient)
         {
-            using (new IndexSettingsForBulkHelper(elasticClient, _arguments.ToIndexName))
+            using (new IndexSettingsForBulkHelper(elasticClient, _arguments.ToIndexName, _arguments.UseEfficientIndexSettingsForBulkIndexing))
             {
                 var cancellationToken = new CancellationTokenSource();
-                var collectionQueue = new BlockingCollection<ISearchResponse<TTransformFromType>>(new ConcurrentQueue<ISearchResponse<TTransformFromType>>(), 10);
+                var collectionQueue = new BlockingCollection<ISearchResponse<TTransformFromType>>(new ConcurrentQueue<ISearchResponse<TTransformFromType>>(), _arguments.DegreeOfParallellism * 10);
                 
                 var tasks = new List<Task>();
 
@@ -147,12 +159,9 @@ namespace ElasticUp.Operation.Reindex
         protected virtual void ProcessHits(IElasticClient elasticClient, IEnumerable<IHit<TTransformFromType>> hits)
         {
             var transformedDocuments = TransformDocuments(hits).ToList();
-
-            //using (new ElasticUpTimer($"Bulkindex batch of {_arguments.BatchSize} items in"))
-            //{
-                BulkIndex(elasticClient, transformedDocuments);
-            //}
-
+            
+            BulkIndex(elasticClient, transformedDocuments);
+            
             if (_arguments.OnDocumentProcessed != null)
             {
                 transformedDocuments.ForEach(doc => _arguments.OnDocumentProcessed?.Invoke(doc.TransformedHit));

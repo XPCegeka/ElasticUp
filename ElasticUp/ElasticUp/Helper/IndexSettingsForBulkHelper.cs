@@ -1,38 +1,49 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Nest;
 
 namespace ElasticUp.Helper
 {
     public class IndexSettingsForBulkHelper : IDisposable
     {
-        private readonly IElasticClient _elasticClient;
-        private readonly string _index;
-        private Time _settingsRefreshInterval;
-        private int? _settingsNumberOfReplicas;
+        public static readonly Time DefaultRefreshInterval = new Time(TimeSpan.FromSeconds(1));
+        public static readonly int DefaultNumberOfReplicas = 1;
 
-        public IndexSettingsForBulkHelper(IElasticClient elasticClient, string index)
+        private readonly IElasticClient _elasticClient;
+        private readonly bool _enabled = true;
+
+        private readonly string _index;
+        private Time _refreshInterval;
+        private int? _numberOfReplicas;
+
+        public IndexSettingsForBulkHelper(IElasticClient elasticClient, string index, bool enabled = true)
         {
             _elasticClient = elasticClient;
             _index = index;
+            _enabled = enabled;
 
             PrepareForBulkIndex();
         }
 
         private void PrepareForBulkIndex()
         {
-            var getIndexSettingsResponse = _elasticClient.GetIndexSettings(s => s.Index(_index));
-            _settingsRefreshInterval = getIndexSettingsResponse.Indices[_index].Settings.RefreshInterval;
-            _settingsNumberOfReplicas = getIndexSettingsResponse.Indices[_index].Settings.NumberOfReplicas;
-            _elasticClient.UpdateIndexSettings(_index, s => s.IndexSettings(p => p.NumberOfReplicas(0).RefreshInterval(new Time(-1))));
+            if (_enabled) { 
+                var settings = _elasticClient.GetIndexSettings(s => s.Index(_index)).Indices[_index].Settings;
+                _refreshInterval = settings.RefreshInterval;
+                _numberOfReplicas = settings.NumberOfReplicas;
+                _elasticClient.UpdateIndexSettings(_index, s => s.IndexSettings(p => p.NumberOfReplicas(0).RefreshInterval(new Time(-1))));
+            }
         }
 
         public void Dispose()
         {
-            _elasticClient.UpdateIndexSettings(_index, s => s.IndexSettings(p => p.NumberOfReplicas(_settingsNumberOfReplicas).RefreshInterval(_settingsRefreshInterval)));
+            if (_enabled)
+            {
+                _elasticClient
+                    .UpdateIndexSettings(_index, s => s
+                        .IndexSettings(p => p
+                            .NumberOfReplicas(_numberOfReplicas ?? DefaultNumberOfReplicas)
+                            .RefreshInterval(_refreshInterval ?? DefaultRefreshInterval)));
+            }
         }
     }
 }

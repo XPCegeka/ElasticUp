@@ -81,6 +81,7 @@
     <Compile Include="Extension\ReadOnlyIndexContextTest.cs" />
     <Compile Include="Extension\ElasticClientExtensionsTest.cs" />
     <Compile Include="Helper\IndexHelperIntegrationTest.cs" />
+    <Compile Include="Helper\IndexSettingsForBulkHelperIntegrationTest.cs" />
     <Compile Include="History\MigrationHistoryHelperTest.cs" />
     <Compile Include="Infrastructure\ResourceUtilities.cs" />
     <Compile Include="Operation\Alias\SwitchAliasOperationIntegrationTest.cs" />
