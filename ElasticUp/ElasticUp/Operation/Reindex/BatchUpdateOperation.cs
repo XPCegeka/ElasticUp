@@ -94,7 +94,11 @@ namespace ElasticUp.Operation.Reindex
         public void ProduceTasks()
         {
             var searchResponse = Search(_elasticClient);
-            if (!searchResponse.Documents.Any()) return;
+            if (!searchResponse.Documents.Any())
+            {
+                _taskQueue.CompleteAdding();
+                return;
+            }
             Console.WriteLine($"Need to process {searchResponse.Total} items");
 
             while (searchResponse.Documents.Any() && !_cts.IsCancellationRequested)
