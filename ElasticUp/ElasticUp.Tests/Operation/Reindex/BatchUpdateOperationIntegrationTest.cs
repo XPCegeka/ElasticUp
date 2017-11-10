@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using ElasticUp.Operation.Index;
 using ElasticUp.Operation.Reindex;
 using ElasticUp.Tests.Sample;
@@ -387,7 +388,7 @@ namespace ElasticUp.Tests.Operation.Reindex
         }
 
         [Test]
-        public void TransformToSameIndex()
+        public void TransformToSameIndex_UsingSameIndexAndIncrementingVersion()
         {
             // GIVEN
             var sampleObject1V1 = new SampleObjectWithId
@@ -422,6 +423,24 @@ namespace ElasticUp.Tests.Operation.Reindex
             var sampleObject1 = ElasticClient
                 .Get<SampleObjectWithId>($"TestId-1", desc => desc.Index(TestIndex.IndexNameWithVersion()));
             sampleObject1.Source.Number.Should().Be(6);
+        }
+
+        [Test]
+        public void ZeroItemsToTransform_OperationCompletesWithoutProblems()
+        {
+            var operation = new BatchUpdateOperation<SampleObject, SampleObject>(s => s
+                .FromIndex(TestIndex.IndexNameWithVersion())
+                .ToIndex(TestIndex.NextIndexNameWithVersion()));
+
+            var task = Task.Run(() => operation.Execute(ElasticClient));
+            if (task.Wait(TimeSpan.FromSeconds(10)))
+            {
+                ElasticClient.Count<SampleObject>(s => s.Index(TestIndex.NextIndexNameWithVersion())).Count.Should().Be(0);
+            }
+            else
+            {
+                throw new Exception("There's nothing todo so the operation should have been finished already. Maybe we have a bug in the parallel code of BatchUpdateOperation");
+            }
         }
     }
 }

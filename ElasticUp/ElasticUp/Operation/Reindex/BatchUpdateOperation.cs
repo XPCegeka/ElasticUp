@@ -23,8 +23,6 @@ namespace ElasticUp.Operation.Reindex
     /// The transformation and reindexing will happen in multiple threads according to 
     /// 
     /// </summary>
-    /// <typeparam name="TTransformFromType"></typeparam>
-    /// <typeparam name="TTransformToType"></typeparam>
     public class BatchUpdateOperation<TTransformFromType, TTransformToType> : AbstractElasticUpOperation
                         where TTransformFromType : class
                         where TTransformToType : class
