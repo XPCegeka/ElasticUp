@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ElasticUp.Operation.Index;
@@ -441,6 +442,65 @@ namespace ElasticUp.Tests.Operation.Reindex
             {
                 throw new Exception("There's nothing todo so the operation should have been finished already. Maybe we have a bug in the parallel code of BatchUpdateOperation");
             }
+        }
+
+        [Test]
+        public void BatchUpdateUsesIdFromTransformedObjectIfItContainsAnId()
+        {
+            // GIVEN
+            var sampleObjectWithId1 = new SampleObjectWithId { Id = new ObjectId { Type = "TestId", Sequence = 0 } };
+            ElasticClient.Index(sampleObjectWithId1, idx => idx.Index(TestIndex.IndexNameWithVersion()));
+            ElasticClient.Refresh(Indices.All);
+
+            // TEST
+            var operation = new BatchUpdateOperation<SampleObjectWithId, SampleObjectWithId>(descriptor => descriptor
+                .FromIndex(TestIndex.IndexNameWithVersion())
+                .ToIndex(TestIndex.NextIndexNameWithVersion())
+                .FromType<SampleObjectWithId>()
+                .ToType<SampleObjectWithId>()
+                .Transformation(doc =>
+                {
+                    doc.Id.Type = $"{doc.Id.Type}2";
+                    return doc;
+                })
+                .SearchDescriptor(sd => sd.MatchAll()));
+
+            operation.Execute(ElasticClient);
+
+            // VERIFY
+            ElasticClient.Refresh(Indices.All);
+
+            var result = ElasticClient.Get<SampleObjectWithId>("TestId2-0", desc => desc.Index(TestIndex.NextIndexNameWithVersion()));
+            result.Id.Should().Be("TestId2-0");
+            
+            result.Source.Id.ToString().Should().Be("TestId2-0");
+        }
+
+        [Test]
+        public void BatchUpdateUsesIdFromHitIfObjectDoesNotContainsItsOwnId()
+        {
+            // GIVEN
+            var sample = new SampleObject { Number = 2 };
+            ElasticClient.Index(sample, idx => idx.Index(TestIndex.IndexNameWithVersion()));
+            ElasticClient.Refresh(Indices.All);
+            var id = ElasticClient.Search<SampleObject>(desc => desc.Index(TestIndex.IndexNameWithVersion()).MatchAll()).Hits.First().Id;
+
+            // TEST
+            var operation = new BatchUpdateOperation<SampleObject, SampleObject>(descriptor => descriptor
+                .FromIndex(TestIndex.IndexNameWithVersion())
+                .ToIndex(TestIndex.NextIndexNameWithVersion())
+                .FromType<SampleObject>()
+                .ToType<SampleObject>()
+                .Transformation(doc => doc)
+                .SearchDescriptor(sd => sd.MatchAll()));
+
+            operation.Execute(ElasticClient);
+
+            // VERIFY
+            ElasticClient.Refresh(Indices.All);
+
+            var result = ElasticClient.Search<SampleObject>(desc => desc.Index(TestIndex.NextIndexNameWithVersion()).MatchAll());
+            result.Hits.First().Id.Should().Be(id);
         }
     }
 }

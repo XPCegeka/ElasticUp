@@ -173,11 +173,16 @@ namespace ElasticUp.Operation.Reindex
         protected void BulkIndex(IElasticClient elasticClient, IEnumerable<TransformedDocument<TTransformFromType, TTransformToType>> transformedDocuments)
         {
             var bulkDescriptor = new BulkDescriptor();
+            var customIdProperty = typeof(TTransformToType).GetProperty("Id");
 
             foreach (var document in transformedDocuments)
             {
                 if (document.TransformedHit == null)
                     continue;
+
+                var id = customIdProperty != null 
+                            ? customIdProperty.GetValue(document.TransformedHit, null).ToString() 
+                            : document.Hit.Id;
 
                 if (document.Hit.Version.HasValue)
                 {
@@ -186,10 +191,11 @@ namespace ElasticUp.Operation.Reindex
                     {
                         version++;
                     }
+
                     bulkDescriptor.Index<object>(
                         descr => descr
                             .Index(_arguments.ToIndexName)
-                            .Id(document.Hit.Id)
+                            .Id(id)
                             .Type(_arguments.ToTypeName)
                             .VersionType(VersionType.External)
                             .Version(version)
@@ -200,7 +206,7 @@ namespace ElasticUp.Operation.Reindex
                     bulkDescriptor.Index<object>(
                         descr => descr
                             .Index(_arguments.ToIndexName)
-                            .Id(document.Hit.Id)
+                            .Id(id)
                             .Type(_arguments.ToTypeName)
                             .Document(document.TransformedHit));
                 }
