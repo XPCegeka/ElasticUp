@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using ElasticUp.Helper;
 using ElasticUp.History;
@@ -15,6 +16,7 @@ namespace ElasticUp
         private string _migrationHistoryIndexAliasName = typeof(ElasticUpMigrationHistory).Name.ToLowerInvariant();
 
         private readonly List<AbstractElasticUpMigration> _migrations = new List<AbstractElasticUpMigration>();
+        public ReadOnlyCollection<AbstractElasticUpMigration> Migrations => _migrations.AsReadOnly();
 
         public ElasticUp(string elasticSearchUrl)
         {
